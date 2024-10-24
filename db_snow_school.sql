@@ -8,6 +8,22 @@ CREATE TABLE activities (
     cost DECIMAL(10, 2) CHECK (cost > 0.0)
 );
 
+
+CREATE TABLE roles (
+    role_id INT AUTO_INCREMENT PRIMARY KEY,
+    role_name VARCHAR(20) NOT NULL
+);
+
+
+CREATE TABLE person(
+    person_ci INT PRIMARY KEY, 
+    name VARCHARCHAR(20) NOT NULL,
+    last_name VARCHAR(20) NOT NULL,
+    role_id INT AUTO_INCREMENT PRIMARY KEY,
+    CHECK (person_ci > 9999999)
+    FOREIGN KEY (role_id) REFERENCES roles(role_id)
+);
+
 CREATE TABLE equipment (
     equipment_id INT AUTO_INCREMENT PRIMARY KEY,
     activity_id INT,
@@ -116,3 +132,14 @@ INSERT INTO student_class (class_id, student_ci, equipment_id) VALUES
 
 insert into students (student_ci, first_name, last_name, birth_date) value
 (500000008,'Manuela', 'Guedez', '2005-01-18');
+
+INSERT INTO roles (role_name) VALUES
+('student'),
+('instructor'),
+('admin');
+
+INSERT INTO person (person_ci, name, last_name, role_id) VALUES
+(20000001, 'Lucas', 'Gray', 1),
+(10000002, 'Jane', 'Smith', 1),
+(10000001, 'Emily', 'White', 2),
+(10000003, 'Sophia', 'Green', 2),
