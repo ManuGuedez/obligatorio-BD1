@@ -1,5 +1,12 @@
 import mysql.connector as mysql
 
+import random
+import string
+import smtplib, secrets
+from datetime import datetime, timedelta
+from email.mime.text import MIMEText
+
+
 cnx = mysql.connect(user='root', password='rootpassword', host='127.0.0.1', database='snowSchool')
 cursor = cnx.cursor(dictionary=True) # devuelve la info en formato kwy-value
 
@@ -94,3 +101,83 @@ print(
 create_user({"ci": 500000008, "first_name": "Manuela", "last_name": "Guedez", "birth_date": "2005-01-18"}, "manuela@example.com", "manu1234")
 )
 
+
+####### PROBANDO IMPLEMENTACION DE OLVIDE CONTRAESÑA #############################################
+
+
+
+def generate_reset_token(email):
+    # Verificar si el email existe en la base de datos
+    query = f"SELECT email FROM login WHERE email = '{email}'"
+    cursor.execute(query)
+    user = cursor.fetchone()
+
+    if not user:
+        return "El email no está registrado"
+
+    # Generar un token único
+    token = secrets.token_urlsafe(32)
+
+    # Establecer un tiempo de expiración (por ejemplo, 1 hora)
+    expiration_time = datetime.now() + timedelta(hours=1)
+
+    # Almacenar el token y la expiración en la base de datos
+    query = f"UPDATE login SET reset_token = '{token}', token_expiration = '{expiration_time}' WHERE email = '{email}'"
+    cursor.execute(query)
+    cnx.commit()
+
+    # Enviar el correo con el token
+    send_reset_email(email, token)
+
+    return "Se ha enviado un correo con las instrucciones para restablecer su contraseña."
+
+
+def send_reset_email(email, token):
+    # Configurar el correo
+    reset_link = f"http://tuservidor.com/reset_password?token={token}"
+    subject = "Restablecer contraseña"
+    body = f"Haz clic en el siguiente enlace para restablecer tu contraseña: {reset_link}"
+
+    msg = MIMEText(body)
+    msg['Subject'] = subject
+    msg['From'] = "poseagus15@gmail.com"
+    msg['To'] = email
+
+    # Enviar el correo
+    try:
+        with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+            smtp.starttls()
+            smtp.login('tu_email@example.com', 'tu_password')
+            smtp.send_message(msg)
+            print(f"Correo enviado a {email}")
+    except Exception as e:
+        print(f"No se pudo enviar el correo: {e}")
+        
+        
+
+def reset_password(token, new_password):
+    # Verificar la validez del token
+    query = f"SELECT email, token_expiration FROM login WHERE reset_token = '{token}'"
+    cursor.execute(query)
+    data = cursor.fetchone()
+
+    if not data:
+        return "Token inválido"
+
+    # Verificar si el token ha expirado
+    if datetime.now() > data['token_expiration']:
+        return "El token ha expirado"
+
+    # Actualizar la contraseña en la base de datos
+    email = data['email']
+    query = f"UPDATE login SET password = '{new_password}', reset_token = NULL, token_expiration = NULL WHERE email = '{email}'"
+    cursor.execute(query)
+    cnx.commit()
+
+    return "Contraseña restablecida correctamente"
+
+# Ejemplo de uso
+print(generate_reset_token('persona1@example.com'))
+
+
+#########################################################################################################

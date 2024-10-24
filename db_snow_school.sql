@@ -15,14 +15,16 @@ CREATE TABLE roles (
 );
 
 
-CREATE TABLE person(
-    person_ci INT PRIMARY KEY, 
-    name VARCHARCHAR(20) NOT NULL,
+CREATE TABLE person (
+    person_ci INT,
+    name VARCHAR(20) NOT NULL,
     last_name VARCHAR(20) NOT NULL,
-    role_id INT AUTO_INCREMENT PRIMARY KEY,
-    CHECK (person_ci > 9999999)
+    role_id INT,
+    CHECK (person_ci > 9999999),
+    PRIMARY KEY (person_ci, role_id),
     FOREIGN KEY (role_id) REFERENCES roles(role_id)
 );
+
 
 CREATE TABLE equipment (
     equipment_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -60,6 +62,12 @@ CREATE TABLE login (
     student_ci INT,
     FOREIGN KEY (student_ci) REFERENCES students(student_ci)
 );
+
+-- Se puede agregar si no directo en el CREATE login de aca arriba
+ALTER TABLE login 
+ADD COLUMN reset_token VARCHAR(255),
+ADD COLUMN token_expiration DATETIME;
+------------------------------------------------------------------
 
 CREATE TABLE classes (
     class_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -142,4 +150,4 @@ INSERT INTO person (person_ci, name, last_name, role_id) VALUES
 (20000001, 'Lucas', 'Gray', 1),
 (10000002, 'Jane', 'Smith', 1),
 (10000001, 'Emily', 'White', 2),
-(10000003, 'Sophia', 'Green', 2),
+(10000003, 'Sophia', 'Green', 2);
