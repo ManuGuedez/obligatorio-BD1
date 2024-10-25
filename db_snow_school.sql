@@ -38,7 +38,8 @@ CREATE TABLE instructors (
     instructor_ci INT PRIMARY KEY,
     first_name VARCHAR(20) NOT NULL,
     last_name VARCHAR(20) NOT NULL,
-    CHECK (instructor_ci > 9999999)
+    CHECK (instructor_ci > 9999999),
+    FOREIGN KEY (instructor_ci) REFERENCES person(person_ci)
 );
 
 
@@ -53,14 +54,15 @@ CREATE TABLE students (
     first_name VARCHAR(20) NOT NULL,
     last_name VARCHAR(20) NOT NULL,
     birth_date DATE NOT NULL,
-    CHECK ( student_ci > 9999999 )
+    CHECK ( student_ci > 9999999 ),
+    FOREIGN KEY (student_ci) REFERENCES person(person_ci)
 );
 
 CREATE TABLE login (
     email VARCHAR(50) PRIMARY KEY,
     password VARCHAR(50) NOT NULL,
-    student_ci INT,
-    FOREIGN KEY (student_ci) REFERENCES students(student_ci)
+    person_ci INT,
+    FOREIGN KEY (person_ci) REFERENCES person(person_ci)
 );
 
 -- Se puede agregar si no directo en el CREATE login de aca arriba
@@ -90,13 +92,13 @@ CREATE TABLE student_class (
     FOREIGN KEY (equipment_id) REFERENCES equipment(equipment_id)
 );
 
--- primeras inserciones para ir probando las cosas
 
-INSERT INTO login (email, password, student_ci) VALUES
-('persona1@example.com', 'persona1', 20000001),
-('persona2@example.com', 'persona2', 20000002),
-('persona3@example.com', 'persona3', 20000003),
-('persona4@example.com', 'persona4', 20000004);
+INSERT INTO roles (role_name) VALUES
+('student'),
+('instructor'),
+('admin');
+
+-- primeras inserciones para ir probando las cosas
 
 INSERT INTO activities (description, cost) VALUES
 ('Snowboarding', 1500.00), -- id: 1
@@ -108,6 +110,16 @@ INSERT INTO equipment (activity_id, description, cost) VALUES
 (2, 'Ski set', 450.00),
 (2, 'Ski set', 450.00),
 (3, 'Snowmobile helmet', 300.00);
+
+INSERT INTO person (person_ci, name, last_name, role_id) VALUES
+(20000001, 'Lucas', 'Gray', 1),
+(20000002, 'Olivia', 'Blue', 1),
+(20000003, 'Noah', 'Black', 1),
+(20000004, 'Emma', 'Red', 1),
+(10000001, 'Emily', 'White', 2),
+(10000002, 'Michael', 'Black', 2),
+(10000003, 'Sophia', 'Green', 2),
+(10000004, 'Daniel', 'Brown', 2);
 
 INSERT INTO instructors (instructor_ci, first_name, last_name) VALUES
 (10000001, 'Emily', 'White'),
@@ -133,21 +145,27 @@ INSERT INTO classes (instructor_ci, activity_id, turn_id, is_held) VALUES
 (10000004, 2, 3, FALSE);
 
 INSERT INTO student_class (class_id, student_ci, equipment_id) VALUES
-(5, 20000001, 1),  -- Lucas Gray takes snowboarding class and rents a snowboard
-(6, 20000002, 2),  -- Olivia Blue takes skiing class and rents ski set
-(7, 20000003, 4),  -- Noah Black takes snowmobile class and rents helmet
-(8, 20000004, 3);  -- Emma Red takes skiing class and rents ski set
+(1, 20000001, 1),  -- Lucas Gray takes snowboarding class and rents a snowboard
+(2, 20000002, 2),  -- Olivia Blue takes skiing class and rents ski set
+(3, 20000003, 4),  -- Noah Black takes snowmobile class and rents helmet
+(2, 20000004, 3);  -- Emma Red takes skiing class and rents ski set
+
+insert into person (person_ci, name, last_name, role_id) value
+(500000008, 'Manuela', 'Guedez', 1);
+
+insert into person (person_ci, name, last_name, role_id) value
+(500000005, 'nombrePrueba', 'apellidoPrueba', 1);
 
 insert into students (student_ci, first_name, last_name, birth_date) value
 (500000008,'Manuela', 'Guedez', '2005-01-18');
 
-INSERT INTO roles (role_name) VALUES
-('student'),
-('instructor'),
-('admin');
+insert into students (student_ci, first_name, last_name, birth_date) value
+(500000005,'nombrePrueba', 'apellidoPrueba', '2000-01-01');
 
-INSERT INTO person (person_ci, name, last_name, role_id) VALUES
-(20000001, 'Lucas', 'Gray', 1),
-(10000002, 'Jane', 'Smith', 1),
-(10000001, 'Emily', 'White', 2),
-(10000003, 'Sophia', 'Green', 2);
+INSERT INTO login (email, password, person_ci) VALUES
+('persona1@example.com', 'persona1', 20000001),
+('persona2@example.com', 'persona2', 20000002),
+('persona3@example.com', 'persona3', 20000003),
+('persona4@example.com', 'persona4', 20000004);
+
+SELECT login.person_ci FROM login WHERE login.email = 'manuela@example.com' AND login.password = 'manu1234'
