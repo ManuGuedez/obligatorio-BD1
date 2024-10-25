@@ -25,15 +25,6 @@ body {
   padding: 2rem;
 }
 
-.app-title {
-  color: white;
-  font-size: 3rem;
-  font-weight: 700;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-  margin-bottom: 4rem;
-  text-align: center;
-  width: 100%;
-}
 
 @media (max-width: 480px) {
   .app-container {
@@ -44,4 +35,23 @@ body {
     font-size: 2rem;
     margin-bottom: 2rem;
   }
+}
+
+.title-container {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 2rem;
+  padding: 0 1rem;
+}
+
+.app-title {
+  font-size: 2rem;
+  color: #ffffff;
+}
+
+.ucu-logo {
+  width: 50px;
+  height: auto;
+  margin-left: 20px;
 }
