@@ -94,13 +94,13 @@ def validate_user(email, password):
     """
         Valdia la existencia del usuario en la base de datos.
     """
-    query =  query = f"SELECT login.person_ci FROM login WHERE login.email = \'{email}\' AND login.password = \'{password}\'"
+    query =  query = f"SELECT login.person_ci, login.role_id FROM login WHERE login.email = \'{email}\' AND login.password = \'{password}\'"
     cursor.execute(query)
     data = cursor.fetchall()
     
     if len(data) > 0:
-        return data[0]["person_ci"]
-    return None
+        return data[0]['person_ci'], data[0]['role_id']
+    return None, None
 
 
 def validate_instructor(instructor):
@@ -159,3 +159,26 @@ def create_instructor_account(instructor, email, password):
     cnx.commit()
  
     return result, message
+
+def get_role(role_id):
+    query = f'SELECT roles.role_name FROM roles WHERE roles.role_id = {role_id}'
+    cursor.execute(query)
+    data = cursor.fetchall()
+    
+    if len(data) > 0:
+        return data[0].get('role_name')
+    return None
+
+def modify_class(class_id, new_turn_id):
+
+    query = f"UPDATE classes SET turn_id = {new_turn_id} WHERE class_id = {class_id}"
+    
+    try:
+        cursor.execute(query)
+        cnx.commit()  
+        if cursor.rowcount > 0:
+            return 1, "Turno de la clase modificado exitosamente."
+        else:
+            return -1, "No se encontró la clase con el ID especificado o el turno ya estaba actualizado."
+    except mysql.Error as err:
+        return -1, f"Error al modificar la clase: {err}"

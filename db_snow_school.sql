@@ -64,7 +64,7 @@ CREATE TABLE login (
     FOREIGN KEY (person_ci) REFERENCES person(person_ci)
 );
 
-------------------------------------------------------------------
+-- ----------------------------------------------------------------
 
 CREATE TABLE classes (
     class_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -164,3 +164,18 @@ INSERT INTO login (email, password, person_ci) VALUES
 ('persona4@example.com', 'persona4', 20000004);
 
 SELECT login.person_ci FROM login WHERE login.email = 'manuela@example.com' AND login.password = 'manu1234'
+
+ALTER TABLE login
+ADD role_id INT;
+
+ALTER TABLE login
+ADD CONSTRAINT fk_role
+FOREIGN KEY (role_id) REFERENCES roles(role_id);
+
+UPDATE login
+SET role_id = 1;  -- Reemplaza '1' por el ID del rol 'student' si es diferente
+
+
+-- (10000001, 'Emily', 'White'), agrego instructor para pruebas en el be de python 
+insert into login (email, password, person_ci, role_id) values
+('emily.white@example.com', 'emily1234', 10000001, 2);
