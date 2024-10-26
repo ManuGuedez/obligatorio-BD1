@@ -1,4 +1,3 @@
-CREATE DATABASE snowSchool;
 
 USE snowSchool;
 
@@ -65,10 +64,6 @@ CREATE TABLE login (
     FOREIGN KEY (person_ci) REFERENCES person(person_ci)
 );
 
--- Se puede agregar si no directo en el CREATE login de aca arriba
-ALTER TABLE login 
-ADD COLUMN reset_token VARCHAR(255),
-ADD COLUMN token_expiration DATETIME;
 ------------------------------------------------------------------
 
 CREATE TABLE classes (
