@@ -69,7 +69,8 @@ def create_student_account(student, email, password):
         return -1, message
     
     ci = student["ci"]
-    query = f"INSERT INTO login (email, password, person_ci) VALUE (\'{email}\', \'{password}\', {ci})"
+    role_id = get_role_id('student')
+    query = f"INSERT INTO login (email, password, person_ci, role_id) VALUE (\'{email}\', \'{password}\', {ci}, {role_id})"
     cursor.execute(query)
     result = cursor.rowcount
     
@@ -143,7 +144,8 @@ def create_instructor_account(instructor, email, password):
         return -1, message
     
     ci = instructor["ci"]
-    query = f"INSERT INTO login (email, password, person_ci) VALUE (\'{email}\', \'{password}\', {ci})"
+    role_id = get_role_id('instructor')
+    query = f"INSERT INTO login (email, password, person_ci, role_id) VALUE (\'{email}\', \'{password}\', {ci})"
     cursor.execute(query)
     result = cursor.rowcount
     
@@ -169,6 +171,15 @@ def get_role(role_id):
         return data[0].get('role_name')
     return None
 
+def get_role_id(role):
+    query = f'SELECT roles.role_id FROM roles WHERE role_name = \'{role}\''
+    cursor.execute(query)
+    data = cursor.fetchall()
+    
+    if len(data) > 0:
+        return data[0]['role_id']
+    return -1            
+
 def modify_class(class_id, new_turn_id):
 
     query = f"UPDATE classes SET turn_id = {new_turn_id} WHERE class_id = {class_id}"
@@ -182,3 +193,28 @@ def modify_class(class_id, new_turn_id):
             return -1, "No se encontró la clase con el ID especificado o el turno ya estaba actualizado."
     except mysql.Error as err:
         return -1, f"Error al modificar la clase: {err}"
+    
+    
+def modify_students_class(class_id, student_ci, action):
+    match action:
+        case 'add':
+            query = f"INSERT INTO student_class (class_id, student_ci) VALUES ({class_id}, {student_ci})"
+            try:
+                cursor.execute(query)
+                cnx.commit()
+                return 1, "Alumno agregado a la clase exitosamente."
+            except mysql.Error as err:
+                return -1, f"Error al agregar el alumno: {err}"
+        case 'delete':    
+            query = f"DELETE FROM student_class WHERE class_id = {class_id} AND student_ci = {student_ci}"
+            try:
+                cursor.execute(query)
+                cnx.commit()
+                if cursor.rowcount > 0:
+                    return 1, "Alumno quitado de la clase exitosamente."
+                else:
+                    return -1, "No se encontró el alumno en la clase especificada."
+            except mysql.Error as err:
+                return -1, f"Error al quitar el alumno: {err}"
+        case _:
+            return -1, "Acción no válida. Use 'add' o 'delete'."

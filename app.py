@@ -1,10 +1,13 @@
 from flask import Flask, jsonify, request
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, get_jwt, jwt_required
 import services
+from datetime import timedelta
 
 app = Flask(__name__)
 
-app.config['JWT_SECRET_KEY'] = 'obligatorio-bd-2024'  # Cambia esto por una clave secreta real
+app.config['JWT_SECRET_KEY'] = 'obligatorio-bd-2024'
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=15) # esto para que el token expire cada 15 min
+
 jwt = JWTManager(app)
 
 @app.route('/login', methods=['POST'])
@@ -53,9 +56,9 @@ def register_user():
         return jsonify({'msg': message}), 400
 
     
-@app.route('/classes/<id>', methods=['PUT'])
+@app.route('/classes/<id>/turn', methods=['PUT'])
 @jwt_required()
-def modify_class(id):
+def modify_class_turn(id):
     data = request.get_json()
     claims = get_jwt()
     turn = data.get('turn') 
@@ -73,7 +76,38 @@ def modify_class(id):
     else:
         return jsonify({'msg': message}), 400
 
-        
+@app.route('/classes/<id>/students', methods=['PUT'])
+@jwt_required()
+def modify_class_students(id):
+    data = request.get_json()
+    user_ci = get_jwt_identity()
+    claims = get_jwt() 
+    action = data.get('action') 
+    
+    if not action:
+        return jsonify({"msg": "Debe ingresar la acción a realizar"}), 400
+
+    role = services.get_role(claims.get('role_id'))
+    
+    # agregar opción para administrator
+    match role:
+        case 'instructor':
+            student_ci = data.get('student_ci')
+                        
+            if not student_ci:
+                return jsonify({"msg": "Debe ingresar la ci del estudiante."}), 400
+            
+            result, message = services.modify_students_class(id, student_ci, action)            
+        case 'student': 
+            result, message = services.modify_students_class(id, user_ci, action)
+        case _:
+            return jsonify({"msg": "Rol inadecuado para realizar esta acción"}), 400
+
+    # modificación exitosa
+    if result > 0: 
+        return jsonify({'msg': message}), 200
+    else:
+        return jsonify({'msg': message}), 400
     
 
 if __name__ == '__main__':

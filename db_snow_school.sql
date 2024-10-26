@@ -176,6 +176,6 @@ UPDATE login
 SET role_id = 1;  -- Reemplaza '1' por el ID del rol 'student' si es diferente
 
 
--- (10000001, 'Emily', 'White'), agrego instructor para pruebas en el be de python 
+-- (10000001, 'Emily', 'White'), agrego instructor para pruebas en el be de python
 insert into login (email, password, person_ci, role_id) values
 ('emily.white@example.com', 'emily1234', 10000001, 2);
