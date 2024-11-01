@@ -1,0 +1,45 @@
+/*.class-card{
+    border: solid 1px;
+    margin: 5px;
+    border-radius: 5px;
+    padding: 7.5px;
+    width: max-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}*/
+.class-card{
+    background-color:rgba(173, 216, 230, 0.8);; /* Fondo blanco semitransparente */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para destacarlo */
+    margin: 10px;
+    color: #333; /* Color del texto */
+    max-width: 300px; /* Ancho máximo para las tarjetas */
+    border: 1px solid rgba(0, 0, 0, 0.1); /* Borde sutil */
+}
+
+.class-card h3 {
+    margin-top: 0;
+    font-size: 1.2em;
+    color: #333;
+}
+
+.class-card p {
+    margin: 5px 0;
+}
+
+.class-card button {
+    background-color: #333;
+    color: #fff;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.class-card button:hover {
+    background-color: #555;
+}

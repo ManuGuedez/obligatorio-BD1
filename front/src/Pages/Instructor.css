@@ -30,11 +30,16 @@
     line-height: 1.2; /* Espaciado entre líneas */
     letter-spacing: 0.5px; /* Ajusta el espaciado entre letras */
     border-bottom: solid 1px;
-    width: 50%;
+    width: 100%;
 
 }
 
 h2{
     font-weight: 600; /* Ajusta el grosor del texto para hacerlo más fino */
     font-size: 1.5em; /* Ajusta el tamaño según tu preferencia */
+}
+
+.instructor-dashboard2{
+    display: flex;
+    justify-content: space-between;
 }
