@@ -19,7 +19,7 @@ const NavBar = () => {
     return (
         <nav className="navbar">
             <div className="navbar-center">
-                <h1 className="app-title">Ucu Snowschool</h1>
+                <h1 className="app-title">UCU Snowschool</h1>
                 <img
                     src="https://upload.wikimedia.org/wikipedia/commons/6/63/UCU.png"
                     alt="Logo UCU"

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import Actividad from '../Components/Actividad';
 import './Alumno.css';
 
 const activities = [
@@ -47,33 +47,24 @@ const Alumno = () => {
 
     return (
         <div className="alumno-container">
-            <h2>Actividades</h2>
+            <div className="actividades-header">
+                <h2 className="actividades-title">Actividades</h2>
+            </div>
             <div className="activities-container">
                 {activities.map(activity => (
-                    <div key={activity.id} className="activity-card">
-                        <h3>{activity.name}</h3>
-                        <p>{activity.shortDescription}</p>
-                        <p><strong>Horario:</strong> {activity.schedule}</p>
-                        <button onClick={() => openModal(activity)} className="details-btn">Ver Detalles</button>
-                        <button
-                            onClick={() => toggleEnrollment(activity.id)}
-                            className={`enroll-btn ${enrolledActivities.includes(activity.id) ? 'enrolled' : ''}`}
-                        >
-                            {enrolledActivities.includes(activity.id) ? 'Darme de baja' : 'Inscribirme'}
-                        </button>
-                        <div className="equipment-switch">
-                            <label className="switch">
-                                <input type="checkbox" />
-                                <span className="slider round"></span>
-                            </label>
-                            <span className="equipment-label">Tengo equipamiento</span>
-                        </div>
-                    </div>
+                    <Actividad
+                        key={activity.id}
+                        activity={activity}
+                        openModal={openModal}
+                        toggleEnrollment={toggleEnrollment}
+                        enrolledActivities={enrolledActivities}
+                    />
                 ))}
             </div>
 
+            {/* Modal de Detalles */}
             {showModal && selectedActivity && (
-                <div className="modal">
+                <div className="modal-overlay">
                     <div className="modal-content">
                         <span className="close-btn" onClick={closeModal}>&times;</span>
                         <h3>{selectedActivity.name}</h3>
