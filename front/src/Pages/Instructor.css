@@ -1,0 +1,40 @@
+.instructor-dashboard {
+    height: 100%;
+    padding-top: 91.33px;
+    height: 100vh;
+    width: 100%;
+}
+
+#inspecciona {
+    text-transform: uppercase;
+    /* Convierte el texto a mayúsculas */
+    letter-spacing: 2px;
+    /* Ajusta el espacio entre letras */
+    color: rgb(14, 14, 41);
+
+}
+
+#root{
+    width: 100%;
+}
+
+.app-container{
+    display: flex;
+    align-items:flex-start;
+}
+
+.instructor-dashboard h1 {
+    font-family: 'Montserrat', sans-serif; /* Asegúrate de tener esta fuente, o usa otra similar */
+    font-weight: 600; /* Ajusta el grosor del texto para hacerlo más fino */
+    font-size: 2em; /* Ajusta el tamaño según tu preferencia */
+    line-height: 1.2; /* Espaciado entre líneas */
+    letter-spacing: 0.5px; /* Ajusta el espaciado entre letras */
+    border-bottom: solid 1px;
+    width: 50%;
+
+}
+
+h2{
+    font-weight: 600; /* Ajusta el grosor del texto para hacerlo más fino */
+    font-size: 1.5em; /* Ajusta el tamaño según tu preferencia */
+}

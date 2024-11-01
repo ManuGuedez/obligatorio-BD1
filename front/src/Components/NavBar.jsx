@@ -19,12 +19,13 @@ const NavBar = () => {
     return (
         <nav className="navbar">
             <div className="navbar-center">
-                <h1 className="app-title">Ucu Snowschool</h1>
                 <img
                     src="https://upload.wikimedia.org/wikipedia/commons/6/63/UCU.png"
                     alt="Logo UCU"
                     className="ucu-logo"
                 />
+                <p className="app-title">ucusnow</p>
+
             </div>
             <div className="menu-icon" onClick={toggleMenu}>
                 &#x22EE; {/* Tres puntos verticales */}
