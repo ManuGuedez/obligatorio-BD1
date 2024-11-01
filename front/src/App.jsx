@@ -1,26 +1,21 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'; 
-import Register from './Components/Register.jsx';
-import LogIn from './Components/LogIn.jsx'; 
-import Home from './Components/Home.jsx';  
+import Register from './Pages/Register.jsx';
+import LogIn from './Pages/LogIn.jsx';
+import Alumno from './Pages/Alumno.jsx';
+import NavBar from './Components/NavBar'; 
 import './App.css';
 
 const App = () => {
     return (
         <Router>
+            <NavBar />
             <div className="app-container">
-                <div className="title-container">
-                    <h1 className="app-title">Gestor UCU</h1>
-                    <img 
-                        src="https://upload.wikimedia.org/wikipedia/commons/6/63/UCU.png" 
-                        alt="Logo UCU" 
-                        className="ucu-logo"
-                    />
-                </div>
                 <Routes>
-                    <Route path="/" element={<Home />} />  
-                    <Route path="/Register" element={<Register />} /> 
-                    <Route path="/LogIn" element={<LogIn />} /> 
+                    <Route path="/" element={<Alumno />} />
+                    <Route path="/Register" element={<Register />} />
+                    <Route path="/LogIn" element={<LogIn />} />
+                    <Route path="/Alumno" element={<Alumno />} />
                 </Routes>
             </div>
         </Router>

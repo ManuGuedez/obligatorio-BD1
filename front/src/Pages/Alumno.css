@@ -1,0 +1,211 @@
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+    .actividades-title {
+        font-size: 1.8rem;
+    }
+    .activity-card {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
+}
+/* Estilos generales */
+.alumno-container {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #e4e6e8;
+    min-height: 100vh;
+    margin-top: 4rem; /* Agrega margen superior para evitar que el contenido se superponga con la barra de navegación */
+}
+
+/* Título */
+.actividades-title {
+    font-size: 2rem;
+    color: #7ba7e4;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+/* Contenedor de tarjetas */
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem; /* Aumenta el espacio entre tarjetas */
+    justify-content: center;
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 1rem;
+}
+
+/* Tarjeta de actividad */
+.activity-card {
+    background-color: #7675c0;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    text-align: center;
+    flex: 1 1 300px;
+    max-width: 300px;
+    margin: 0.5rem 0; /* Espaciado adicional entre las tarjetas */
+}
+
+.activity-card h3 {
+    font-size: 1.2rem;
+    color: #1a365d;
+    margin: 0.5rem 0;
+}
+
+.activity-card p,
+.activity-card h4 {
+    font-size: 0.9rem;
+    color: #2d3748;
+}
+
+/* Barra de navegación */
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%; /* Ocupa todo el ancho de la pantalla */
+    padding: 1rem 2rem;
+    background-color: #1a365d; /* Color de fondo de la barra */
+    position: fixed; /* Cambia a posición fija */
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000; /* Asegura que la barra de navegación esté por encima de los demás elementos */
+}
+
+.navbar-logo {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-logo img {
+    width: 32px;
+    height: 32px;
+    margin-left: 8px;
+}
+
+.navbar-menu {
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: white; /* Set the text color to white for better visibility */
+}
+
+.details-btn {
+    background-color: #1a365d;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}   
+
+
+.enroll-btn {
+    background-color: #1a365d;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.enroll-btn.enrolled {
+    background-color: #2c5282;
+}
+
+.details-btn,
+.enroll-btn {
+    font-size: 0.9rem; /* Reduce el tamaño de la fuente */
+    padding: 0.3rem 0.8rem; /* Reduce el padding de los botones */
+    margin-right: 0.5rem; /* Agrega un margen derecho entre los botones */
+    margin-top: 0.5rem; /* Agrega un margen superior de 0.5rem */
+
+}
+
+.activity-card {
+    padding: 1rem 0.5rem; /* Reduce el padding interno de las tarjetas */
+}
+
+.equipment-switch {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    color: #7ba7e4;
+}
+
+.equipment-label {
+    font-size: 0.9rem;
+    margin-left: 0.5rem;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #1a365d;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+}
+
+input:checked + .slider {
+    background-color: #2c5282;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2c5282;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(16px);
+    -ms-transform: translateX(16px);
+    transform: translateX(16px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
