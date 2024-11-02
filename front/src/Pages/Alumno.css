@@ -16,7 +16,7 @@
     align-items: center;
     color: #e4e6e8;
     min-height: 100vh;
-    margin-top: 4rem; /* Agrega margen superior para evitar que el contenido se superponga con la barra de navegación */
+    padding-top: 120px; /* Agrega margen superior para evitar que el contenido se superponga con la barra de navegación */
 }
 
 /* Título */

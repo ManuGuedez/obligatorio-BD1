@@ -1,6 +1,6 @@
 .instructor-dashboard {
     height: 100%;
-    padding-top: 91.33px;
+    padding-top: 120px;
     height: 100vh;
     width: 100%;
 }
@@ -10,7 +10,7 @@
     /* Convierte el texto a mayúsculas */
     letter-spacing: 2px;
     /* Ajusta el espacio entre letras */
-    color: rgb(14, 14, 41);
+    color: rgb(106, 142, 252);
 
 }
 
