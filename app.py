@@ -110,6 +110,30 @@ def modify_class_students(id):
         return jsonify({'msg': message}), 400
     
 
+@app.route('/classes/<id>/instructor', methods=['PATCH'])
+@jwt_required()
+def get_instructor_schedules(id): # id de la clase
+    data = request.get_json()
+    instructor_ci = data.get("instructor_ci") # ci del instructor al que le quiero asignar la clase
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "admin"):
+        return jsonify({'msg': 'Esta acción puede ser realizada únicamente por el administrador'}), 400
+    
+    turn_id = services.get_class_turn(id) 
+    instructor_schedules = services.get_instructor_schedules(instructor_ci) # set con los horarios ocupados del instructor
+    
+    if instructor_schedules.__contains__(turn_id):
+        return jsonify({'msg': 'El instructor ya tiene una clase agendada en ese horario'}), 409 # conflict
+    
+    result, message = services.modify_class_instructor(id, instructor_ci)    
+    if result > 0: 
+        return jsonify({'msg': message}), 200
+    else:
+        return jsonify({'msg': message}), 400
+
+
 if __name__ == '__main__':
     app.run(debug=True)
 

@@ -179,3 +179,10 @@ SET role_id = 1;  -- Reemplaza '1' por el ID del rol 'student' si es diferente
 -- (10000001, 'Emily', 'White'), agrego instructor para pruebas en el be de python
 insert into login (email, password, person_ci, role_id) values
 ('emily.white@example.com', 'emily1234', 10000001, 2);
+
+-- agrega usuario admin al sistema
+insert into person (person_ci, name, last_name, role_id) value
+(111111111, 'admin', 'admin', 3);
+
+insert into login (email, password, person_ci, role_id) value
+('ucusnowschool@gmail.com', '@dminSnowSchool', 111111111, 3);

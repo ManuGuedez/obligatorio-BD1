@@ -31,9 +31,7 @@ def modificarInstructor(class_id, new_instructor_ci):
         else:
             return "No se encontró la clase con el ID especificado o el instructor ya estaba actualizado."
     except mysql.Error as err:
-        return f"Error al modificar el instructor de la clase: {err}"
-    
-    
+        return f"Error al modificar el instructor de la clase: {err}"    
     
 def modificarAlumnosClase(class_id, student_ci, action):
     
@@ -115,6 +113,6 @@ def main():
             print("Opción no válida. Intenta de nuevo.")
 
 
-# Ejecutar el menú
+# # Ejecutar el menú
 # if __name__ == "__main__":
 #     # main()

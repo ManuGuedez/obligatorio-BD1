@@ -178,7 +178,16 @@ def get_role_id(role):
     
     if len(data) > 0:
         return data[0]['role_id']
-    return -1            
+    return -1 
+
+def get_class_turn(class_id):
+    query = 'SELECT turn_id FROM classes WHERE class_id = %s'
+    cursor.execute(query, (class_id,))
+    data = cursor.fetchall()
+    
+    if len(data) > 0:
+        return int(data[0]['turn_id'])
+    return -1 
 
 def modify_class(class_id, new_turn_id):
 
@@ -193,7 +202,6 @@ def modify_class(class_id, new_turn_id):
             return -1, "No se encontró la clase con el ID especificado o el turno ya estaba actualizado."
     except mysql.Error as err:
         return -1, f"Error al modificar la clase: {err}"
-    
     
 def modify_students_class(class_id, student_ci, action):
     match action:
@@ -218,3 +226,25 @@ def modify_students_class(class_id, student_ci, action):
                 return -1, f"Error al quitar el alumno: {err}"
         case _:
             return -1, "Acción no válida. Use 'add' o 'delete'."
+        
+def get_instructor_schedules(instructor_id):
+    query = 'SELECT turn_id FROM classes WHERE instructor_ci = %s'
+    cursor.execute(query, (instructor_id,))
+    data = cursor.fetchall()
+    
+    turns_ids = {turn["turn_id"] for turn in data} # hago un set con los horarios del instructor
+    return turns_ids
+
+def modify_class_instructor(class_id, instructor_ci):
+    query = f"UPDATE classes SET instructor_ci = {instructor_ci} WHERE class_id = {class_id}"
+    
+    try:
+        cursor.execute(query)
+        cnx.commit()  
+        if cursor.rowcount > 0:
+            # mandar mail al instructor avisando que fue asignado para dar esta clase
+            return 1, "Instructor de la clase modificado exitosamente."
+        else:
+            return -1, "No se encontró la clase con el ID especificado o el instructor ya la estaba dictando."
+    except mysql.Error as err:
+        return -1, f"Error al modificar la clase: {err}"
