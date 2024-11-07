@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, get_jwt, jwt_required
 import services
 from datetime import timedelta
+import smtp
 
 app = Flask(__name__)
 
@@ -129,6 +130,19 @@ def get_instructor_schedules(id): # id de la clase
     
     result, message = services.modify_class_instructor(id, instructor_ci)    
     if result > 0: 
+        class_information = services.get_class_information(id)
+        description = class_information["description"]
+        start_time = class_information["start_time"]
+        end_time = class_information["end_time"]
+        
+        # estoy sacando el email del login, deberíamos tenerlo guardado en instructor o persona
+        email = class_information["email"] 
+        
+        subject = "New class to teach as an instructor"
+        content = f"You were assigned to teach {description} from {start_time} to {end_time}"
+        
+        smtp.send_email("manuelaguedez18@gmail.com", subject, email + ": " + content) # para testear que el mensaje llega correctamente
+        smtp.send_email(email, subject, content)
         return jsonify({'msg': message}), 200
     else:
         return jsonify({'msg': message}), 400

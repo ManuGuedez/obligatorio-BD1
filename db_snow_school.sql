@@ -186,3 +186,11 @@ insert into person (person_ci, name, last_name, role_id) value
 
 insert into login (email, password, person_ci, role_id) value
 ('ucusnowschool@gmail.com', '@dminSnowSchool', 111111111, 3);
+
+SELECT login.email, activities.description, turns.start_time, turns.end_time
+FROM classes
+    JOIN activities ON (classes.activity_id = activities.activity_id)
+    JOIN turns ON (classes.turn_id = turns.turn_id)
+    JOIN login ON (classes.instructor_ci = login.person_ci)
+WHERE classes.class_id = 1
+

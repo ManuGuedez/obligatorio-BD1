@@ -189,6 +189,16 @@ def get_class_turn(class_id):
         return int(data[0]['turn_id'])
     return -1 
 
+def get_class_information(class_id):
+    query = 'SELECT activities.description, turns.start_time, turns.end_time, login.email FROM classes JOIN activities ON (classes.activity_id = activities.activity_id) JOIN turns ON (classes.turn_id = turns.turn_id) JOIN login ON (classes.instructor_ci = login.person_ci) WHERE classes.class_id = %s'
+    cursor.execute(query, (class_id,))
+    data = cursor.fetchall()
+    
+    if len(data) > 0:
+        return data[0]
+    return -1 
+    
+
 def modify_class(class_id, new_turn_id):
 
     query = f"UPDATE classes SET turn_id = {new_turn_id} WHERE class_id = {class_id}"

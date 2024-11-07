@@ -1,7 +1,7 @@
 import smtplib
 from email.message import EmailMessage
 
-def send_email(recipient_email):
+def send_email(recipient_email, subject, content):
     try:
         # Email configuration
         sender_email = 'dreamteambd0@gmail.com'
@@ -11,12 +11,12 @@ def send_email(recipient_email):
         
         # Create the email message
         mensaje = EmailMessage()
-        mensaje['Subject'] = 'Prueba de correo desde Python'
+        mensaje['Subject'] = subject
         mensaje['From'] = sender_email
         mensaje['To'] = recipient_email
         
         # Set the email body
-        mensaje.set_content('¡Hola desde Python!')
+        mensaje.set_content(content)
         
         
         # Connect to Gmail's SMTP server
@@ -35,5 +35,5 @@ def send_email(recipient_email):
     except Exception as e:
         print(f"An error occurred: {e}")
 
-if __name__ == "__main__":
-    send_email()
+# if __name__ == "__main__":
+#     send_email("manuelaguedez18@gmail.com", "", "")
