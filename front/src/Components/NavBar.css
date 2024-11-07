@@ -2,13 +2,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #1a365d;
+    background-color: #2c5691;
     padding: 0.8rem 0; /* Quita los paddings laterales */
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     width: 100%;
+    height: max-content;
 }
 
 .navbar-center {
@@ -20,16 +21,15 @@
 }
 
 .app-title {
-    font-size: 1.5rem;
     font-weight: bold;
     margin: 0;
+    /* Convierte el texto a mayúsculas */
+    letter-spacing: 1px;
 }
 
 .ucu-logo {
     width: 30px;
     height: 30px;
-    filter: brightness(0) invert(1);
-
 }
 
 .menu-icon {
