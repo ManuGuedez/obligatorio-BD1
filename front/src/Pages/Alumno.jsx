@@ -10,6 +10,7 @@ const activities = [
         schedule: 'Lunes 10:00 - 12:00',
         instructor: 'Prof. Juan Pérez',
         details: 'En este taller, abordaremos temas avanzados de programación, incluyendo algoritmos y estructuras de datos.',
+        price: 15, // Precio de alquiler de equipamiento para esta actividad
     },
     {
         id: 2,
@@ -18,8 +19,9 @@ const activities = [
         schedule: 'Miércoles 14:00 - 16:00',
         instructor: 'Ing. Ana García',
         details: 'Laboratorio práctico para comprender el funcionamiento de redes de datos y protocolos de comunicación.',
+        price: 20, // Precio de alquiler de equipamiento para esta actividad
     },
-    // Agrega más actividades si deseas
+    // Agrega más actividades con sus respectivos precios si deseas
 ];
 
 const Alumno = () => {

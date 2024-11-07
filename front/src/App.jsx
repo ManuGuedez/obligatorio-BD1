@@ -5,6 +5,7 @@ import LogIn from './Pages/LogIn.jsx';
 import Alumno from './Pages/Alumno.jsx';
 import NavBar from './Components/NavBar'; 
 import Instructor from './Pages/Instructor.jsx';
+import Home from './Pages/Home.jsx';
 import './App.css';
 
 const App = () => {
