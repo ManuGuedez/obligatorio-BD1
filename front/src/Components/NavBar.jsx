@@ -13,7 +13,7 @@ const NavBar = () => {
     const handleLogout = () => {
         console.log("Cerrando sesión...");
         setMenuOpen(false);
-        navigate('/LogIn'); // Redirige a la página de inicio de sesión
+        navigate('/LogIn'); 
     };
 
     return (
