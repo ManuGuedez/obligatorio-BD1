@@ -6,6 +6,7 @@ import Alumno from './Pages/Alumno.jsx';
 import NavBar from './Components/NavBar'; 
 import Instructor from './Pages/Instructor.jsx';
 import Home from './Pages/Home.jsx';
+import Admin from './Pages/Admin.jsx';
 import './App.css';
 
 const App = () => {
@@ -23,6 +24,7 @@ const App = () => {
                     <Route path="/LogIn" element={<LogIn />} />
                     <Route path="/Alumno" element={<Alumno />} />
                     <Route path="/Instructor" element={<Instructor />} />
+                    <Route path="/Admin" element={<Admin/>} />
                 </Routes>
             </div>
         </div>
