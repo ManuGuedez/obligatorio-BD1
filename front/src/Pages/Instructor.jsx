@@ -47,7 +47,7 @@ const Instructor = () => {
                 <div>
                     <div className="encabezadoInstructor">
                         <p id="inspecciona">Inspecciona tus clases</p>
-                        <h1>Bienvenido, Donal Trump</h1>
+                        <h1>Bienvenido, Donald Trump</h1>
                     </div>
                     <section className="schedule">
                         <h2>Clases de Hoy</h2>

@@ -1,0 +1,53 @@
+.admin-dashboard {
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+}
+
+.admin-dashboard h1 {
+    font-size: 2em;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.admin-card-container {
+    display: flex;
+    flex-wrap: wrap; /* Permite que las tarjetas se muevan a la siguiente fila si no hay suficiente espacio */
+    gap: 20px; /* Espacio entre tarjetas */
+    justify-content: center; /* Centra las tarjetas horizontalmente */
+}
+
+.admin-card {
+    background-color: #7ba7e4;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para dar profundidad */
+    text-align: center;
+}
+
+.admin-card h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+button {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #1a365d;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #1d3778;
+}
+
+.report-content p {
+    font-size: 1em;
+    margin-top: 8px;
+}
