@@ -10,7 +10,7 @@ const activities = [
         schedule: 'Lunes 10:00 - 12:00',
         instructor: 'Prof. Juan Pérez',
         details: 'En este taller, abordaremos temas avanzados de programación, incluyendo algoritmos y estructuras de datos.',
-        price: 15, // Precio de alquiler de equipamiento para esta actividad
+        price: 15,
     },
     {
         id: 2,
@@ -19,9 +19,8 @@ const activities = [
         schedule: 'Miércoles 14:00 - 16:00',
         instructor: 'Ing. Ana García',
         details: 'Laboratorio práctico para comprender el funcionamiento de redes de datos y protocolos de comunicación.',
-        price: 20, // Precio de alquiler de equipamiento para esta actividad
+        price: 20,
     },
-    // Agrega más actividades con sus respectivos precios si deseas
 ];
 
 const Alumno = () => {
@@ -37,6 +36,13 @@ const Alumno = () => {
     const closeModal = () => {
         setSelectedActivity(null);
         setShowModal(false);
+    };
+
+    const handleOverlayClick = (e) => {
+        // Cierra el modal solo si se hace clic en la superposición, no en el contenido del modal
+        if (e.target.classList.contains('modal-overlay')) {
+            closeModal();
+        }
     };
 
     const toggleEnrollment = (activityId) => {
@@ -66,7 +72,7 @@ const Alumno = () => {
 
             {/* Modal de Detalles */}
             {showModal && selectedActivity && (
-                <div className="modal-overlay">
+                <div className="modal-overlay" onClick={handleOverlayClick}>
                     <div className="modal-content">
                         <span className="close-btn" onClick={closeModal}>&times;</span>
                         <h3>{selectedActivity.name}</h3>
