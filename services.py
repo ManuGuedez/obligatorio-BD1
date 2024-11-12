@@ -87,10 +87,6 @@ def create_student_account(student, email, password):
  
     return result, message
 
-# print(
-# create_student_account({"ci": 500000008, "first_name": "Manuela", "last_name": "Guedez", "birth_date": "2005-01-18"}, "manuela@example.com", "manu1234")
-# )
-
 def validate_user(email, password):
     """
         Valdia la existencia del usuario en la base de datos.
@@ -102,7 +98,6 @@ def validate_user(email, password):
     if len(data) > 0:
         return data[0]['person_ci'], data[0]['role_id']
     return None, None
-
 
 def validate_instructor(instructor):
     if len(instructor) != 3:
@@ -190,7 +185,7 @@ def get_class_turn(class_id):
     return -1 
 
 def get_class_information(class_id):
-    query = 'SELECT activities.description, turns.start_time, turns.end_time, login.email FROM classes JOIN activities ON (classes.activity_id = activities.activity_id) JOIN turns ON (classes.turn_id = turns.turn_id) JOIN login ON (classes.instructor_ci = login.person_ci) WHERE classes.class_id = %s'
+    query = 'SELECT activities.description, turns.start_time, turns.end_time, login.email as instructor_email FROM classes JOIN activities ON (classes.activity_id = activities.activity_id) JOIN turns ON (classes.turn_id = turns.turn_id) JOIN login ON (classes.instructor_ci = login.person_ci) WHERE classes.class_id = %s'
     cursor.execute(query, (class_id,))
     data = cursor.fetchall()
     
@@ -198,8 +193,7 @@ def get_class_information(class_id):
         return data[0]
     return -1 
     
-
-def modify_class(class_id, new_turn_id):
+def modify_class_turn(class_id, new_turn_id):
 
     query = f"UPDATE classes SET turn_id = {new_turn_id} WHERE class_id = {class_id}"
     
@@ -256,5 +250,105 @@ def modify_class_instructor(class_id, instructor_ci):
             return 1, "Instructor de la clase modificado exitosamente."
         else:
             return -1, "No se encontró la clase con el ID especificado o el instructor ya la estaba dictando."
+    except mysql.Error as err:
+        return -1, f"Error al modificar la clase: {err}"
+    
+def get_person_id_with_ci(person_ci):
+    query = 'SELECT person.person_id FROM person WHERE person_ci = %s'
+    cursor.execute(query,(person_ci,))
+    data = cursor.fetchall()
+    
+    if len(data) > 0:
+        return data[0]['person_id']
+    return -1
+
+def get_days():
+    query = 'SELECT * FROM days'
+    cursor.execute(query)
+    data = cursor.fetchall()
+    
+    result = dict()
+    for i in range(len(data)):
+        info = data[i]
+        day = info['day_name']
+        id = info['day_id']
+        result[day] = id
+        
+    return result
+
+def retrieve_instructor_classes_by_turn_and_days(instructor_id, turn_id, days_id):
+    # qurey = '''
+    #     SELECT
+    #         c.class_id,
+    #         i.first_name,
+    #         i.last_name,
+    #         c.activity_id,
+    #         c.turn_id,
+    #         cd.day_id
+    #     FROM
+    #         classes c
+    #     JOIN
+    #         instructors i ON i.instructor_ci = c.instructor_ci
+    #     JOIN
+    #         class_day cd ON cd.class_id = c.class_id
+    #     WHERE
+    #         i.person_id = %s          
+    #         AND c.turn_id = %s  
+    #         AND cd.day_id IN 
+    # '''
+    select = 'SELECT c.class_id, i.first_name, i.last_name, c.activity_id, c.turn_id, cd.day_id FROM classes c '
+    joins = 'JOIN instructors i ON i.instructor_ci = c.instructor_ci JOIN class_day cd ON cd.class_id = c.class_id '
+    where = 'WHERE i.person_id = %s AND c.turn_id = %s AND cd.day_id IN '
+    
+    days = '('
+    for d in days_id:
+        days += str(d) + ', '
+    
+    days = days[0:len(days) - 2] + ')'
+    
+    query = select + joins + where + days
+    cursor.execute(query, (instructor_id, turn_id,))
+    data = cursor.fetchall()
+   
+    return data
+
+def is_instructor_busy(instructor_id, turn_id, days_ids):
+    classes = retrieve_instructor_classes_by_turn_and_days(instructor_id, turn_id, days_ids)
+    return len(classes) > 0
+
+def get_person_ci_with_id(person_id):
+    query = 'SELECT person.person_ci FROM person WHERE person_id = %s'
+    cursor.execute(query,(person_id,))
+    data = cursor.fetchall()
+    
+    if len(data) > 0:
+        return data[0]['person_ci']
+    return -1
+
+def get_activities():
+    query = 'SELECT * FROM activities'
+    cursor.execute(query)
+    data = cursor.fetchall()
+    
+    result = dict()
+    for i in range(len(data)):
+        info = data[i]
+        day = info['description']
+        id = info['activity_id']
+        result[day] = id
+        
+    return result
+
+def add_class(instructor_ci, activity_id, turn_id, start_date, end_date):
+    insert = 'INSERT INTO classes (instructor_ci, activity_id, turn_id, start_date, end_date) VALUE (%s, %s, %s, %s, %s)'
+    
+    try:
+        cursor.execute(insert, (instructor_ci, activity_id, turn_id, start_date, end_date))
+        cnx.commit()  
+        if cursor.rowcount > 0:
+            # mandar mail al instructor avisando que fue asignado para dar esta clase
+            return 1, "Nueva clase creada exitosamente."
+        else:
+            return -1, "Hubo un problema, no fue posible crear la clase."
     except mysql.Error as err:
         return -1, f"Error al modificar la clase: {err}"

@@ -69,7 +69,7 @@ def modify_class_turn(id):
     if role != "instructor" or not role:
         return jsonify({"msg": "Permiso denegado: solo los instructores pueden modificar clases"}), 403
     
-    result, message = services.modify_class(id, turn) # asumiendo que me llega el id del turno
+    result, message = services.modify_class_turn(id, turn) # asumiendo que me llega el id del turno
     
     # modificación exitosa
     if result > 0: 
@@ -136,13 +136,65 @@ def get_instructor_schedules(id): # id de la clase
         end_time = class_information["end_time"]
         
         # estoy sacando el email del login, deberíamos tenerlo guardado en instructor o persona
-        email = class_information["email"] 
+        email = class_information["instructor_email"] 
         
-        subject = "New class to teach as an instructor"
-        content = f"You were assigned to teach {description} from {start_time} to {end_time}"
+        subject = "Nueva clase para dictar como instructor"
+        content = f"Has sido asingado para dictar {description} desde {start_time} hasta {end_time}" # agergar info de los días
         
         smtp.send_email("manuelaguedez18@gmail.com", subject, email + ": " + content) # para testear que el mensaje llega correctamente
         smtp.send_email(email, subject, content)
+        return jsonify({'msg': message}), 200
+    else:
+        return jsonify({'msg': message}), 400
+
+
+@app.route('/classes/new-class', methods=['POST'])
+@jwt_required()
+def create_class():
+    
+    # primero se verifica que quien intenta crear una clase es el administrador 
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "admin"):
+        return jsonify({'msg': 'Esta acción puede ser realizada únicamente por el administrador'}), 400
+    
+    # en caso de que sea el adminsitrador
+    data = request.get_json()
+    instructor_id = data.get('instructor_id')
+    instructor_ci = services.get_person_ci_with_id(instructor_id)
+    if instructor_ci == -1:
+        return jsonify({'msg': 'No es posible identificar el id del instructor ingresado'}), 400
+    
+    start_date = data.get('start_date')
+    end_date = data.get('end_date')
+    
+    activity = str(data.get('activity')).strip().capitalize() # premier letra en may y resto en min
+    activities = services.get_activities()
+    activity = activities.get(activity)
+    
+    if not activity:
+        return jsonify({'msg': 'La actividad ingresada no es válida'}), 400        
+    
+    turn = data.get('turn')
+    days = data.get('days') # lista con los días en los que se quiere dictar la clase
+    days_ids = services.get_days() # devuelve diccionario con días y sus respectivos ids
+    
+    # reemplazo los días con los ids
+    for i in range(len(days)):
+        id = days_ids.get(days[i])
+        if id:
+            days[i] = id
+        else:
+            days[i] = -1 # en caso de que el valor no sea un día válido se pone -1 entonces no altera la query
+
+    if services.is_instructor_busy(instructor_id, turn, days):
+        return jsonify({'msg': 'El instructor ya tiene clases en ese horario'}), 400
+    
+    
+    result, message = services.add_class(instructor_ci, activity, turn, start_date, end_date)
+    
+    if result > 0: 
         return jsonify({'msg': message}), 200
     else:
         return jsonify({'msg': message}), 400
