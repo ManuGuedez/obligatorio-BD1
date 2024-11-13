@@ -1,18 +1,20 @@
-import mysql.connector as mysql
-
-cnx = mysql.connect(user='root', password='rootpassword', host='127.0.0.1', database='snowSchool')
-cursor = cnx.cursor(dictionary=True) # devuelve la info en formato key-value
-
 from datetime import datetime, timedelta
 
-def generar_calendario(): #start_date, end_date, dias_clase ----> para agregar en el parametro
+# devuelve una lista con las tuplas en formato (fecha, día_semana)
+def generar_calendario(start_date, end_date, dias_clase): #start_date, end_date, dias_clase ----> para agregar en el parametro
     
-    # Las fechas entran en formato Y/M/D y salen en formato D/M/Y
+    # Las fechas entran en formato Y/M/D y salen en formato Y/M/D
+     
+    for i in range(len(dias_clase)):
+        dias_clase[i] = dias_clase[i] - 1 # Días de clase: lunes (0), martes (1), miércoles (2), jueves (3) , viernes (4) = 5 dias
     
-    start_date = "2024-11-11"  # Fecha de inicio en noviembre 2024
-    end_date = "2024-12-15"    # Fecha de fin en noviembre 2024
-    dias_clase = [0, 2, 4]     # Días de clase: lunes (0), martes (1), miércoles (2), jueves (3) , viernes (4) = 5 dias
-    
+    dias_semana_español = {
+    "Monday": "lunes",
+    "Tuesday": "martes",
+    "Wednesday": "miercoles",
+    "Thursday": "jueves",
+    "Friday": "viernes"
+    }
     
     # Convertir las fechas a formato datetime
     start = datetime.strptime(start_date, "%Y-%m-%d")
@@ -25,13 +27,32 @@ def generar_calendario(): #start_date, end_date, dias_clase ----> para agregar e
     dia_actual = start
     while dia_actual <= end:
         if dia_actual.weekday() in dias_clase:
-            dias_marcados.append(f"{dia_actual.strftime('%d-%m-%Y')} - {dia_actual.strftime('%A')}")
+            nombre_dia = dia_actual.strftime("%A")  # Día en inglés
+            dia_español = dias_semana_español.get(nombre_dia)
+            fecha = (f"{dia_actual.strftime('%Y-%m-%d')}", dia_español)
+            dias_marcados.append(fecha)
         dia_actual += timedelta(days=1)
 
 
     print("Días en los que se dicta clase en noviembre de 2024:")
-    for dia in dias_marcados:
-        print(dia)
+    # for dia in dias_marcados:
+        # print(dia)
 
+        
+    return dias_marcados
 
-generar_calendario()
+days = {
+    'lunes': 1,
+    'martes': 2,
+    'miercoles': 3
+}
+
+fechas = generar_calendario("2024-11-11" ,  "2024-12-11", [1, 3])
+session_values = ""
+class_id = 1
+for fecha in fechas:
+        id_dia = days.get(fecha[1])
+        session_values += f"({str(class_id)}, \'{fecha[0]}\', {str(id_dia)}),"
+session_values = session_values[:-1]
+
+print(session_values)

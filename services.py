@@ -2,6 +2,7 @@ import mysql.connector as mysql
 
 cnx = mysql.connect(user='root', password='rootpassword', host='127.0.0.1', database='snowSchool')
 cursor = cnx.cursor(dictionary=True) # devuelve la info en formato key-value
+import algoritmo
 
 
 def validate_student(student):
@@ -276,7 +277,7 @@ def get_days():
         
     return result
 
-def retrieve_instructor_classes_by_turn_and_days(instructor_id, turn_id, days_id):
+def retrieve_instructor_classes_by_turn_and_days(instructor_id, turn_id, days_id, start_date, end_date):
     # qurey = '''
     #     SELECT
     #         c.class_id,
@@ -296,9 +297,9 @@ def retrieve_instructor_classes_by_turn_and_days(instructor_id, turn_id, days_id
     #         AND c.turn_id = %s  
     #         AND cd.day_id IN 
     # '''
-    select = 'SELECT c.class_id, i.first_name, i.last_name, c.activity_id, c.turn_id, cd.day_id FROM classes c '
+    select = 'SELECT c.class_id, c.activity_id, c.turn_id, cd.day_id FROM classes c '
     joins = 'JOIN instructors i ON i.instructor_ci = c.instructor_ci JOIN class_day cd ON cd.class_id = c.class_id '
-    where = 'WHERE i.person_id = %s AND c.turn_id = %s AND cd.day_id IN '
+    where = 'WHERE i.person_id = %s AND c.turn_id = %s AND (c.start_date <= %s OR c.end_date >= %s) AND cd.day_id IN '
     
     days = '('
     for d in days_id:
@@ -307,13 +308,19 @@ def retrieve_instructor_classes_by_turn_and_days(instructor_id, turn_id, days_id
     days = days[0:len(days) - 2] + ')'
     
     query = select + joins + where + days
-    cursor.execute(query, (instructor_id, turn_id,))
+    cursor.execute(query, (instructor_id, turn_id, start_date, end_date))
     data = cursor.fetchall()
    
     return data
 
-def is_instructor_busy(instructor_id, turn_id, days_ids):
-    classes = retrieve_instructor_classes_by_turn_and_days(instructor_id, turn_id, days_ids)
+def query_to_add_class(instructor_id, turn_id, days_ids, start_date, end_date):
+    classes = retrieve_instructor_classes_by_turn_and_days(instructor_id, turn_id, days_ids, start_date, end_date)
+    
+    return classes
+
+def is_instructor_busy(instructor_id, turn_id, days_ids, start_date, end_date):
+    classes = retrieve_instructor_classes_by_turn_and_days(instructor_id, turn_id, days_ids, start_date, end_date)
+
     return len(classes) > 0
 
 def get_person_ci_with_id(person_id):
@@ -339,16 +346,73 @@ def get_activities():
         
     return result
 
-def add_class(instructor_ci, activity_id, turn_id, start_date, end_date):
+def add_class(instructor_ci, activity_id, turn_id, start_date, end_date, days_ids):
     insert = 'INSERT INTO classes (instructor_ci, activity_id, turn_id, start_date, end_date) VALUE (%s, %s, %s, %s, %s)'
     
     try:
         cursor.execute(insert, (instructor_ci, activity_id, turn_id, start_date, end_date))
         cnx.commit()  
+        
+        # en caso de haber podido agregar la clase a la tabla classes
         if cursor.rowcount > 0:
-            # mandar mail al instructor avisando que fue asignado para dar esta clase
-            return 1, "Nueva clase creada exitosamente."
+            
+            class_id = cursor.lastrowid # obtiene el id de la clase recién insertada
+            insert = "INSERT INTO class_day (class_id, day_id) VALUES "
+            values = ""
+            for i in days_ids:
+                values += f"({str(class_id)}, {str(i)}),"
+            
+            values = values[:-1]
+            
+            insert = insert + values
+            cursor.execute(insert)
+            cnx.commit()
+            
+            # si se pudo insertar en la tabla class_day
+            if cursor.rowcount > 0:
+                fechas = algoritmo.generar_calendario(start_date, end_date, days_ids)
+                
+                insert = "INSERT INTO class_session (class_id, class_date, day_id) VALUES " # por defecto se establece como no dictada
+                days = get_days()
+                values = ""
+                for fecha in fechas:
+                    id_dia = days.get(fecha[1])
+                    values += f"({class_id}, \'{fecha[0]}\', {id_dia}),"
+                
+                values = values[:-1]
+                insert = insert + values
+                cursor.execute(insert)
+                cnx.commit()
+                
+                if cursor.rowcount > 0:
+                    # mandar mail al instructor avisando que fue asignado para dar esta clase
+                    return 1, "Nueva clase creada exitosamente."
+                else:
+                    delete = "DELETE FROM class_day WHERE class_id = " + str(class_id)
+                    cursor.execute(delete)
+                    
+                    delete = "DELETE FROM classes WHERE class_id = " + str(class_id)
+                    cursor.execute(delete)
+                    
+                    #eliminar clase de classes y de class_day
+                    return -1, "Hubo un error creando la clase."
+            else:
+                delete = "DELETE FROM class_day WHERE class_id = " + str(class_id)
+                cursor.execute(delete)
+                
+                delete = "DELETE FROM classes WHERE class_id = " + str(class_id)
+                cursor.execute(delete)
+                
+                #eliminar clase de classes y de class_day
+                return -1, "Hubo un error creando la clase."
+            
         else:
             return -1, "Hubo un problema, no fue posible crear la clase."
     except mysql.Error as err:
-        return -1, f"Error al modificar la clase: {err}"
+        delete = "DELETE FROM class_day WHERE class_id = " + str(class_id)
+        cursor.execute(delete)
+        
+        delete = "DELETE FROM classes WHERE class_id = " + str(class_id)
+        cursor.execute(delete)
+        
+        return -1, f"Error al crear la clase: {err}"

@@ -182,17 +182,17 @@ def create_class():
     
     # reemplazo los días con los ids
     for i in range(len(days)):
-        id = days_ids.get(days[i])
+        id = days_ids.get(str(days[i]).lower())
         if id:
             days[i] = id
         else:
-            days[i] = -1 # en caso de que el valor no sea un día válido se pone -1 entonces no altera la query
+             # en caso de que el valor no sea un día válido se pone -1 entonces no altera la query
+            return jsonify({'msg': 'Se ingresó un día inválido, deben ser de lunes a viernes.'}), 400
 
-    if services.is_instructor_busy(instructor_id, turn, days):
+    if services.is_instructor_busy(instructor_id, turn, days, start_date, end_date):
         return jsonify({'msg': 'El instructor ya tiene clases en ese horario'}), 400
     
-    
-    result, message = services.add_class(instructor_ci, activity, turn, start_date, end_date)
+    result, message = services.add_class(instructor_ci, activity, turn, start_date, end_date, days)
     
     if result > 0: 
         return jsonify({'msg': message}), 200

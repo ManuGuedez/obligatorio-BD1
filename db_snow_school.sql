@@ -388,7 +388,9 @@ JOIN
     class_day cd ON cd.class_id = c.class_id
 WHERE
     i.person_id = 5           -- id del instructor a buscar
-    AND c.turn_id = 1         -- id del turno a buscar
+    AND c.turn_id = 3         -- id del turno a buscar
+    AND  (c.start_date <= '2024-11-11'
+    OR c.end_date >= '2024-12-11')
     AND cd.day_id IN (1, 3)    -- lista de ids de los días específicos
 ORDER BY
     cd.day_id, c.turn_id;
