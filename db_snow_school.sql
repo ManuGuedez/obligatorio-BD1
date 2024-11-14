@@ -395,8 +395,27 @@ WHERE
 ORDER BY
     cd.day_id, c.turn_id;
 
-
 -- get id with ci
 SELECT person.person_id FROM person WHERE person_ci = 43158769;
 
 SELECT * FROM activities;
+
+SELECT c.turn_id, cd.day_id, i.person_id as instructor_id
+FROM classes c
+JOIN class_day cd ON c.class_id = cd.class_id
+JOIN instructors i ON c.instructor_ci = i.instructor_ci
+WHERE c.class_id = 1;
+
+-- corroboración para saber si el instructor está
+SELECT c.class_id
+FROM classes c
+JOIN instructors i ON c.instructor_ci = i.instructor_ci
+JOIN turns t ON c.turn_id = t.turn_id -- para qué???
+JOIN class_day cd ON c.class_id = cd.class_id
+WHERE c.class_id = 1
+    AND i.person_id = 5
+    AND c.turn_id = 1
+    AND cd.day_id IN (1, 3);
+
+
+SELECT s.student_ci FROM students s WHERE s.person_id = 19

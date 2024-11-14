@@ -7,7 +7,7 @@ import smtp
 app = Flask(__name__)
 
 app.config['JWT_SECRET_KEY'] = 'obligatorio-bd-2024'
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=15) # esto para que el token expire cada 15 min
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30) # esto para que el token expire cada 30 min
 
 jwt = JWTManager(app)
 
@@ -57,26 +57,6 @@ def register_user():
         return jsonify({'msg': message}), 400
 
     
-@app.route('/classes/<id>/turn', methods=['PUT'])
-@jwt_required()
-def modify_class_turn(id):
-    data = request.get_json()
-    claims = get_jwt()
-    turn = data.get('turn') 
-    
-    role = services.get_role(claims.get('role_id'))
-    
-    if role != "instructor" or not role:
-        return jsonify({"msg": "Permiso denegado: solo los instructores pueden modificar clases"}), 403
-    
-    result, message = services.modify_class_turn(id, turn) # asumiendo que me llega el id del turno
-    
-    # modificación exitosa
-    if result > 0: 
-        return jsonify({'msg': message}), 200
-    else:
-        return jsonify({'msg': message}), 400
-
 @app.route('/classes/<id>/students', methods=['PUT'])
 @jwt_required()
 def modify_class_students(id):
@@ -110,44 +90,6 @@ def modify_class_students(id):
     else:
         return jsonify({'msg': message}), 400
     
-
-@app.route('/classes/<id>/instructor', methods=['PATCH'])
-@jwt_required()
-def get_instructor_schedules(id): # id de la clase
-    data = request.get_json()
-    instructor_ci = data.get("instructor_ci") # ci del instructor al que le quiero asignar la clase
-    claims = get_jwt()
-    role = services.get_role(claims.get("role_id"))
-    
-    if(role != "admin"):
-        return jsonify({'msg': 'Esta acción puede ser realizada únicamente por el administrador'}), 400
-    
-    turn_id = services.get_class_turn(id) 
-    instructor_schedules = services.get_instructor_schedules(instructor_ci) # set con los horarios ocupados del instructor
-    
-    if instructor_schedules.__contains__(turn_id):
-        return jsonify({'msg': 'El instructor ya tiene una clase agendada en ese horario'}), 409 # conflict
-    
-    result, message = services.modify_class_instructor(id, instructor_ci)    
-    if result > 0: 
-        class_information = services.get_class_information(id)
-        description = class_information["description"]
-        start_time = class_information["start_time"]
-        end_time = class_information["end_time"]
-        
-        # estoy sacando el email del login, deberíamos tenerlo guardado en instructor o persona
-        email = class_information["instructor_email"] 
-        
-        subject = "Nueva clase para dictar como instructor"
-        content = f"Has sido asingado para dictar {description} desde {start_time} hasta {end_time}" # agergar info de los días
-        
-        smtp.send_email("manuelaguedez18@gmail.com", subject, email + ": " + content) # para testear que el mensaje llega correctamente
-        smtp.send_email(email, subject, content)
-        return jsonify({'msg': message}), 200
-    else:
-        return jsonify({'msg': message}), 400
-
-
 @app.route('/classes/new-class', methods=['POST'])
 @jwt_required()
 def create_class():
@@ -200,6 +142,141 @@ def create_class():
         return jsonify({'msg': message}), 400
 
 
+@app.route('/classes/<int:id>/modify-class', methods=['PATCH']) 
+@jwt_required()
+def modify_class(id):
+    # primero se verifica que quien intenta crear una clase es el administrador 
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "admin"):
+        return jsonify({'msg': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
+    
+    data = request.get_json()
+    turn_id = data.get('turn_id')
+    instructor_id = data.get('instructor_id')          
+        
+    instructor_ci = services.get_person_ci_with_id(instructor_id)
+    if instructor_ci == -1:
+        return jsonify({'msg': 'No es posible identificar el id del instructor ingresado'}), 400            
+    
+    class_info = services.get_basic_class_info(id)
+    
+    if len(class_info) <= 0:
+        return jsonify({'msg': 'El id de la clase ingresada no se encuentra en la base de datos.'}), 400
+    
+    # class_info = class_info[0]
+    days = [int(data["day_id"]) for data in class_info]
+    turn_time = services.get_turn_time(class_info[0]["turn_id"])
+    
+    if not services.can_modify(turn_time["start_time"], turn_time["end_time"], days):
+        return jsonify({'msg': 'No es posible modificar la clase dado que se encuentra en curso.'}), 400
+    
+    if not turn_id and not instructor_id:
+        return jsonify({'msg': 'Es necesario ingresar turno a modificar o instructor'}), 400  
+        
+    current_class_instructor = class_info[0]['instructor_id']
+    
+    # si lo que se intenta modificar es el turno de la clase
+    if turn_id and instructor_id == int(current_class_instructor):
+        if turn_id == class_info[0]["turn_id"]:
+            return jsonify({'msg': 'La clase ya se encunetra en el turno y instructor especificados.'}), 400
+            
+        instructor_schedule = services.get_instructor_schedule(instructor_id, turn_id, days) # falta pasarle parametros, para eso pasar los days que devuelve la info de la clase pasarlos a una única lista y mandarlo como parámentros.
+        if len(instructor_schedule) > 0:
+            return jsonify({'msg': 'No es posible modificar el turno de la clase porque el instructor se encuentra ocupado en ese horario.'}), 400
+        is_instructor_modified = False
+        result, message = services.modify_class_turn(id, turn_id)
+    # si lo que se quiere modificar es el instructor
+    elif instructor_id != current_class_instructor and (not turn_id or turn_id == class_info[0]["turn_id"]):
+        instructor_schedule = services.get_instructor_schedule(instructor_id, class_info[0]["turn_id"], days)
+        if len(instructor_schedule) > 0:
+            return jsonify({'msg': 'No es posible modificar el instructor dado que tiene ya tiene otra clase en el horario de esta clase.'}), 400
+        is_instructor_modified = True
+        result, message = services.modify_class_instructor(id, instructor_ci)
+    elif turn_id and instructor_id != int(current_class_instructor):
+        return jsonify({'msg': 'No se pueden modificar turno e instructor de manera simultánea.'}), 400
+        
+    if result > 0: 
+        if is_instructor_modified:
+            class_information = services.get_class_information(id)
+            description = class_information["description"]
+            start_time = class_information["start_time"]
+            end_time = class_information["end_time"]
+            
+            # estoy sacando el email del login, deberíamos tenerlo guardado en instructor o persona
+            email = class_information["instructor_email"] 
+            
+            subject = "Nueva clase para dictar como instructor"
+            content = f"Has sido asingado para dictar {description} desde {start_time} hasta {end_time}" # agergar info de los días
+            
+            smtp.send_email("manuelaguedez18@gmail.com", subject, email + ": " + content) # para testear que el mensaje llega correctamente
+            smtp.send_email(email, subject, content)
+        return jsonify({'msg': message}), 200
+    else:
+        return jsonify({'msg': message}), 400
+
+
+@app.route('/add_user', methods=['POST']) 
+@jwt_required()
+def add_user():
+    '''
+    Cuerpo requerido:
+    {
+        ci
+        first_name
+        last_name
+        user_type (instructor / estudiante)
+        fecha de nacimiento (si es estudiante)
+    }
+    '''
+    # primero se verifica que quien intenta crear una clase es el administrador 
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "admin"):
+        return jsonify({'msg': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
+    
+    data = request.get_json()
+    ci = data.get('ci')
+    first_name = data.get('first_name')
+    last_name = data.get('last_name')
+    user_type = data.get('user_type')
+    
+    if not ci or not first_name or not last_name or not user_type:
+        return jsonify({'msg': 'Faltan datos obligatorios'}), 400
+    
+    match user_type:
+        case 'instructor':
+            person_id = services.add_person(ci, first_name, last_name) 
+            
+            if person_id <= 0:
+                return jsonify({'msg': 'Hubo un problema al ingresar la persona en el sistema.'}), 400
+            
+            result, message = services.add_instructor(person_id, ci, first_name, last_name)
+            
+        case 'student' | 'estudiante':
+            birth_date = data.get('birth_date')
+            
+            if not birth_date:
+                return jsonify({'msg': 'Falta especificar fecha de nacimiento del estudiante.'}), 400
+
+            person_id = services.add_person(ci, first_name, last_name) 
+            
+            if person_id <= 0:
+                return jsonify({'msg': 'Hubo un problema al ingresar la persona en el sistema.'}), 400
+            
+            result, message = services.add_student(person_id, ci, first_name, last_name, birth_date)
+
+        case _:
+            return jsonify({'msg': 'El tipo de usuario especificado no es adecuado, ingrese instructor o estudiante.'}), 400
+    
+    if result > 0: 
+        return jsonify({'msg': message}), 200
+    else:
+        return jsonify({'msg': message}), 400
+    
+    
 if __name__ == '__main__':
     app.run(debug=True)
 
