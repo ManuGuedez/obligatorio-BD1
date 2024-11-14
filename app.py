@@ -32,6 +32,15 @@ def login():
 
 @app.route('/register', methods=['POST'])
 def register_user():
+    '''
+    cuerpo requerido:
+        - rol con el que se va a registrar la persona
+        - ci
+        - first_name
+        - last_name
+        - email
+        - password
+    '''
     data = request.get_json()
     rol = data.get('rol')
     ci = data.get('ci')
@@ -44,7 +53,7 @@ def register_user():
         case 'instructor':
             instructor = {'ci': ci, 'first_name': first_name, 'last_name': last_name}
             result, message = services.create_instructor_account(instructor, email, password)
-        case 'student':
+        case 'student' | 'estudiante':
             birth_date = data.get('birth_date') # manejar keyError
             student = {'ci': ci, 'first_name': first_name, 'last_name': last_name, 'birth_date': birth_date }
             result, message = services.create_student_account(student, email, password)
@@ -289,6 +298,19 @@ def add_user():
         return jsonify({'msg': message}), 200
     else:
         return jsonify({'error': message}), 400
+    
+
+
+@app.route('/students/available-classes', methods=['GET']) 
+@jwt_required()
+def get_available_classes():
+    user_ci = get_jwt_identity()
+    student_id = services.get_person_id_with_ci(user_ci)
+    
+    classes = services.get_available_classes(user_ci)
+    
+            
+    return jsonify(classes), 200
     
     
 if __name__ == '__main__':

@@ -62,8 +62,8 @@ def create_student_account(student, email, password):
     if response == -1:
         return -1, "No hay un alumno que cumpla con las especificaciones en la bd, primero debe ser ingresado al sistema por el adminsitrador"
     
-    query = f"SELECT login.email FROM login WHERE login.person_ci = {response}"
-    cursor.execute(query)
+    query = "SELECT login.email FROM login WHERE login.person_ci = %s"
+    cursor.execute(query, (response, ))
     data = cursor.fetchall()
     if len(data) > 0 :
         message = "Ya hay un alumno ingrsado en el sistema con el mail" + data[0]["email"]
@@ -71,8 +71,8 @@ def create_student_account(student, email, password):
     
     ci = student["ci"]
     role_id = get_role_id('student')
-    query = f"INSERT INTO login (email, password, person_ci, role_id) VALUE (\'{email}\', \'{password}\', {ci}, {role_id})"
-    cursor.execute(query)
+    query = "INSERT INTO login (email, password, person_ci, role_id) VALUE (%s, %s, %s, %s)"
+    cursor.execute(query, (email, password, ci, role_id))
     result = cursor.rowcount
     
     # verificación de que la isnerción fue exitosa
@@ -132,8 +132,8 @@ def create_instructor_account(instructor, email, password):
     if response == -1:
         return -1, "No hay un instructor que cumpla con las especificaciones en la bd, primero debe ser ingresado al sistema por el adminsitrador"
     
-    query = f"SELECT login.email FROM login WHERE login.person_ci = {response}"
-    cursor.execute(query)
+    query = "SELECT login.email FROM login WHERE login.person_ci = %s"
+    cursor.execute(query, (response,))
     data = cursor.fetchall()
     if len(data) > 0 :
         message = "Ya hay un instructor ingrsado en el sistema con el mail" + data[0]["email"]
@@ -141,8 +141,8 @@ def create_instructor_account(instructor, email, password):
     
     ci = instructor["ci"]
     role_id = get_role_id('instructor')
-    query = f"INSERT INTO login (email, password, person_ci, role_id) VALUE (\'{email}\', \'{password}\', {ci})"
-    cursor.execute(query)
+    query = "INSERT INTO login (email, password, person_ci, role_id) VALUE (%s, %s, %s, %s)"
+    cursor.execute(query, (email, password, ci, role_id))
     result = cursor.rowcount
     
     # verificación de que la isnerción fue exitosa
@@ -530,3 +530,62 @@ def add_student(person_id, student_ci, first_name, last_name, birth_date):
     if result > 0:
         return 1, "Estudiante agregado exitosamente al sistema."    
     return -1, "Hubo un error al ingresar al estudiante en el sistema."
+
+def get_available_classes(student_ci):
+    query = """
+        SELECT DISTINCT c.class_id, d.day_name, t.start_time, t.end_time
+        FROM classes c
+        JOIN class_day cd ON c.class_id = cd.class_id
+        JOIN days d ON cd.day_id = d.day_id
+        JOIN turns t ON c.turn_id = t.turn_id
+        LEFT JOIN student_class sc ON c.class_id = sc.class_id
+        WHERE ((c.is_group = TRUE
+            AND (SELECT COUNT(*) FROM student_class WHERE class_id = c.class_id) < 10)
+            OR (c.is_group = FALSE 
+            AND (SELECT COUNT(*) FROM student_class WHERE class_id = c.class_id) < 1))
+            AND c.class_id NOT IN (
+                SELECT class_id 
+                FROM student_class 
+                WHERE student_ci = %s
+            )
+            AND NOT EXISTS (
+                SELECT 1 
+                FROM student_class sc2
+                JOIN classes c2 ON sc2.class_id = c2.class_id
+                JOIN class_day cd2 ON c2.class_id = cd2.class_id
+                JOIN days d2 ON cd2.day_id = d2.day_id
+                JOIN turns t2 ON c2.turn_id = t2.turn_id
+                WHERE sc2.student_ci = %s
+                AND c.turn_id = c2.turn_id
+                AND d.day_id = d2.day_id
+            );
+    """
+    cursor.execute(query, (student_ci, student_ci))
+    data = cursor.fetchall()
+    classes = dict()
+    
+    for current_class in data:
+        hours, remainder = divmod(current_class['start_time'].seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        start_time = time(hours, minutes, seconds)
+        current_class['start_time'] = start_time.strftime('%H:%M:%S')
+        
+        hours, remainder = divmod(current_class['end_time'].seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        end_time = time(hours, minutes, seconds)
+        current_class['end_time'] = end_time.strftime('%H:%M:%S')
+        
+        class_id = current_class['class_id']
+        day_name = current_class['day_name']
+
+        if not classes.get(class_id):
+            end_time = current_class['end_time']
+            start_time = current_class['start_time']
+            classes[class_id] = {'class_id': class_id, 'days': [day_name], 'start_time': start_time, 'end_time': end_time}
+        else:
+            c = classes.get(class_id)
+            days = c.get("days")
+            days.append(day_name)
+
+    
+    return list(classes.values())
