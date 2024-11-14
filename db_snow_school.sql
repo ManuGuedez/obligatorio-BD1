@@ -372,6 +372,9 @@ INSERT INTO class_day (class_id, day_id) VALUES (4, 4); -- Jueves
 INSERT INTO class_day (class_id, day_id) VALUES (5, 3); -- Miércoles
 INSERT INTO class_day (class_id, day_id) VALUES (5, 5); -- Viernes
 
+ALTER TABLE classes
+ADD COLUMN is_group BOOLEAN DEFAULT TRUE;
+
 -- dado un instructor obtiene las clases que tiene en los días especificados en el turno especificado
 SELECT
     c.class_id,

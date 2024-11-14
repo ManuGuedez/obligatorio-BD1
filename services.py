@@ -346,10 +346,15 @@ def get_activities():
         
     return result
 
-def add_class(instructor_ci, activity_id, turn_id, start_date, end_date, days_ids):
+def add_class(instructor_ci, activity_id, turn_id, start_date, end_date, days_ids, type):
     try:
-        insert = 'INSERT INTO classes (instructor_ci, activity_id, turn_id, start_date, end_date) VALUE (%s, %s, %s, %s, %s)'
-        cursor.execute(insert, (instructor_ci, activity_id, turn_id, start_date, end_date))
+        if type:
+            is_group = False
+        else:
+            is_group = True
+            
+        insert = 'INSERT INTO classes (instructor_ci, activity_id, turn_id, start_date, end_date, is_group) VALUE (%s, %s, %s, %s, %s, %s)'
+        cursor.execute(insert, (instructor_ci, activity_id, turn_id, start_date, end_date, is_group))
         cnx.commit()  
         
         # en caso de haber podido agregar la clase a la tabla classes
