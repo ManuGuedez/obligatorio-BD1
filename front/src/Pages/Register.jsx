@@ -3,7 +3,10 @@ import './Register.css';
 
 const Register = () => {
     const [formData, setFormData] = useState({
+        name: '',
+        lastname: '',
         username: '',
+        ci: '',
         email: '',
         password: '',
     });
@@ -18,7 +21,7 @@ const Register = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // aca va la lógica para mandar los datos al backend
+        // Lógica para mandar los datos al backend
         console.log('Datos del registro:', formData);
     };
 
@@ -26,6 +29,28 @@ const Register = () => {
         <div className="register-container">
             <h2>Registro</h2>
             <form onSubmit={handleSubmit} className="register-form">
+                <div className="form-group">
+                    <label>Nombre:</label>
+                    <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                        placeholder="Ingrese su Nombre"
+                    />
+                </div>
+                <div className="form-group">
+                    <label>Apellido:</label>
+                    <input
+                        type="text"
+                        name="lastname"
+                        value={formData.lastname}
+                        onChange={handleChange}
+                        required
+                        placeholder="Ingrese su Apellido"
+                    />
+                </div>
                 <div className="form-group">
                     <label>Usuario:</label>
                     <input
@@ -35,6 +60,17 @@ const Register = () => {
                         onChange={handleChange}
                         required
                         placeholder="Ingrese su usuario"
+                    />
+                </div>
+                <div className="form-group">
+                    <label>Cédula:</label>
+                    <input
+                        type="text"
+                        name="ci"
+                        value={formData.ci}
+                        onChange={handleChange}
+                        required
+                        placeholder="Ingrese su Cédula"
                     />
                 </div>
                 <div className="form-group">
