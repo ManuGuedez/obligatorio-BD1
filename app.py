@@ -222,7 +222,7 @@ def modify_class(id):
         
     if result > 0: 
         if is_instructor_modified:
-            class_information = services.get_class_information(id)
+            class_information = services.get_class_information_for_instructor(id)
             description = class_information["description"]
             start_time = class_information["start_time"]
             end_time = class_information["end_time"]
@@ -282,7 +282,6 @@ def add_user():
             birth_date = data.get('birth_date')
             if not birth_date:
                 return jsonify({'error': 'Falta especificar fecha de nacimiento del estudiante.'}), 400
-            
             result, message = services.add_student(person_id, ci, first_name, last_name, birth_date)
 
         case _:
@@ -345,6 +344,81 @@ def get_equipment_rental(id):
         return jsonify({'error': message}), 400
     
 
+@app.route('/classes/<int:id>/infromation', methods=['GET']) 
+@jwt_required()
+def get_class_information(id):
+    '''
+    este endpoint no requiere un body
+    '''
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    user_ci = get_jwt_identity()    
+    class_information = services.get_extended_class_info(id)
+    
+    match role:
+        case 'admin':
+            return jsonify(class_information), 200
+        case 'instructor':
+            if not services.is_instructor_responsible(id, user_ci):
+                return jsonify({'error': 'Debe ser instructor responsable de la clase para acceder a la información'}), 400   
+            
+        case 'student':
+            if not services.is_student_enrolled(user_ci, id):
+                return jsonify({'error': 'Debe estar inscripto a la clase para poder acceder a la información.'}), 400
+        case _:
+            return jsonify({'error': 'Rol no identificado'}), 400
+            
+    return jsonify(class_information), 200
+    
+    
+@app.route('/classes/<int:id>/enrolled-students', methods=['GET']) 
+@jwt_required()
+def get_enrolled_students(id):
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "instructor" and role != 'admin'): # si es estudiante o no reconocido
+        return jsonify({'error': 'No tienes permiso de acceder a lista de inscriptos.'}), 400 
+    
+    user_ci = get_jwt_identity()
+    enrolled_students = services.get_enrolled_students(id)
+    
+    if role == 'instructor':
+        if not services.is_instructor_responsible(id, user_ci):
+                return jsonify({'error': 'Debes ser el instructor responsable para acceder a la lista de inscriptos'}), 400
+    
+    return jsonify(enrolled_students), 200
+        
+            
+@app.route('/classes/<int:id>/roll-call', methods=['POST']) 
+@jwt_required()
+def roll_call(id):
+    '''
+    cuerpo requerido:
+        - students_present: [lista con los ids de los estudiantes que fueron parte]
+    '''
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "instructor"):
+        return jsonify({'error': 'Debes ser instructor para pasar la lista.'}), 400
+    
+    user_ci = get_jwt_identity()
+    
+    if not services.is_instructor_responsible(id, user_ci):
+        return jsonify({'error': 'Debes ser el instructor responsable para pasar la lista'}), 400
+    
+    data = request.get_json() 
+    students_present = data.get('students_present')
+    
+    result, message = services.roll_call(id, students_present)
+    
+    if result > 0: 
+        return jsonify({'msg': message}), 200
+    else:
+        return jsonify({'error': message}), 400
+    
+    
 if __name__ == '__main__':
     app.run(debug=True)
 

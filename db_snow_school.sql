@@ -447,6 +447,8 @@ WHERE c.is_group = TRUE
         WHERE sc2.student_ci = 500000005
         AND c.turn_id = c2.turn_id
         AND d.day_id = d2.day_id
+        AND c.start_date > c2.start_date
+        AND c.end_date < c2.end_date
     );
 
 SELECT DISTINCT e.description, e.cost
@@ -470,3 +472,37 @@ WHERE sc.student_ci = 43158769 AND sc.class_id = 1;
 
 INSERT INTO student_class (class_id, student_ci) VALUE (1, 500000005);
 
+SELECT activities.description, turns.start_time, turns.end_time,
+       c.start_date, c.end_date, c.is_group, i.first_name as instructor_first_name, i.last_name as instructor_last_name
+FROM classes c
+    JOIN activities ON (c.activity_id = activities.activity_id)
+    JOIN turns ON (c.turn_id = turns.turn_id)
+    JOIN instructors i on (c.instructor_ci = i.instructor_ci)
+WHERE c.class_id = 1;
+
+SELECT classes.instructor_ci
+FROM classes
+WHERE class_id =1
+AND instructor_ci = 43211578;
+
+-- lista de inscriptos dada una clase
+SELECT s.person_id as student_id, s.first_name, s.last_name
+FROM students s
+JOIN student_class sc ON s.student_ci = sc.student_ci
+WHERE sc.class_id = 13;
+
+SELECT cs.id_class_session
+FROM class_session cs
+WHERE cs.class_id = 13
+AND cs.class_date = '2024-11-15';
+
+update classes set classes.end_date = '2024-11-14' WHERE class_id = 5;
+
+insert into student_class (class_id, student_ci) values
+(13, 44751236), -- Rodrigo en la clase de Julia Méndez (Skiing, 09:00-11:00)
+(13, 41657890); -- Paula en la clase de Julia Méndez (Skiing, 09:00-11:00)
+
+INSERT INTO class_attendance (id_class_session, student_id, attended) VALUES
+(13, 12, TRUE);
+
+delete from class_attendance
