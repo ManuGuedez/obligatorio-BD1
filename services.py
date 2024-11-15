@@ -2,31 +2,11 @@ import mysql.connector as mysql
 
 cnx = mysql.connect(user='root', password='rootpassword', host='127.0.0.1', database='snowSchool')
 cursor = cnx.cursor(dictionary=True) # devuelve la info en formato key-value
+from mysql.connector.errors import IntegrityError
 import algoritmo
 from datetime import datetime, time, timedelta
 
 def validate_student(student):
-    """
-    Valida la existencia de un estudiante en la base de datos.
-
-    Esta función verifica si un estudiante existe en la base de datos
-    utilizando su cédula de identidad y otros datos personales.
-
-    Args: 
-        student (dict): Diccionario con la información del estudiante.
-                        Debe contener las claves 'ci', 'first_name', 
-                        'last_name' y 'birth_date'.
-
-    Returns:
-        int: El número de cédula de identidad (ci) del estudiante si existe,
-             o -1 si no se encuentra en la base de datos.
-
-    Raises:
-        ValueError: Si el diccionario no tiene exactamente 4 elementos 
-                    o si faltan claves necesarias ('ci', 'first_name', 
-                    'last_name', 'birth_date').
-    """
-
     if len(student) != 4:
         raise ValueError("Asegurate de haber ingrsado correctamente los datos")
     
@@ -313,10 +293,6 @@ def retrieve_instructor_classes_by_turn_and_days(instructor_id, turn_id, days_id
    
     return data
 
-def query_to_add_class(instructor_id, turn_id, days_ids, start_date, end_date):
-    classes = retrieve_instructor_classes_by_turn_and_days(instructor_id, turn_id, days_ids, start_date, end_date)
-    
-    return classes
 
 def is_instructor_busy(instructor_id, turn_id, days_ids, start_date, end_date):
     classes = retrieve_instructor_classes_by_turn_and_days(instructor_id, turn_id, days_ids, start_date, end_date)
@@ -558,6 +534,8 @@ def get_available_classes(student_ci):
                 WHERE sc2.student_ci = %s
                 AND c.turn_id = c2.turn_id
                 AND d.day_id = d2.day_id
+                AND c.start_date = cs.start_date
+                AND c.end_date = c2.end_date
             );
     """
     cursor.execute(query, (student_ci, student_ci))
@@ -589,3 +567,58 @@ def get_available_classes(student_ci):
 
     
     return list(classes.values())
+
+
+
+def get_rentable_equipment(class_id):
+    
+    query = """
+    SELECT DISTINCT e.description, e.cost, e.equipment_id
+    FROM classes c
+    JOIN equipment e ON c.activity_id = e.activity_id
+    WHERE c.activity_id = (
+        select c2.activity_id
+        FROM classes c2
+        WHERE c2.class_id = %s
+        );
+    """
+    cursor.execute(query, (class_id, ))
+    data = cursor.fetchall()
+    
+    return data
+
+
+def rent_equipment(class_id, student_id, equipment_id):
+    rentable_equipment = get_rentable_equipment(class_id)
+    rentable_equipment = [equipment['equipment_id'] for equipment in rentable_equipment]
+    
+    for e in equipment_id:
+        if not e in rentable_equipment:
+            return -1, "El equipo rentado debe ser de la actividad correspondiente a la clase."
+            
+    
+    insert = "INSERT INTO equipment_rental (class_id, person_id, equipment_id) VALUE (%s, %s, %s) "
+    for id in equipment_id:
+        try:
+            cursor.execute(insert, (class_id, student_id, id))
+            cnx.commit()
+            result = cursor.rowcount
+            
+            if result <= 0:
+                return -1, "Algo salió mal rentando equipamiento."    
+        except IntegrityError: # en caso de que ya esté rentado el equipamiento
+            continue
+    
+    return 1, "Equipos rentados exitosamente"
+    
+    
+def is_student_enrolled(student_ci, class_id):
+    query = """
+    SELECT sc.student_ci
+    FROM student_class sc
+    WHERE sc.student_ci = %s AND sc.class_id = %s
+    """
+    cursor.execute(query, (student_ci, class_id))
+    data = cursor.fetchall()
+    
+    return len(data) > 0

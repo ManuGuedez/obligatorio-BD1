@@ -448,3 +448,25 @@ WHERE c.is_group = TRUE
         AND c.turn_id = c2.turn_id
         AND d.day_id = d2.day_id
     );
+
+SELECT DISTINCT e.description, e.cost
+FROM classes c
+JOIN equipment e ON c.activity_id = e.activity_id
+WHERE c.activity_id = (
+    select c2.activity_id
+    FROM classes c2
+    WHERE c2.class_id = 1
+    );
+
+SELECT er.class_id
+FROM equipment_rental er
+WHERE er.class_id = 1
+    AND er.equipment_id IN (1, 3)
+    AND er.person_id = 1;
+
+SELECT sc.student_ci
+FROM student_class sc
+WHERE sc.student_ci = 43158769 AND sc.class_id = 1;
+
+INSERT INTO student_class (class_id, student_ci) VALUE (1, 500000005);
+
