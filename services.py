@@ -584,6 +584,26 @@ def add_student_to_class(student_ci, class_id):
         print(f"Error al ejecutar la consulta: {query_insert}, Parámetros: {class_id}, {student_ci}")
         print(f"Error devuelto por MySQL: {err}")
         return -1, f"Error al agregar el estudiante: {err}"
+    
+    
+def remove_student_from_class(student_ci, class_id):
+    query_delete = "DELETE FROM student_class WHERE class_id = %s AND student_ci = %s"
+
+    try:
+        cursor.execute(query_delete, (class_id, student_ci))
+        cnx.commit()
+
+        if cursor.rowcount > 0:
+            return 1, "Estudiante eliminado de la clase exitosamente."
+        else:
+            return -1, "Error al eliminar al estudiante de la clase."
+
+    except mysql.Error as err:
+        # Depuración: Imprimir error y consulta para diagnóstico
+        print(f"Error al ejecutar la consulta: {query_delete}, Parámetros: {class_id}, {student_ci}")
+        print(f"Error devuelto por MySQL: {err}")
+        return -1, f"Error al eliminar el estudiante: {err}"
+    
 
 
 def get_available_classes(student_ci):

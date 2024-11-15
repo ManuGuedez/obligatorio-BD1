@@ -325,6 +325,27 @@ def add_student_to_class(class_id):
         return jsonify({'msg': new_enrollment}), 200
     else:
         return jsonify({'error': new_enrollment}), 400
+    
+    
+
+    
+@app.route('/classes/<int:class_id>/remove_student_from_class', methods=['DELETE'])
+#@jwt_required()   
+def remove_student_from_class(class_id):
+    data = request.get_json()
+    student_ci = data.get("student_ci")
+    
+    if not services.is_student_enrolled(student_ci, class_id):
+        return jsonify({'error': 'El estudiante no está inscripto en esta clase'}), 400
+        
+    result, message = services.remove_student_from_class(class_id, student_ci)
+
+    if result > 0:
+        return jsonify({'msg': message}), 200
+    else:
+        return jsonify({'error': message}), 400
+
+
 
 
 @app.route('/students/available-classes', methods=['GET']) 
