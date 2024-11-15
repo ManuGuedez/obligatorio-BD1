@@ -70,7 +70,7 @@ CREATE TABLE classes (
     instructor_ci INT,
     activity_id INT,
     turn_id INT,
-    is_held BOOLEAN,
+    dictated BOOLEAN,
     FOREIGN KEY (instructor_ci) REFERENCES instructors(instructor_ci),
     FOREIGN KEY (activity_id) REFERENCES activities(activity_id),
     FOREIGN KEY (turn_id) REFERENCES turns(turn_id)
@@ -315,7 +315,7 @@ CREATE TABLE class_session (
     class_id INT,
     class_date DATE,
     day_id INT,
-    is_held BOOLEAN DEFAULT false,
+    dictated BOOLEAN DEFAULT false,
     FOREIGN KEY (class_id) REFERENCES classes(class_id),
     FOREIGN KEY (day_id) REFERENCES days(day_id)
 );
@@ -421,4 +421,30 @@ WHERE c.class_id = 1
     AND cd.day_id IN (1, 3);
 
 
-SELECT s.student_ci FROM students s WHERE s.person_id = 19
+SELECT s.student_ci FROM students s WHERE s.person_id = 19;
+
+
+SELECT DISTINCT c.class_id, d.day_name, t.start_time, t.end_time
+FROM classes c
+JOIN class_day cd ON c.class_id = cd.class_id
+JOIN days d ON cd.day_id = d.day_id
+JOIN turns t ON c.turn_id = t.turn_id
+LEFT JOIN student_class sc ON c.class_id = sc.class_id
+WHERE c.is_group = TRUE
+    AND (SELECT COUNT(*) FROM student_class WHERE class_id = c.class_id) < 10
+    AND c.class_id NOT IN (
+        SELECT class_id
+        FROM student_class
+        WHERE student_ci = 500000005
+    )
+    AND NOT EXISTS (
+        SELECT 1
+        FROM student_class sc2
+        JOIN classes c2 ON sc2.class_id = c2.class_id
+        JOIN class_day cd2 ON c2.class_id = cd2.class_id
+        JOIN days d2 ON cd2.day_id = d2.day_id
+        JOIN turns t2 ON c2.turn_id = t2.turn_id
+        WHERE sc2.student_ci = 500000005
+        AND c.turn_id = c2.turn_id
+        AND d.day_id = d2.day_id
+    );

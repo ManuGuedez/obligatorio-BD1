@@ -32,6 +32,15 @@ def login():
 
 @app.route('/register', methods=['POST'])
 def register_user():
+    '''
+    cuerpo requerido:
+        - rol con el que se va a registrar la persona
+        - ci
+        - first_name
+        - last_name
+        - email
+        - password
+    '''
     data = request.get_json()
     rol = data.get('rol')
     ci = data.get('ci')
@@ -44,7 +53,7 @@ def register_user():
         case 'instructor':
             instructor = {'ci': ci, 'first_name': first_name, 'last_name': last_name}
             result, message = services.create_instructor_account(instructor, email, password)
-        case 'student':
+        case 'student' | 'estudiante':
             birth_date = data.get('birth_date') # manejar keyError
             student = {'ci': ci, 'first_name': first_name, 'last_name': last_name, 'birth_date': birth_date }
             result, message = services.create_student_account(student, email, password)
@@ -291,23 +300,21 @@ def add_user():
         return jsonify({'error': message}), 400
     
 
-@app.route('/classes/<int:class_id>/add-student', methods=['POST'])
-@jwt_required()
+@app.route('/classes/<int:class_id>/add_student_to_class', methods=['POST'])
+#@jwt_required()
 
 def add_student_to_class(class_id):
     
     data = request.get_json()
-    
+    # print("Datos recibidos:", data) 
+         
     student_id = data.get("student_id")
+    student_ci = data.get("student_ci")
     turn_id = data.get("turn_id")
     days_ids = data.get("days_ids")
     start_date = data.get("start_date")
     end_date = data.get("end_date") 
     
-    
-    class_info = services.get_class_information(class_id)
-    if not class_info:
-        return jsonify({'error': 'Clase no encontrada'}), 404
     
     enrolled_students_count = services.enrolled_students_count(class_id)
     
@@ -318,14 +325,26 @@ def add_student_to_class(class_id):
     if services.is_student_busy(student_id, turn_id, days_ids, start_date, end_date):
         return jsonify({"message": "El alumno ya está ocupado en el turno y los días seleccionados."}), 400
     
-    result, new_enrollment = services.add_student_to_class(student_id=student_id, class_id=class_id)
+    print("class_id:", class_id, student_ci)
+    result, new_enrollment = services.add_student_to_class(student_ci, class_id)
 
     if result > 0: 
         return jsonify({'msg': new_enrollment}), 200
     else:
         return jsonify({'error': new_enrollment}), 400
 
+
+@app.route('/students/available-classes', methods=['GET']) 
+@jwt_required()
+def get_available_classes():
+    user_ci = get_jwt_identity()
+    student_id = services.get_person_id_with_ci(user_ci)
     
+    classes = services.get_available_classes(user_ci)
+    
+            
+    return jsonify(classes), 200
+        
 if __name__ == '__main__':
     app.run(debug=True)
 
