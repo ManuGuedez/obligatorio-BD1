@@ -55,3 +55,36 @@
     border-radius: 4px;
 }
 
+
+/* Estilo del encabezado de mes y año */
+.react-calendar__navigation__label {
+    font-size: 1.5rem; /* Tamaño de fuente más grande para el mes y año */
+    color: #4f46e5; /* Color azul */
+    font-weight: bold;
+    text-transform: capitalize; /* Para que el mes esté en mayúscula solo la primera letra */
+}
+
+/* Ajustes para centrar y alinear el encabezado */
+.react-calendar__navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Espacio alrededor de las flechas de navegación */
+.react-calendar__navigation button {
+    color: #4f46e5;
+    min-width: 44px;
+    background: none;
+    font-size: 1.2em;
+    margin: 0px; /* Ajuste de espacio para que se vea más alineado */
+    padding: 0;
+    width: 10px;
+}
+
+/* Cambios de color para hover en los botones de navegación */
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
+    background-color: #e0e7ff;
+    border-radius: 4px;
+}

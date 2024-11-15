@@ -39,7 +39,40 @@ h2{
     font-size: 1.5em; /* Ajusta el tamaño según tu preferencia */
 }
 
-.instructor-dashboard2{
+.instructor-dashboard2 {
     display: flex;
     justify-content: space-between;
+    gap: 50px;
+}
+.classes {
+    display: flex;
+    flex-wrap: wrap; /* Permite que las tarjetas pasen a la siguiente fila cuando no hay espacio */
+    
+    width: 100%;
+    
+}
+
+.classes ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap; /* Asegura que las tarjetas se ajusten en varias filas */
+    gap: 20px;
+}
+
+.classes ul li {
+    background-color: #1e3a8a; /* Color de fondo de las tarjetas */
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: calc(33.33% - 20px); /* Tamaño de cada tarjeta para que quepan tres en una fila (ajústalo según sea necesario) */
+    box-sizing: border-box;
+}
+
+.instructor{
+    width: 100%;
+}
+#noClasse{
+
 }

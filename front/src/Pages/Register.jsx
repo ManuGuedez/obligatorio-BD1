@@ -19,10 +19,25 @@ const Register = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // Lógica para mandar los datos al backend
-        console.log('Datos del registro:', formData);
+    const handleSubmit = async (e) => {
+        if (formData.username === "" || formData.email === "" || formData.passwd === "") {
+            setErrorMsg("Fields can't be left empty.");
+            setHidden(false);
+            return;
+        }
+
+        setErrorMsg("");
+        setHidden(true);
+
+        const user = await AuthService.register(username, email, passwd);
+
+        if (user.code === 400) { // El usuario existe
+            setErrorMsg("User already exists.");
+            setHidden(false);
+        } else {
+            setHidden(true);
+            navigate("/login");
+        }
     };
 
     return (

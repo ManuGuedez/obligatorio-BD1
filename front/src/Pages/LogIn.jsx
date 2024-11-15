@@ -3,7 +3,7 @@ import './LogIn.css';
 
 const LogIn = () => {
     const [formData, setFormData] = useState({
-        username: '',
+        email: '',
         password: '',
     });
 
@@ -16,9 +16,10 @@ const LogIn = () => {
     };
 
     const handleSubmit = (e) => {
-        e.preventDefault();
-        // aca va la lógica para mandar los datos al backend
-        console.log('Datos del inicio de sesión:', formData);
+        
+        if (formData.username == "" || formData.password){
+            
+        }
     };
 
     return (
@@ -26,14 +27,14 @@ const LogIn = () => {
             <h2>Inicio de Sesión</h2>
             <form onSubmit={handleSubmit} className="login-form">
                 <div className="form-group">
-                    <label>Usuario:</label>
+                    <label>Mail:</label>
                     <input
                         type="text"
-                        name="username"
-                        value={formData.username}
+                        name="mail"
+                        value={formData.mail}
                         onChange={handleChange}
                         required
-                        placeholder="Ingrese su usuario"
+                        placeholder="Ingrese su mail"
                     />
                 </div>
                 <div className="form-group">

@@ -6,6 +6,12 @@ import CalendarioClases from './../Components/CalendarioClases';
 const Instructor = () => {
     const [classes, setClasses] = useState([]);
 
+    const actualDate = new Date();
+    console.log(actualDate.toDateString())
+    const todayClasses = classes.filter(
+        (classData) =>
+            classData.fecha === actualDate.toISOString().split('T')[0]
+    );
     const calendario = [
         { fecha: '2024-11-05', deporte: 'Snow Ski', horario: '10:00 - 12:00' },
         { fecha: '2024-11-06', deporte: 'Snowboard', horario: '14:00 - 16:00' },
@@ -16,7 +22,8 @@ const Instructor = () => {
         // Simulación de datos de ejemplo
 
         const exampleClasses = [
-            {
+            {   
+                fecha: '2024-11-14',
                 turno: "Lunes 10:00 - 12:00",
                 dictada: "Sí",
                 deporte: "Snow Ski",
@@ -27,6 +34,29 @@ const Instructor = () => {
                 ]
             },
             {
+                fecha: '2024-11-14',
+                turno: "Martes 14:00 - 16:00",
+                dictada: "No",
+                deporte: "Snowboard",
+                maxAlumnos: "10",
+                cantAlumnos: [
+                    { name: "Carlos Gómez", email: "carlos@example.com" },
+                    { name: "Luisa Fernanda", email: "luisa@example.com" }
+                ]
+            },
+            {
+                fecha: '2024-11-14',
+                turno: "Martes 14:00 - 16:00",
+                dictada: "No",
+                deporte: "Snowboard",
+                maxAlumnos: "10",
+                cantAlumnos: [
+                    { name: "Carlos Gómez", email: "carlos@example.com" },
+                    { name: "Luisa Fernanda", email: "luisa@example.com" }
+                ]
+            },
+            {
+                fecha: '2024-11-14',
                 turno: "Martes 14:00 - 16:00",
                 dictada: "No",
                 deporte: "Snowboard",
@@ -44,25 +74,30 @@ const Instructor = () => {
     return (
         <div className="instructor-dashboard">
             <div className='instructor-dashboard2'>
-                <div>
+                <div className='instructor'>
                     <div className="encabezadoInstructor">
                         <p id="inspecciona">Inspecciona tus clases</p>
                         <h1>Bienvenido, Donald Trump</h1>
                     </div>
                     <section className="schedule">
                         <h2>Clases de Hoy</h2>
-                        <ul>
-                            {classes.map((classData, key) => (
-                                <Clases
-                                    key={key}
-                                    turno={classData.turno}
-                                    dictada={classData.dictada}
-                                    deporte={classData.deporte}
-                                    maxAlumnos={classData.maxAlumnos}
-                                    alumnos={classData.cantAlumnos}
-                                />
-                            ))}
-                        </ul>
+                        <div className="classes">
+                            {todayClasses.length > 0 ? (
+                                <ul>
+                                    {todayClasses.map((classData, key) => (
+                                        <Clases
+                                            key={key}
+                                            turno={classData.turno}
+                                            dictada={classData.dictada}
+                                            deporte={classData.deporte}
+                                            maxAlumnos={classData.maxAlumnos}
+                                            alumnos={classData.cantAlumnos}
+                                            fecha={classData.fecha}
+                                        />
+                                    ))}
+                                </ul>
+                            ) : (<p id="noClasses">No hay clases agendadas</p>)}
+                        </div>
                     </section>
                 </div>
 

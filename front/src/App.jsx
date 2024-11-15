@@ -13,7 +13,7 @@ const App = () => {
     const location = useLocation();
 
     // Define rutas en las que no deseas que aparezca la NavBar
-    const noNavBarRoutes = ['/LogIn', '/Register'];
+    const noNavBarRoutes = ['/LogIn', '/Register', '/register', '/login' ];
     return (
         <div>
             <div className="app-container">
