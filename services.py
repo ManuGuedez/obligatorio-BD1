@@ -530,3 +530,62 @@ def add_student(person_id, student_ci, first_name, last_name, birth_date):
     if result > 0:
         return 1, "Estudiante agregado exitosamente al sistema."    
     return -1, "Hubo un error al ingresar al estudiante en el sistema."
+
+
+
+def retrieve_student_classes_by_turn_and_days(student_id, turn_id, days_id, start_date, end_date):
+    select = '''
+        SELECT 
+            c.class_id, 
+            c.activity_id, 
+            c.turn_id, 
+            cd.day_id 
+        FROM classes c
+    '''
+    joins = '''
+        JOIN student_class sc ON sc.class_id = c.class_id
+        JOIN students s ON s.student_ci = sc.student_ci
+        JOIN class_day cd ON cd.class_id = c.class_id
+    '''
+    where = '''
+        WHERE s.person_id = %s 
+        AND c.turn_id = %s 
+        AND (c.start_date <= %s OR c.end_date >= %s)
+        AND cd.day_id IN 
+    '''
+    
+    days = '('
+    for d in days_id:
+        days += str(d) + ', '
+    days = days[0:len(days) - 2] + ')'
+    
+    query = select + joins + where + days
+    cursor.execute(query, (student_id, turn_id, start_date, end_date))
+    data = cursor.fetchall()
+   
+    return data
+
+def is_student_busy(student_id, turn_id, days_ids, start_date, end_date):
+
+    classes = retrieve_student_classes_by_turn_and_days(student_id, turn_id, days_ids, start_date, end_date)
+    return len(classes) > 0
+
+
+def enrolled_students_count(class_id):
+    query = 'SELECT COUNT(*) AS enrolled_students FROM student_class WHERE class_id = %s'
+    cursor.execute(query, (class_id,))
+    data = cursor.fetchall()
+    return data[0]['enrolled_students']
+
+
+def add_student_to_class(class_id, student_ci):
+    query_insert = f"INSERT INTO student_class (class_id, student_ci) VALUES ({class_id}, {student_ci})"
+    try:
+        cursor.execute(query_insert)
+        cnx.commit()
+        if cursor.rowcount > 0:
+            return 1, "Estudiante agregado a la clase exitosamente."
+        else:
+            return -1, "Error al agregar al estudiante a la clase."
+    except mysql.Error as err:
+        return -1, f"Error al agregar el estudiante: {err}"

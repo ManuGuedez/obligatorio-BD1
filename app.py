@@ -290,6 +290,41 @@ def add_user():
     else:
         return jsonify({'error': message}), 400
     
+
+@app.route('/classes/<int:class_id>/add-student', methods=['POST'])
+@jwt_required()
+
+def add_student_to_class(class_id):
+    
+    data = request.get_json()
+    
+    student_id = data.get("student_id")
+    turn_id = data.get("turn_id")
+    days_ids = data.get("days_ids")
+    start_date = data.get("start_date")
+    end_date = data.get("end_date") 
+    
+    
+    class_info = services.get_class_information(class_id)
+    if not class_info:
+        return jsonify({'error': 'Clase no encontrada'}), 404
+    
+    enrolled_students_count = services.enrolled_students_count(class_id)
+    
+    if enrolled_students_count >= 10:
+        return jsonify({"message": "La clase ya está llena."}), 400
+
+    
+    if services.is_student_busy(student_id, turn_id, days_ids, start_date, end_date):
+        return jsonify({"message": "El alumno ya está ocupado en el turno y los días seleccionados."}), 400
+    
+    result, new_enrollment = services.add_student_to_class(student_id=student_id, class_id=class_id)
+
+    if result > 0: 
+        return jsonify({'msg': new_enrollment}), 200
+    else:
+        return jsonify({'error': new_enrollment}), 400
+
     
 if __name__ == '__main__':
     app.run(debug=True)
