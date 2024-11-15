@@ -65,7 +65,7 @@ def register_user():
     else:
         return jsonify({'error': message}), 400
 
-    
+# no se usa todavía
 @app.route('/classes/<id>/students', methods=['PUT'])
 @jwt_required()
 def modify_class_students(id):
@@ -222,7 +222,7 @@ def modify_class(id):
         
     if result > 0: 
         if is_instructor_modified:
-            class_information = services.get_class_information(id)
+            class_information = services.get_class_information_for_instructor(id)
             description = class_information["description"]
             start_time = class_information["start_time"]
             end_time = class_information["end_time"]
@@ -269,26 +269,19 @@ def add_user():
     if not ci or not first_name or not last_name or not user_type:
         return jsonify({'error': 'Faltan datos obligatorios'}), 400
     
+    person_id = services.add_person(ci, first_name, last_name) 
+    
+    if person_id <= 0:
+        return jsonify({'error': 'Hubo un problema al ingresar la persona en el sistema.'}), 400
+    
     match user_type:
         case 'instructor':
-            person_id = services.add_person(ci, first_name, last_name) 
-            
-            if person_id <= 0:
-                return jsonify({'error': 'Hubo un problema al ingresar la persona en el sistema.'}), 400
-            
             result, message = services.add_instructor(person_id, ci, first_name, last_name)
             
         case 'student' | 'estudiante':
             birth_date = data.get('birth_date')
-            
             if not birth_date:
                 return jsonify({'error': 'Falta especificar fecha de nacimiento del estudiante.'}), 400
-
-            person_id = services.add_person(ci, first_name, last_name) 
-            
-            if person_id <= 0:
-                return jsonify({'error': 'Hubo un problema al ingresar la persona en el sistema.'}), 400
-            
             result, message = services.add_student(person_id, ci, first_name, last_name, birth_date)
 
         case _:
@@ -336,14 +329,144 @@ def add_student_to_class(class_id):
 
 @app.route('/students/available-classes', methods=['GET']) 
 @jwt_required()
-def get_available_classes():
+def get_available_classes(): # pensado para que lo use el estudiante
     user_ci = get_jwt_identity()
-    student_id = services.get_person_id_with_ci(user_ci)
-    
     classes = services.get_available_classes(user_ci)
     
-            
     return jsonify(classes), 200
+    
+
+@app.route('/classes/<int:id>/equipment-available', methods=['GET']) 
+@jwt_required()
+def get_available_equipment(id):
+    rentable_equipment = services.get_rentable_equipment(id)
+    return jsonify(rentable_equipment), 200
+    
+
+@app.route('/classes/<int:id>/rental-equipment', methods=['POST']) 
+@jwt_required()
+def get_equipment_rental(id):
+    '''
+    cuerpo requerido
+        - equipment_id: [lista de ids del equipamiento a rentar]
+    '''
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "student"):
+        return jsonify({'error': 'Solo los alumnos pueden rentar equipamiento.'}), 400
+    
+    user_ci = get_jwt_identity()
+    
+    if not services.is_student_enrolled(user_ci, id):
+        return jsonify({'error': 'Para poder rentar equipo para esta clase debes estar inscripto primero.'}), 400
+        
+    data = request.get_json() # ids de las los equipos a rentar 
+    lista_ids_equipamiento = data.get('equipment_id')
+    
+    if not lista_ids_equipamiento:
+        return jsonify({'error': 'Es necesario ingresar los ids de los equipamientos a rentar.'}), 400
+    
+    student_id = services.get_person_id_with_ci(user_ci)
+    
+    result, message = services.rent_equipment(id, student_id, lista_ids_equipamiento)
+    
+    if result > 0: 
+        return jsonify({'msg': message}), 200
+    else:
+        return jsonify({'error': message}), 400
+    
+
+@app.route('/classes/<int:id>/infromation', methods=['GET']) 
+@jwt_required()
+def get_class_information(id):
+    '''
+    este endpoint no requiere un body
+    '''
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    user_ci = get_jwt_identity()    
+    class_information = services.get_extended_class_info(id)
+    
+    match role:
+        case 'admin':
+            return jsonify(class_information), 200
+        case 'instructor':
+            if not services.is_instructor_responsible(id, user_ci):
+                return jsonify({'error': 'Debe ser instructor responsable de la clase para acceder a la información'}), 400   
+            
+        case 'student':
+            if not services.is_student_enrolled(user_ci, id):
+                return jsonify({'error': 'Debe estar inscripto a la clase para poder acceder a la información.'}), 400
+        case _:
+            return jsonify({'error': 'Rol no identificado'}), 400
+            
+    return jsonify(class_information), 200
+    
+    
+@app.route('/classes/<int:id>/enrolled-students', methods=['GET']) 
+@jwt_required()
+def get_enrolled_students(id):
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "instructor" and role != 'admin'): # si es estudiante o no reconocido
+        return jsonify({'error': 'No tienes permiso de acceder a lista de inscriptos.'}), 400 
+    
+    user_ci = get_jwt_identity()
+    enrolled_students = services.get_enrolled_students(id)
+    
+    if role == 'instructor':
+        if not services.is_instructor_responsible(id, user_ci):
+                return jsonify({'error': 'Debes ser el instructor responsable para acceder a la lista de inscriptos'}), 400
+    
+    return jsonify(enrolled_students), 200
+        
+            
+@app.route('/classes/<int:id>/roll-call', methods=['POST']) 
+@jwt_required()
+def roll_call(id):
+    '''
+    cuerpo requerido:
+        - students_present: [lista con los ids de los estudiantes que fueron parte]
+    '''
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "instructor"):
+        return jsonify({'error': 'Debes ser instructor para pasar la lista.'}), 400
+    
+    user_ci = get_jwt_identity()
+    
+    if not services.is_instructor_responsible(id, user_ci):
+        return jsonify({'error': 'Debes ser el instructor responsable para pasar la lista'}), 400
+    
+    data = request.get_json() 
+    students_present = data.get('students_present')
+    
+    result, message = services.roll_call(id, students_present)
+    
+    if result > 0: 
+        return jsonify({'msg': message}), 200
+    else:
+        return jsonify({'error': message}), 400
+    
+
+@app.route('/instructor/class-calendar', methods=['GET']) 
+@jwt_required()
+def get_class_calendar():
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "instructor"):
+        return jsonify({'error': 'Debes ser instructor para poder acceder al calendario.'}), 400
+    
+    user_ci = get_jwt_identity()
+    instructor_calendar = services.get_class_calendar(user_ci)
+    
+    return jsonify(instructor_calendar), 200
+    
+    
         
 if __name__ == '__main__':
     app.run(debug=True)

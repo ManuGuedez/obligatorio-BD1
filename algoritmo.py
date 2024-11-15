@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta, date
 
 # devuelve una lista con las tuplas en formato (fecha, día_semana)
 def generar_calendario(start_date, end_date, dias_clase): #start_date, end_date, dias_clase ----> para agregar en el parametro
