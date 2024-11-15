@@ -505,4 +505,10 @@ insert into student_class (class_id, student_ci) values
 INSERT INTO class_attendance (id_class_session, student_id, attended) VALUES
 (13, 12, TRUE);
 
-delete from class_attendance
+SELECT c.class_id, c.start_date, c.end_date, a.description, t.start_time, t.end_time, cs.class_date
+FROM classes c
+JOIN turns t on c.turn_id = t.turn_id
+JOIN activities a on a.activity_id = c.activity_id
+JOIN instructors i on i.instructor_ci = c.instructor_ci
+JOIN class_session cs on c.class_id = cs.class_id
+WHERE i.instructor_ci = 43258790

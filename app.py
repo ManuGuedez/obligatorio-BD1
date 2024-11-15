@@ -418,6 +418,23 @@ def roll_call(id):
     else:
         return jsonify({'error': message}), 400
     
+
+@app.route('/instructor/class-calendar', methods=['GET']) 
+@jwt_required()
+def get_class_calendar():
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "instructor"):
+        return jsonify({'error': 'Debes ser instructor para poder acceder al calendario.'}), 400
+    
+    user_ci = get_jwt_identity()
+    instructor_calendar = services.get_class_calendar(user_ci)
+    
+    return jsonify(instructor_calendar), 200
+    
+    
+    
     
 if __name__ == '__main__':
     app.run(debug=True)

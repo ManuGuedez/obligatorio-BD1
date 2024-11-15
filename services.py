@@ -728,4 +728,22 @@ def roll_call(class_id, students_present):
         return 1, "Lista guardada correctamente."
     return -1, "Algo salió mal al dictar la clase."
     
+
+def get_class_calendar(instructor_ci):
+    query = """
+    SELECT c.class_id, a.description, t.start_time, t.end_time, cs.class_date
+    FROM classes c
+    JOIN turns t on c.turn_id = t.turn_id
+    JOIN activities a on a.activity_id = c.activity_id
+    JOIN instructors i on i.instructor_ci = c.instructor_ci
+    JOIN class_session cs on c.class_id = cs.class_id
+    WHERE i.instructor_ci = %s
+    """
+    cursor.execute(query, (instructor_ci, ))
+    data = cursor.fetchall()
     
+    for current_data in data:
+        current_data['start_time'] = cast_time(current_data['start_time'])
+        current_data['end_time'] = cast_time(current_data['end_time'])
+        current_data['class_date'] = cast_date(current_data['class_date'])
+    return data
