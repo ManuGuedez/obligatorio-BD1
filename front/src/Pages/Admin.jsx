@@ -7,8 +7,29 @@ const Admin = () => {
     const [activities, setActivities] = useState([]);
     const [students, setStudents] = useState([]);
     const [reports, setReports] = useState({});
+    const [isModalOpen, setIsModalOpen] = useState(false); // Controla la visibilidad del modal
+    const [newInstructor, setNewInstructor] = useState({ name: '', email: '' }); // Almacena los datos del nuevo instructor
 
-    const handleAddInstructor = () => { /* Lógica para agregar instructor */ };
+    const handleAddInstructor = () => {
+        setIsModalOpen(true); // Abre el modal al hacer clic en "Agregar Instructor"
+    };
+
+    const handleSaveInstructor = () => {
+        setInstructors([...instructors, newInstructor]); // Agrega el nuevo instructor a la lista
+        setNewInstructor({ name: '', email: '' }); // Reinicia el formulario
+        setIsModalOpen(false); // Cierra el modal
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setNewInstructor((prev) => ({ ...prev, [name]: value })); // Actualiza los datos del instructor
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false); // Cierra el modal sin guardar
+        setNewInstructor({ name: '', email: '' }); // Reinicia el formulario si se cierra el modal
+    };
+
     const handleRemoveInstructor = (id) => { /* Lógica para eliminar instructor */ };
     const handleEditInstructor = (id) => { /* Lógica para editar instructor */ };
     const handleAddSchedule = () => { /* Lógica para agregar turno */ };
@@ -63,6 +84,41 @@ const Admin = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Modal para agregar instructor */}
+            {isModalOpen && (
+                <div className="modal">
+                    <div className="modal-content">
+                        <h2>Nuevo Instructor</h2>
+                        <div className="form-group">
+                            <label>Nombre:</label>
+                            <input
+                                type="text"
+                                name="name"
+                                value={newInstructor.name}
+                                onChange={handleChange}
+                                placeholder="Ingrese el nombre"
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label>Email:</label>
+                            <input
+                                type="email"
+                                name="email"
+                                value={newInstructor.email}
+                                onChange={handleChange}
+                                placeholder="Ingrese el email"
+                                required
+                            />
+                        </div>
+                        <div className="modal-buttons">
+                            <button onClick={handleSaveInstructor}>Guardar</button>
+                            <button onClick={handleCloseModal}>Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
