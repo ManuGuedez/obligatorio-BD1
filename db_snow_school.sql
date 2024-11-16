@@ -391,9 +391,9 @@ JOIN
     class_day cd ON cd.class_id = c.class_id
 WHERE
     i.person_id = 5           -- id del instructor a buscar
-    AND c.turn_id = 3         -- id del turno a buscar
-    AND  (c.start_date <= '2024-11-11'
-    OR c.end_date >= '2024-12-11')
+    AND c.turn_id = 1         -- id del turno a buscar
+    AND  (c.start_date <= '2024-12-11'
+    OR c.end_date >= '2024-11-11')
     AND cd.day_id IN (1, 3)    -- lista de ids de los días específicos
 ORDER BY
     cd.day_id, c.turn_id;
@@ -447,8 +447,8 @@ WHERE c.is_group = TRUE
         WHERE sc2.student_ci = 500000005
         AND c.turn_id = c2.turn_id
         AND d.day_id = d2.day_id
-        AND c.start_date > c2.start_date
-        AND c.end_date < c2.end_date
+        AND c.start_date <= c2.end_date
+        AND c2.end_date <= c.start_date
     );
 
 SELECT DISTINCT e.description, e.cost
@@ -511,4 +511,28 @@ JOIN turns t on c.turn_id = t.turn_id
 JOIN activities a on a.activity_id = c.activity_id
 JOIN instructors i on i.instructor_ci = c.instructor_ci
 JOIN class_session cs on c.class_id = cs.class_id
-WHERE i.instructor_ci = 43258790
+WHERE i.instructor_ci = 43258790;
+
+-- alumno ocupado en estas fechas con estos horarios
+ SELECT
+    c.class_id,
+    s.first_name,
+    s.last_name,
+    c.activity_id,
+    c.turn_id,
+    cd.day_id
+FROM
+    classes c
+JOIN
+    student_class sc on sc.class_id = c.class_id
+JOIN students s on sc.student_ci = s.student_ci
+JOIN
+    class_day cd ON cd.class_id = c.class_id
+WHERE
+    s.person_id = 23
+    AND c.turn_id = 1
+    AND cd.day_id IN (1, 2, 3)
+    AND (c.start_date <= '2024-12-20' AND '2024-12-02' <= c.end_date );
+    --                  fecha inicio                fecha fin
+
+delete from student_class where student_ci = 43158769 and class_id = 13

@@ -295,16 +295,12 @@ def retrieve_instructor_classes_by_turn_and_days(instructor_id, turn_id, days_id
     # '''
     select = 'SELECT c.class_id, c.activity_id, c.turn_id, cd.day_id FROM classes c '
     joins = 'JOIN instructors i ON i.instructor_ci = c.instructor_ci JOIN class_day cd ON cd.class_id = c.class_id '
-    where = 'WHERE i.person_id = %s AND c.turn_id = %s AND (c.start_date <= %s OR c.end_date >= %s) AND cd.day_id IN '
+    where = 'WHERE i.person_id = %s AND c.turn_id = %s AND (c.start_date <= %s and %s <= c.end_date) AND cd.day_id IN '
     
-    days = '('
-    for d in days_id:
-        days += str(d) + ', '
-    
-    days = days[0:len(days) - 2] + ')'
+    days = '('+ str(days)[1:-1] + ')'
     
     query = select + joins + where + days
-    cursor.execute(query, (instructor_id, turn_id, start_date, end_date))
+    cursor.execute(query, (instructor_id, turn_id, end_date, start_date))
     data = cursor.fetchall()
    
     return data
@@ -405,7 +401,7 @@ def rollback_added_class(class_id):
 
 def get_basic_class_info(class_id):
     query = """
-    SELECT c.turn_id, cd.day_id, i.person_id as instructor_id
+    SELECT c.turn_id, cd.day_id, i.person_id as instructor_id, c.start_date, c.end_date
     FROM classes c
     JOIN class_day cd ON c.class_id = cd.class_id
     JOIN instructors i ON c.instructor_ci = i.instructor_ci
@@ -515,44 +511,37 @@ def add_student(person_id, student_ci, first_name, last_name, birth_date):
 
 
 
-def retrieve_student_classes_by_turn_and_days(student_id, turn_id, days_id, start_date, end_date):
-    if isinstance(days_id, int):
-        days_id = [days_id]
+def retrieve_student_classes_by_turn_and_days(student_id, turn_id, days_id, start_date, end_date):        
+    query = """
+        SELECT
+            c.class_id,
+            s.first_name,
+            s.last_name,
+            c.activity_id,
+            c.turn_id,
+            cd.day_id
+        FROM
+            classes c
+        JOIN
+            student_class sc on sc.class_id = c.class_id
+        JOIN students s on sc.student_ci = s.student_ci
+        JOIN
+            class_day cd ON cd.class_id = c.class_id
+        WHERE
+            s.person_id = %s
+            AND c.turn_id = %s
+            AND (c.start_date <= %s and %s <= c.end_date)
+            AND cd.day_id IN (1, 2, 3)
+    """
     
-    select = '''
-        SELECT 
-            c.class_id, 
-            c.activity_id, 
-            c.turn_id, 
-            cd.day_id 
-        FROM classes c
-    '''
-    joins = '''
-        JOIN student_class sc ON sc.class_id = c.class_id
-        JOIN students s ON s.student_ci = sc.student_ci
-        JOIN class_day cd ON cd.class_id = c.class_id
-    '''
-    where = '''
-        WHERE s.person_id = %s 
-        AND c.turn_id = %s 
-        AND (c.start_date <= %s OR c.end_date >= %s)
-        AND cd.day_id IN 
-    '''
+    days = '('+ str(days_id)[1:-1] + ')'
     
-    days = '('
-    for d in days_id:
-        days += str(d) + ', '
-    
-    days = days[0:len(days) - 2] + ')'
-    
-    query = select + joins + where + days
-    cursor.execute(query, (student_id, turn_id, start_date, end_date))
+    cursor.execute(query, (student_id, turn_id, end_date, start_date))
     data = cursor.fetchall()
    
     return data
 
 def is_student_busy(student_id, turn_id, days_ids, start_date, end_date):
-
     classes = retrieve_student_classes_by_turn_and_days(student_id, turn_id, days_ids, start_date, end_date)
     return len(classes) > 0
 
@@ -561,29 +550,30 @@ def enrolled_students_count(class_id):
     query = 'SELECT COUNT(*) AS enrolled_students FROM student_class WHERE class_id = %s'
     cursor.execute(query, (class_id,))
     data = cursor.fetchall()
+    
+    if len(data) <= 0:
+        return data
     return data[0]['enrolled_students']
 
 
 def add_student_to_class(student_ci, class_id):
-    print("CLASS ID", class_id, student_ci)
-    query_insert = "INSERT INTO student_class (class_id, student_ci) VALUES (%s, %s)"
-    
+    insert = "INSERT INTO student_class (class_id, student_ci) VALUES (%s, %s)"
     try:
         # Ejecución de la consulta con parámetros
-        cursor.execute(query_insert, (class_id, student_ci))
+        cursor.execute(insert, (class_id, student_ci))
         cnx.commit()
-        
         if cursor.rowcount > 0:
             return 1, "Estudiante agregado a la clase exitosamente."
         else:
             return -1, "Error al agregar al estudiante a la clase."
-        
+    except IntegrityError as e:
+        if e.errno == 1452: # código de error de fk
+            return -1, "No hay un estudiante con el id ingresado"
+        elif e.errno == 1062: # código de clave repetida
+            return 1, "El alumno ya se encontraba inscripto en la clase."
+            
     except mysql.Error as err:
-        # Depuración: Imprimir error y consulta para diagnóstico
-        print("HOLA ", class_id, student_ci)
-        print(f"Error al ejecutar la consulta: {query_insert}, Parámetros: {class_id}, {student_ci}")
-        print(f"Error devuelto por MySQL: {err}")
-        return -1, f"Error al agregar el estudiante: {err}"
+        return -1, f"Error al agregar el estudiante: {err}, student_ci: " + str(student_ci)
     
     
 def remove_student_from_class(student_ci, class_id):
@@ -633,8 +623,8 @@ def get_available_classes(student_ci):
                 WHERE sc2.student_ci = %s
                 AND c.turn_id = c2.turn_id
                 AND d.day_id = d2.day_id
-                AND c.start_date > c2.start_date
-                AND c.end_date < c2.end_date
+                AND c.start_date <= c2.end_date
+                AND c2.end_date <= c.start_date
             );
     """
     cursor.execute(query, (student_ci, student_ci))
@@ -840,3 +830,9 @@ def get_class_calendar(instructor_ci):
         current_data['end_time'] = cast_time(current_data['end_time'])
         current_data['class_date'] = cast_date(current_data['class_date'])
     return data
+
+def get_days(class_info):
+    days = []
+    for current_class in class_info:
+        days.append(current_class['day_id'])
+    return days

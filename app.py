@@ -293,41 +293,51 @@ def add_user():
         return jsonify({'error': message}), 400
     
 
-@app.route('/classes/<int:class_id>/add_student_to_class', methods=['POST'])
-#@jwt_required()
-
-def add_student_to_class(class_id):
-    
+@app.route('/classes/<int:id>/enroll-student', methods=['POST'])
+@jwt_required()
+def enroll_student(id):
+    '''
+    cuerpo requerido:
+        - student_id: id del alumno a inscribir
+    '''
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id")) 
     data = request.get_json()
-    # print("Datos recibidos:", data) 
-         
     student_id = data.get("student_id")
-    student_ci = data.get("student_ci")
-    turn_id = data.get("turn_id")
-    days_ids = data.get("days_ids")
-    start_date = data.get("start_date")
-    end_date = data.get("end_date") 
     
+    if not student_id:
+        return jsonify({"error": "Faltan datos requeridos en el cuerpo de la solicitud."}), 400   
     
-    enrolled_students_count = services.enrolled_students_count(class_id)
+    user_ci = get_jwt_identity()
+    student_ci = services.get_person_ci_with_id(student_id) 
+    
+    if role == 'instructor':
+        if not services.is_instructor_responsible(id, user_ci):
+            return jsonify({"error": "Debes ser el instructor de la clase para agregar alumnos."}), 400   
+    elif role == 'student':
+        if user_ci != student_ci:
+            return jsonify({"error": "Un alumno no puede inscribir a otro"}), 400   
+            
+    enrolled_students_count = services.enrolled_students_count(id)
+    
+    class_info = services.get_basic_class_info(id) 
+    if len(class_info) <= 0:
+        return jsonify({"error": "Clase no encontrada"}), 400
     
     if enrolled_students_count >= 10:
-        return jsonify({"message": "La clase ya está llena."}), 400
+        return jsonify({"error": "La clase ya está llena."}), 400
 
-    
-    if services.is_student_busy(student_id, turn_id, days_ids, start_date, end_date):
-        return jsonify({"message": "El alumno ya está ocupado en el turno y los días seleccionados."}), 400
-    
-    print("class_id:", class_id, student_ci)
-    result, new_enrollment = services.add_student_to_class(student_ci, class_id)
+    days_ids = services.get_days(class_info)
+    if services.is_student_busy(student_id, class_info[0]['turn_id'], days_ids, class_info[0]['start_date'], class_info[0]['end_date']):
+        return jsonify({"error": "El alumno ya está ocupado en el turno y los días seleccionados."}), 400    
+            
+    result, new_enrollment = services.add_student_to_class(student_ci, id)
 
     if result > 0: 
         return jsonify({'msg': new_enrollment}), 200
     else:
         return jsonify({'error': new_enrollment}), 400
     
-    
-
     
 @app.route('/classes/<int:class_id>/remove_student_from_class', methods=['DELETE'])
 #@jwt_required()   
