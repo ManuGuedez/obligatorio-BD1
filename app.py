@@ -318,11 +318,11 @@ def enroll_student(id):
         if user_ci != student_ci:
             return jsonify({"error": "Un alumno no puede inscribir a otro"}), 400   
             
-    enrolled_students_count = services.enrolled_students_count(id)
-    
     class_info = services.get_basic_class_info(id) 
     if len(class_info) <= 0:
         return jsonify({"error": "Clase no encontrada"}), 400
+    
+    enrolled_students_count = services.enrolled_students_count(id)
     
     if enrolled_students_count >= 10:
         return jsonify({"error": "La clase ya está llena."}), 400
@@ -339,16 +339,33 @@ def enroll_student(id):
         return jsonify({'error': new_enrollment}), 400
     
     
-@app.route('/classes/<int:class_id>/remove_student_from_class', methods=['DELETE'])
-#@jwt_required()   
-def remove_student_from_class(class_id):
+@app.route('/classes/<int:id>/remove-student', methods=['DELETE'])
+@jwt_required()   
+def remove_student_from_class(id):
+    '''
+    cuerpo requerido:
+        - student_id: id del alumno a inscribir
+    '''
     data = request.get_json()
-    student_ci = data.get("student_ci")
+    student_id = data.get('student_id')
     
-    if not services.is_student_enrolled(student_ci, class_id):
-        return jsonify({'error': 'El estudiante no está inscripto en esta clase'}), 400
+    if not student_id:
+        return jsonify({"error": "Faltan datos requeridos en el cuerpo de la solicitud."}), 400   
+    
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id")) 
+    
+    user_ci = get_jwt_identity()
+    student_ci = services.get_person_ci_with_id(student_id) 
+    
+    if role == 'instructor':
+        if not services.is_instructor_responsible(id, user_ci):
+            return jsonify({"error": "Debes ser el instructor de la clase para eliminar alumnos."}), 400   
+    elif role == 'student':
+        if user_ci != student_ci:
+            return jsonify({"error": "Un alumno no puede eliminar de una clase a otro"}), 400 
         
-    result, message = services.remove_student_from_class(class_id, student_ci)
+    result, message = services.remove_student_from_class(id, student_ci)
 
     if result > 0:
         return jsonify({'msg': message}), 200

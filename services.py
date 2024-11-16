@@ -395,9 +395,11 @@ def add_class(instructor_ci, activity_id, turn_id, start_date, end_date, days_id
 def rollback_added_class(class_id):
     delete = "DELETE FROM class_day WHERE class_id = " + str(class_id)
     cursor.execute(delete)
+    cnx.commit()
     
     delete = "DELETE FROM classes WHERE class_id = " + str(class_id)
     cursor.execute(delete)
+    cnx.commit()
 
 def get_basic_class_info(class_id):
     query = """
@@ -576,22 +578,21 @@ def add_student_to_class(student_ci, class_id):
         return -1, f"Error al agregar el estudiante: {err}, student_ci: " + str(student_ci)
     
     
-def remove_student_from_class(student_ci, class_id):
-    query_delete = "DELETE FROM student_class WHERE class_id = %s AND student_ci = %s"
+def remove_student_from_class(class_id, student_ci):
+    delete = "DELETE FROM student_class WHERE class_id = %s AND student_ci = %s"
 
     try:
-        cursor.execute(query_delete, (class_id, student_ci))
+        cursor.execute(delete, (class_id, student_ci))
         cnx.commit()
 
         if cursor.rowcount > 0:
             return 1, "Estudiante eliminado de la clase exitosamente."
+        elif cursor.rowcount == 0:
+            return 1, "El estudiante no se encontraba inscripto en la clase."
         else:
             return -1, "Error al eliminar al estudiante de la clase."
 
     except mysql.Error as err:
-        # Depuración: Imprimir error y consulta para diagnóstico
-        print(f"Error al ejecutar la consulta: {query_delete}, Parámetros: {class_id}, {student_ci}")
-        print(f"Error devuelto por MySQL: {err}")
         return -1, f"Error al eliminar el estudiante: {err}"
     
 
