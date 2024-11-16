@@ -70,7 +70,7 @@ CREATE TABLE classes (
     instructor_ci INT,
     activity_id INT,
     turn_id INT,
-    is_held BOOLEAN,
+    dictated BOOLEAN,
     FOREIGN KEY (instructor_ci) REFERENCES instructors(instructor_ci),
     FOREIGN KEY (activity_id) REFERENCES activities(activity_id),
     FOREIGN KEY (turn_id) REFERENCES turns(turn_id)
@@ -315,7 +315,7 @@ CREATE TABLE class_session (
     class_id INT,
     class_date DATE,
     day_id INT,
-    is_held BOOLEAN DEFAULT false,
+    dictated BOOLEAN DEFAULT false,
     FOREIGN KEY (class_id) REFERENCES classes(class_id),
     FOREIGN KEY (day_id) REFERENCES days(day_id)
 );
@@ -372,6 +372,9 @@ INSERT INTO class_day (class_id, day_id) VALUES (4, 4); -- Jueves
 INSERT INTO class_day (class_id, day_id) VALUES (5, 3); -- Miércoles
 INSERT INTO class_day (class_id, day_id) VALUES (5, 5); -- Viernes
 
+ALTER TABLE classes
+ADD COLUMN is_group BOOLEAN DEFAULT TRUE;
+
 -- dado un instructor obtiene las clases que tiene en los días especificados en el turno especificado
 SELECT
     c.class_id,
@@ -388,15 +391,148 @@ JOIN
     class_day cd ON cd.class_id = c.class_id
 WHERE
     i.person_id = 5           -- id del instructor a buscar
-    AND c.turn_id = 3         -- id del turno a buscar
-    AND  (c.start_date <= '2024-11-11'
-    OR c.end_date >= '2024-12-11')
+    AND c.turn_id = 1         -- id del turno a buscar
+    AND  (c.start_date <= '2024-12-11'
+    OR c.end_date >= '2024-11-11')
     AND cd.day_id IN (1, 3)    -- lista de ids de los días específicos
 ORDER BY
     cd.day_id, c.turn_id;
-
 
 -- get id with ci
 SELECT person.person_id FROM person WHERE person_ci = 43158769;
 
 SELECT * FROM activities;
+
+SELECT c.turn_id, cd.day_id, i.person_id as instructor_id
+FROM classes c
+JOIN class_day cd ON c.class_id = cd.class_id
+JOIN instructors i ON c.instructor_ci = i.instructor_ci
+WHERE c.class_id = 1;
+
+-- corroboración para saber si el instructor está
+SELECT c.class_id
+FROM classes c
+JOIN instructors i ON c.instructor_ci = i.instructor_ci
+JOIN turns t ON c.turn_id = t.turn_id -- para qué???
+JOIN class_day cd ON c.class_id = cd.class_id
+WHERE c.class_id = 1
+    AND i.person_id = 5
+    AND c.turn_id = 1
+    AND cd.day_id IN (1, 3);
+
+
+SELECT s.student_ci FROM students s WHERE s.person_id = 19;
+
+
+SELECT DISTINCT c.class_id, d.day_name, t.start_time, t.end_time
+FROM classes c
+JOIN class_day cd ON c.class_id = cd.class_id
+JOIN days d ON cd.day_id = d.day_id
+JOIN turns t ON c.turn_id = t.turn_id
+LEFT JOIN student_class sc ON c.class_id = sc.class_id
+WHERE c.is_group = TRUE
+    AND (SELECT COUNT(*) FROM student_class WHERE class_id = c.class_id) < 10
+    AND c.class_id NOT IN (
+        SELECT class_id
+        FROM student_class
+        WHERE student_ci = 500000005
+    )
+    AND NOT EXISTS (
+        SELECT 1
+        FROM student_class sc2
+        JOIN classes c2 ON sc2.class_id = c2.class_id
+        JOIN class_day cd2 ON c2.class_id = cd2.class_id
+        JOIN days d2 ON cd2.day_id = d2.day_id
+        JOIN turns t2 ON c2.turn_id = t2.turn_id
+        WHERE sc2.student_ci = 500000005
+        AND c.turn_id = c2.turn_id
+        AND d.day_id = d2.day_id
+        AND c.start_date <= c2.end_date
+        AND c2.end_date <= c.start_date
+    );
+
+SELECT DISTINCT e.description, e.cost
+FROM classes c
+JOIN equipment e ON c.activity_id = e.activity_id
+WHERE c.activity_id = (
+    select c2.activity_id
+    FROM classes c2
+    WHERE c2.class_id = 1
+    );
+
+SELECT er.class_id
+FROM equipment_rental er
+WHERE er.class_id = 1
+    AND er.equipment_id IN (1, 3)
+    AND er.person_id = 1;
+
+SELECT sc.student_ci
+FROM student_class sc
+WHERE sc.student_ci = 43158769 AND sc.class_id = 1;
+
+INSERT INTO student_class (class_id, student_ci) VALUE (1, 500000005);
+
+SELECT activities.description, turns.start_time, turns.end_time,
+       c.start_date, c.end_date, c.is_group, i.first_name as instructor_first_name, i.last_name as instructor_last_name
+FROM classes c
+    JOIN activities ON (c.activity_id = activities.activity_id)
+    JOIN turns ON (c.turn_id = turns.turn_id)
+    JOIN instructors i on (c.instructor_ci = i.instructor_ci)
+WHERE c.class_id = 1;
+
+SELECT classes.instructor_ci
+FROM classes
+WHERE class_id =1
+AND instructor_ci = 43211578;
+
+-- lista de inscriptos dada una clase
+SELECT s.person_id as student_id, s.first_name, s.last_name
+FROM students s
+JOIN student_class sc ON s.student_ci = sc.student_ci
+WHERE sc.class_id = 13;
+
+SELECT cs.id_class_session
+FROM class_session cs
+WHERE cs.class_id = 13
+AND cs.class_date = '2024-11-15';
+
+update classes set classes.end_date = '2024-11-14' WHERE class_id = 5;
+
+insert into student_class (class_id, student_ci) values
+(13, 44751236), -- Rodrigo en la clase de Julia Méndez (Skiing, 09:00-11:00)
+(13, 41657890); -- Paula en la clase de Julia Méndez (Skiing, 09:00-11:00)
+
+INSERT INTO class_attendance (id_class_session, student_id, attended) VALUES
+(13, 12, TRUE);
+
+SELECT c.class_id, c.start_date, c.end_date, a.description, t.start_time, t.end_time, cs.class_date
+FROM classes c
+JOIN turns t on c.turn_id = t.turn_id
+JOIN activities a on a.activity_id = c.activity_id
+JOIN instructors i on i.instructor_ci = c.instructor_ci
+JOIN class_session cs on c.class_id = cs.class_id
+WHERE i.instructor_ci = 43258790;
+
+-- alumno ocupado en estas fechas con estos horarios
+ SELECT
+    c.class_id,
+    s.first_name,
+    s.last_name,
+    c.activity_id,
+    c.turn_id,
+    cd.day_id
+FROM
+    classes c
+JOIN
+    student_class sc on sc.class_id = c.class_id
+JOIN students s on sc.student_ci = s.student_ci
+JOIN
+    class_day cd ON cd.class_id = c.class_id
+WHERE
+    s.person_id = 23
+    AND c.turn_id = 1
+    AND cd.day_id IN (1, 2, 3)
+    AND (c.start_date <= '2024-12-20' AND '2024-12-02' <= c.end_date );
+    --                  fecha inicio                fecha fin
+
+delete from student_class where student_ci = 43158769 and class_id = 13

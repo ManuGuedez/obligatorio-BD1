@@ -2,31 +2,11 @@ import mysql.connector as mysql
 
 cnx = mysql.connect(user='root', password='rootpassword', host='127.0.0.1', database='snowSchool')
 cursor = cnx.cursor(dictionary=True) # devuelve la info en formato key-value
+from mysql.connector.errors import IntegrityError
 import algoritmo
-
+from datetime import datetime, time, timedelta, date
 
 def validate_student(student):
-    """
-    Valida la existencia de un estudiante en la base de datos.
-
-    Esta función verifica si un estudiante existe en la base de datos
-    utilizando su cédula de identidad y otros datos personales.
-
-    Args: 
-        student (dict): Diccionario con la información del estudiante.
-                        Debe contener las claves 'ci', 'first_name', 
-                        'last_name' y 'birth_date'.
-
-    Returns:
-        int: El número de cédula de identidad (ci) del estudiante si existe,
-             o -1 si no se encuentra en la base de datos.
-
-    Raises:
-        ValueError: Si el diccionario no tiene exactamente 4 elementos 
-                    o si faltan claves necesarias ('ci', 'first_name', 
-                    'last_name', 'birth_date').
-    """
-
     if len(student) != 4:
         raise ValueError("Asegurate de haber ingrsado correctamente los datos")
     
@@ -62,8 +42,8 @@ def create_student_account(student, email, password):
     if response == -1:
         return -1, "No hay un alumno que cumpla con las especificaciones en la bd, primero debe ser ingresado al sistema por el adminsitrador"
     
-    query = f"SELECT login.email FROM login WHERE login.person_ci = {response}"
-    cursor.execute(query)
+    query = "SELECT login.email FROM login WHERE login.person_ci = %s"
+    cursor.execute(query, (response, ))
     data = cursor.fetchall()
     if len(data) > 0 :
         message = "Ya hay un alumno ingrsado en el sistema con el mail" + data[0]["email"]
@@ -71,8 +51,8 @@ def create_student_account(student, email, password):
     
     ci = student["ci"]
     role_id = get_role_id('student')
-    query = f"INSERT INTO login (email, password, person_ci, role_id) VALUE (\'{email}\', \'{password}\', {ci}, {role_id})"
-    cursor.execute(query)
+    query = "INSERT INTO login (email, password, person_ci, role_id) VALUE (%s, %s, %s, %s)"
+    cursor.execute(query, (email, password, ci, role_id))
     result = cursor.rowcount
     
     # verificación de que la isnerción fue exitosa
@@ -132,8 +112,8 @@ def create_instructor_account(instructor, email, password):
     if response == -1:
         return -1, "No hay un instructor que cumpla con las especificaciones en la bd, primero debe ser ingresado al sistema por el adminsitrador"
     
-    query = f"SELECT login.email FROM login WHERE login.person_ci = {response}"
-    cursor.execute(query)
+    query = "SELECT login.email FROM login WHERE login.person_ci = %s"
+    cursor.execute(query, (response,))
     data = cursor.fetchall()
     if len(data) > 0 :
         message = "Ya hay un instructor ingrsado en el sistema con el mail" + data[0]["email"]
@@ -141,8 +121,8 @@ def create_instructor_account(instructor, email, password):
     
     ci = instructor["ci"]
     role_id = get_role_id('instructor')
-    query = f"INSERT INTO login (email, password, person_ci, role_id) VALUE (\'{email}\', \'{password}\', {ci})"
-    cursor.execute(query)
+    query = "INSERT INTO login (email, password, person_ci, role_id) VALUE (%s, %s, %s, %s)"
+    cursor.execute(query, (email, password, ci, role_id))
     result = cursor.rowcount
     
     # verificación de que la isnerción fue exitosa
@@ -176,6 +156,15 @@ def get_role_id(role):
         return data[0]['role_id']
     return -1 
 
+def cast_date(date: datetime.date):
+    return date.strftime("%Y-%m-%d")
+
+def cast_time(current_time):   
+    hours, remainder = divmod(current_time.seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    new_time = time(hours, minutes, seconds)
+    return new_time.strftime('%H:%M:%S')
+
 def get_class_turn(class_id):
     query = 'SELECT turn_id FROM classes WHERE class_id = %s'
     cursor.execute(query, (class_id,))
@@ -185,8 +174,15 @@ def get_class_turn(class_id):
         return int(data[0]['turn_id'])
     return -1 
 
-def get_class_information(class_id):
-    query = 'SELECT activities.description, turns.start_time, turns.end_time, login.email as instructor_email FROM classes JOIN activities ON (classes.activity_id = activities.activity_id) JOIN turns ON (classes.turn_id = turns.turn_id) JOIN login ON (classes.instructor_ci = login.person_ci) WHERE classes.class_id = %s'
+def get_class_information_for_instructor(class_id):
+    query = """
+    SELECT activities.description, turns.start_time, turns.end_time, login.email as instructor_email 
+    FROM classes 
+        JOIN activities ON (classes.activity_id = activities.activity_id) 
+        JOIN turns ON (classes.turn_id = turns.turn_id) 
+        JOIN login ON (classes.instructor_ci = login.person_ci) 
+    WHERE classes.class_id = %s
+    """
     cursor.execute(query, (class_id,))
     data = cursor.fetchall()
     
@@ -232,7 +228,7 @@ def modify_students_class(class_id, student_ci, action):
         case _:
             return -1, "Acción no válida. Use 'add' o 'delete'."
         
-def get_instructor_schedules(instructor_id):
+def get_instructor_schedules(instructor_id): # quedó obsoleto porque agregamos nuevas tablas
     query = 'SELECT turn_id FROM classes WHERE instructor_ci = %s'
     cursor.execute(query, (instructor_id,))
     data = cursor.fetchall()
@@ -299,24 +295,16 @@ def retrieve_instructor_classes_by_turn_and_days(instructor_id, turn_id, days_id
     # '''
     select = 'SELECT c.class_id, c.activity_id, c.turn_id, cd.day_id FROM classes c '
     joins = 'JOIN instructors i ON i.instructor_ci = c.instructor_ci JOIN class_day cd ON cd.class_id = c.class_id '
-    where = 'WHERE i.person_id = %s AND c.turn_id = %s AND (c.start_date <= %s OR c.end_date >= %s) AND cd.day_id IN '
+    where = 'WHERE i.person_id = %s AND c.turn_id = %s AND (c.start_date <= %s and %s <= c.end_date) AND cd.day_id IN '
     
-    days = '('
-    for d in days_id:
-        days += str(d) + ', '
-    
-    days = days[0:len(days) - 2] + ')'
+    days = '('+ str(days)[1:-1] + ')'
     
     query = select + joins + where + days
-    cursor.execute(query, (instructor_id, turn_id, start_date, end_date))
+    cursor.execute(query, (instructor_id, turn_id, end_date, start_date))
     data = cursor.fetchall()
    
     return data
 
-def query_to_add_class(instructor_id, turn_id, days_ids, start_date, end_date):
-    classes = retrieve_instructor_classes_by_turn_and_days(instructor_id, turn_id, days_ids, start_date, end_date)
-    
-    return classes
 
 def is_instructor_busy(instructor_id, turn_id, days_ids, start_date, end_date):
     classes = retrieve_instructor_classes_by_turn_and_days(instructor_id, turn_id, days_ids, start_date, end_date)
@@ -346,11 +334,15 @@ def get_activities():
         
     return result
 
-def add_class(instructor_ci, activity_id, turn_id, start_date, end_date, days_ids):
-    insert = 'INSERT INTO classes (instructor_ci, activity_id, turn_id, start_date, end_date) VALUE (%s, %s, %s, %s, %s)'
-    
+def add_class(instructor_ci, activity_id, turn_id, start_date, end_date, days_ids, type):
     try:
-        cursor.execute(insert, (instructor_ci, activity_id, turn_id, start_date, end_date))
+        if type:
+            is_group = False
+        else:
+            is_group = True
+            
+        insert = 'INSERT INTO classes (instructor_ci, activity_id, turn_id, start_date, end_date, is_group) VALUE (%s, %s, %s, %s, %s, %s)'
+        cursor.execute(insert, (instructor_ci, activity_id, turn_id, start_date, end_date, is_group))
         cnx.commit()  
         
         # en caso de haber podido agregar la clase a la tabla classes
@@ -372,12 +364,12 @@ def add_class(instructor_ci, activity_id, turn_id, start_date, end_date, days_id
             if cursor.rowcount > 0:
                 fechas = algoritmo.generar_calendario(start_date, end_date, days_ids)
                 
-                insert = "INSERT INTO class_session (class_id, class_date, day_id) VALUES " # por defecto se establece como no dictada
+                insert = "INSERT INTO class_session (class_id, class_date, day_id, dictated) VALUES " # por defecto se establece como no dictada
                 days = get_days()
                 values = ""
                 for fecha in fechas:
                     id_dia = days.get(fecha[1])
-                    values += f"({class_id}, \'{fecha[0]}\', {id_dia}),"
+                    values += f"({class_id}, \'{fecha[0]}\', {id_dia}, FALSE),"
                 
                 values = values[:-1]
                 insert = insert + values
@@ -388,31 +380,460 @@ def add_class(instructor_ci, activity_id, turn_id, start_date, end_date, days_id
                     # mandar mail al instructor avisando que fue asignado para dar esta clase
                     return 1, "Nueva clase creada exitosamente."
                 else:
-                    delete = "DELETE FROM class_day WHERE class_id = " + str(class_id)
-                    cursor.execute(delete)
-                    
-                    delete = "DELETE FROM classes WHERE class_id = " + str(class_id)
-                    cursor.execute(delete)
-                    
-                    #eliminar clase de classes y de class_day
+                    rollback_added_class(class_id)
                     return -1, "Hubo un error creando la clase."
             else:
-                delete = "DELETE FROM class_day WHERE class_id = " + str(class_id)
-                cursor.execute(delete)
-                
-                delete = "DELETE FROM classes WHERE class_id = " + str(class_id)
-                cursor.execute(delete)
-                
-                #eliminar clase de classes y de class_day
+                rollback_added_class(class_id)
                 return -1, "Hubo un error creando la clase."
             
         else:
             return -1, "Hubo un problema, no fue posible crear la clase."
     except mysql.Error as err:
-        delete = "DELETE FROM class_day WHERE class_id = " + str(class_id)
-        cursor.execute(delete)
-        
-        delete = "DELETE FROM classes WHERE class_id = " + str(class_id)
-        cursor.execute(delete)
-        
+        rollback_added_class(class_id)
         return -1, f"Error al crear la clase: {err}"
+
+def rollback_added_class(class_id):
+    delete = "DELETE FROM class_day WHERE class_id = " + str(class_id)
+    cursor.execute(delete)
+    cnx.commit()
+    
+    delete = "DELETE FROM classes WHERE class_id = " + str(class_id)
+    cursor.execute(delete)
+    cnx.commit()
+
+def get_basic_class_info(class_id):
+    query = """
+    SELECT c.turn_id, cd.day_id, i.person_id as instructor_id, c.start_date, c.end_date
+    FROM classes c
+    JOIN class_day cd ON c.class_id = cd.class_id
+    JOIN instructors i ON c.instructor_ci = i.instructor_ci
+        WHERE c.class_id = %s
+    """
+    cursor.execute(query, (class_id,))
+    data = cursor.fetchall()
+
+    return data
+
+def get_instructor_schedule(instructor_id, turn_id, days_ids):
+    query = """
+    SELECT c.class_id
+    FROM classes c
+    JOIN instructors i ON c.instructor_ci = i.instructor_ci
+    JOIN turns t ON c.turn_id = t.turn_id -- para qué???
+    JOIN class_day cd ON c.class_id = cd.class_id
+    WHERE i.person_id = %s
+        AND c.turn_id = %s
+        AND cd.day_id IN
+    """
+    
+    days = ' ('+ str(days_ids)[1:-1] + ')'
+    query = query + days
+    
+    cursor.execute(query, (instructor_id, turn_id))
+    data = cursor.fetchall()
+    return data # if len(data) > 0, then the instructor is busy 
+
+def can_modify(start_time, end_time, days):
+    # si hoy no se dicta la clase se puede modificar
+    dia_actual = datetime.now().weekday() + 1 
+    if not dia_actual in days:
+        return True
+    
+    # si hoy se dicta, verificar horario
+    if isinstance(start_time, timedelta):
+        start_time = (datetime.min + start_time).time()
+    if isinstance(end_time, timedelta):
+        end_time = (datetime.min + end_time).time()
+        
+    current_time = datetime.now().time()
+    
+    if start_time <= current_time and end_time >= current_time:
+        return False
+    else:
+        return True
+    
+def get_turn_time(turn_id):
+    query = 'SELECT t.start_time, t.end_time FROM turns as t WHERE t.turn_id = %s'
+    cursor.execute(query,(turn_id,))
+    data = cursor.fetchall()
+    
+    if len(data) > 0:
+        return data[0]
+    return -1
+
+def add_person(person_ci, name, last_name):
+    query = 'SELECT person.person_id FROM person WHERE person_ci = %s'
+    cursor.execute(query, (person_ci,))
+    data = cursor.fetchall()
+    
+    if len(data) > 0:
+        return data[0]['person_id']
+    
+    insert = 'INSERT INTO person (person_ci, name, last_name) VALUE (%s, %s, %s)'
+    cursor.execute(insert, (person_ci, name, last_name))
+    result = cursor.rowcount
+    
+    if result > 0:
+        return cursor.lastrowid # devuelve id de la persona recién insertada
+    return -1
+
+def add_instructor(person_id, instructor_ci, first_name, last_name):
+    query = 'SELECT i.instructor_ci FROM instructors i WHERE i.instructor_ci = %s'
+    cursor.execute(query, (instructor_ci,))
+    data = cursor.fetchall()
+    
+    if len(data) > 0:
+        return -1, "Ya hay un instructor ingresado con la ci ingresada."
+    
+    insert = "INSERT INTO instructors (person_id, instructor_ci, first_name, last_name) VALUE (%s, %s, %s, %s)"
+    cursor.execute(insert, (person_id, instructor_ci, first_name, last_name))
+    cnx.commit()
+    result = cursor.rowcount
+    
+    if result > 0:
+        return 1, "Instructor agregado exitosamente al sistema."    
+    return -1, "Hubo un error al ingresar el instrucor al sistema."
+
+def add_student(person_id, student_ci, first_name, last_name, birth_date):
+    query = 'SELECT s.student_ci FROM students s WHERE s.student_ci = %s'
+    cursor.execute(query, (student_ci,))
+    data = cursor.fetchall()
+    
+    if len(data) > 0:
+        return -1, "Ya hay un estudiante ingresado con la ci especificada."
+    
+    insert = "INSERT INTO students (person_id, student_ci, first_name, last_name, birth_date) VALUE (%s, %s, %s, %s, %s)"
+    cursor.execute(insert, (person_id, student_ci, first_name, last_name, birth_date))
+    cnx.commit()
+    result = cursor.rowcount
+    
+    if result > 0:
+        return 1, "Estudiante agregado exitosamente al sistema."    
+    return -1, "Hubo un error al ingresar al estudiante en el sistema."
+
+
+
+def retrieve_student_classes_by_turn_and_days(student_id, turn_id, days_id, start_date, end_date):        
+    query = """
+        SELECT
+            c.class_id,
+            s.first_name,
+            s.last_name,
+            c.activity_id,
+            c.turn_id,
+            cd.day_id
+        FROM
+            classes c
+        JOIN
+            student_class sc on sc.class_id = c.class_id
+        JOIN students s on sc.student_ci = s.student_ci
+        JOIN
+            class_day cd ON cd.class_id = c.class_id
+        WHERE
+            s.person_id = %s
+            AND c.turn_id = %s
+            AND (c.start_date <= %s and %s <= c.end_date)
+            AND cd.day_id IN (1, 2, 3)
+    """
+    
+    days = '('+ str(days_id)[1:-1] + ')'
+    
+    cursor.execute(query, (student_id, turn_id, end_date, start_date))
+    data = cursor.fetchall()
+   
+    return data
+
+def is_student_busy(student_id, turn_id, days_ids, start_date, end_date):
+    classes = retrieve_student_classes_by_turn_and_days(student_id, turn_id, days_ids, start_date, end_date)
+    return len(classes) > 0
+
+
+def enrolled_students_count(class_id):
+    query = 'SELECT COUNT(*) AS enrolled_students FROM student_class WHERE class_id = %s'
+    cursor.execute(query, (class_id,))
+    data = cursor.fetchall()
+    
+    if len(data) <= 0:
+        return data
+    return data[0]['enrolled_students']
+
+
+def add_student_to_class(student_ci, class_id):
+    insert = "INSERT INTO student_class (class_id, student_ci) VALUES (%s, %s)"
+    try:
+        # Ejecución de la consulta con parámetros
+        cursor.execute(insert, (class_id, student_ci))
+        cnx.commit()
+        if cursor.rowcount > 0:
+            return 1, "Estudiante agregado a la clase exitosamente."
+        else:
+            return -1, "Error al agregar al estudiante a la clase."
+    except IntegrityError as e:
+        if e.errno == 1452: # código de error de fk
+            return -1, "No hay un estudiante con el id ingresado"
+        elif e.errno == 1062: # código de clave repetida
+            return 1, "El alumno ya se encontraba inscripto en la clase."
+            
+    except mysql.Error as err:
+        return -1, f"Error al agregar el estudiante: {err}, student_ci: " + str(student_ci)
+    
+    
+def remove_student_from_class(class_id, student_ci):
+    delete = "DELETE FROM student_class WHERE class_id = %s AND student_ci = %s"
+
+    try:
+        cursor.execute(delete, (class_id, student_ci))
+        cnx.commit()
+
+        if cursor.rowcount > 0:
+            return 1, "Estudiante eliminado de la clase exitosamente."
+        elif cursor.rowcount == 0:
+            return 1, "El estudiante no se encontraba inscripto en la clase."
+        else:
+            return -1, "Error al eliminar al estudiante de la clase."
+
+    except mysql.Error as err:
+        return -1, f"Error al eliminar el estudiante: {err}"
+    
+
+
+def get_available_classes(student_ci):
+    query = """
+        SELECT DISTINCT c.class_id, d.day_name, t.start_time, t.end_time
+        FROM classes c
+        JOIN class_day cd ON c.class_id = cd.class_id
+        JOIN days d ON cd.day_id = d.day_id
+        JOIN turns t ON c.turn_id = t.turn_id
+        LEFT JOIN student_class sc ON c.class_id = sc.class_id
+        WHERE ((c.is_group = TRUE
+            AND (SELECT COUNT(*) FROM student_class WHERE class_id = c.class_id) < 10)
+            OR (c.is_group = FALSE 
+            AND (SELECT COUNT(*) FROM student_class WHERE class_id = c.class_id) < 1))
+            AND c.class_id NOT IN (
+                SELECT class_id 
+                FROM student_class 
+                WHERE student_ci = %s
+            )
+            AND NOT EXISTS (
+                SELECT 1 
+                FROM student_class sc2
+                JOIN classes c2 ON sc2.class_id = c2.class_id
+                JOIN class_day cd2 ON c2.class_id = cd2.class_id
+                JOIN days d2 ON cd2.day_id = d2.day_id
+                JOIN turns t2 ON c2.turn_id = t2.turn_id
+                WHERE sc2.student_ci = %s
+                AND c.turn_id = c2.turn_id
+                AND d.day_id = d2.day_id
+                AND c.start_date <= c2.end_date
+                AND c2.end_date <= c.start_date
+            );
+    """
+    cursor.execute(query, (student_ci, student_ci))
+    data = cursor.fetchall()
+    classes = dict()
+    
+    for current_class in data:
+        current_class['start_time'] = cast_time(current_class['start_time'])
+        current_class['end_time'] = cast_time(current_class['end_time'])
+        
+        class_id = current_class['class_id']
+        day_name = current_class['day_name']
+
+        if not classes.get(class_id):
+            end_time = current_class['end_time']
+            start_time = current_class['start_time']
+            classes[class_id] = {'class_id': class_id, 'days': [day_name], 'start_time': start_time, 'end_time': end_time}
+        else:
+            c = classes.get(class_id)
+            days = c.get("days")
+            days.append(day_name)
+
+    
+    return list(classes.values())
+
+
+
+def get_rentable_equipment(class_id):
+    query = """
+    SELECT DISTINCT e.description, e.cost, e.equipment_id
+    FROM classes c
+    JOIN equipment e ON c.activity_id = e.activity_id
+    WHERE c.activity_id = (
+        select c2.activity_id
+        FROM classes c2
+        WHERE c2.class_id = %s
+        );
+    """
+    cursor.execute(query, (class_id, ))
+    data = cursor.fetchall()
+    
+    return data
+
+
+def rent_equipment(class_id, student_id, equipment_id):
+    rentable_equipment = get_rentable_equipment(class_id)
+    rentable_equipment = [equipment['equipment_id'] for equipment in rentable_equipment]
+    
+    for e in equipment_id:
+        if not e in rentable_equipment:
+            return -1, "El equipo rentado debe ser de la actividad correspondiente a la clase."
+            
+    
+    insert = "INSERT INTO equipment_rental (class_id, person_id, equipment_id) VALUE (%s, %s, %s) "
+    for id in equipment_id:
+        try:
+            cursor.execute(insert, (class_id, student_id, id))
+            cnx.commit()
+            result = cursor.rowcount
+            
+            if result <= 0:
+                return -1, "Algo salió mal rentando equipamiento."    
+        except IntegrityError: # en caso de que ya esté rentado el equipamiento
+            continue
+    
+    return 1, "Equipos rentados exitosamente"
+    
+    
+def is_student_enrolled(student_ci, class_id):
+    query = """
+    SELECT sc.student_ci
+    FROM student_class sc
+    WHERE sc.student_ci = %s AND sc.class_id = %s
+    """
+    cursor.execute(query, (student_ci, class_id))
+    data = cursor.fetchall()
+    
+    return len(data) > 0
+
+def get_extended_class_info(class_id):
+    query = """
+    SELECT activities.description, turns.start_time, turns.end_time,
+            c.start_date, c.end_date, c.is_group, i.first_name as instructor_first_name, 
+            i.last_name as instructor_last_name
+    FROM classes c
+        JOIN activities ON (c.activity_id = activities.activity_id)
+        JOIN turns ON (c.turn_id = turns.turn_id)
+        JOIN instructors i on (c.instructor_ci = i.instructor_ci)
+    WHERE c.class_id = %s
+    """
+    cursor.execute(query, (class_id, ))
+    data = cursor.fetchall()
+    
+    if len(data) <= 0:
+        return data
+    
+    current_class = data[0]
+    current_class['start_time'] = cast_time(current_class['start_time'])
+    current_class['end_time'] = cast_time(current_class['end_time'])
+    
+    current_class["start_date"] = cast_date(current_class["start_date"])
+    current_class["end_date"] = cast_date(current_class["end_date"])
+    
+    return data
+
+def is_instructor_responsible(class_id, instructor_ci):
+    query = """
+    SELECT classes.instructor_ci
+    FROM classes
+    WHERE class_id = %s
+    AND instructor_ci = %s
+    """
+    cursor.execute(query, (class_id, instructor_ci))
+    data = cursor.fetchall()
+    
+    return len(data) > 0
+
+def get_enrolled_students(class_id):
+    query = """
+    SELECT s.person_id as student_id, s.first_name, s.last_name
+    FROM students s
+    JOIN student_class sc ON s.student_ci = sc.student_ci
+    WHERE sc.class_id = %s
+    """
+    cursor.execute(query, (class_id, ))
+    data = cursor.fetchall()
+    return data
+
+def get_id_class_session(class_id, date):
+    query = """
+    SELECT cs.id_class_session
+    FROM class_session cs
+    WHERE cs.class_id = %s
+    AND cs.class_date = %s
+    """
+    cursor.execute(query, (class_id, date))
+    data = cursor.fetchall()
+    if len(data) <= 0:
+        return -1 # hoy no hay esta clase!!!
+    return data[0]['id_class_session']
+    
+def clase_dictada(id_class_session):
+    update = 'UPDATE class_session SET dictated = %s WHERE id_class_session = %s'
+    cursor.execute(update, (True, id_class_session, ))
+    cnx.commit() 
+    return cursor.rowcount >= 0
+
+def marcar_asistencia(id_class_session, student_id):
+    update = 'UPDATE class_attendance SET attended = %s WHERE id_class_session = %s AND student_id = %s'
+    cursor.execute(update, (True, id_class_session, student_id))
+    cnx.commit() 
+    return cursor.rowcount >= 0
+
+def roll_call(class_id, students_present):
+    hoy = date.today()
+    fecha_formateada = hoy.strftime('%Y-%m-%d')
+    id_class_session = get_id_class_session(class_id, fecha_formateada)
+    
+    if id_class_session < 0:
+        return -1, "Hoy no se dicta esta clase, por lo que no se puede pasar lista."
+    
+    students = get_enrolled_students(class_id)
+    
+    insert = "INSERT INTO class_attendance (id_class_session, student_id, attended) VALUES (%s, %s, %s)"
+    for i in range(len(students)):
+        try: 
+            id = students[i]["student_id"]
+            cursor.execute(insert, (id_class_session, id, False))
+            cnx.commit()  
+            if cursor.rowcount <= 0:
+                return -1, "Algo salió mal insertando los datos."
+        except IntegrityError: # en caso de querer "actualizar" la lista pasada
+            update = 'UPDATE class_attendance SET attended = %s WHERE id_class_session = %s AND student_id = %s'
+            cursor.execute(update, (False, id_class_session, id))
+            if cursor.rowcount < 0:
+                return -1, "Algo salió mal modificando los datos."
+            cnx.commit()  
+    
+    for student_id in students_present:
+        if not marcar_asistencia(id_class_session, student_id):
+            return -1, f"Algo salió mal al marcar la asistencia. {student_id}"
+    
+    if clase_dictada(id_class_session):
+        return 1, "Lista guardada correctamente."
+    return -1, "Algo salió mal al dictar la clase."
+    
+
+def get_class_calendar(instructor_ci):
+    query = """
+    SELECT c.class_id, a.description, t.start_time, t.end_time, cs.class_date
+    FROM classes c
+    JOIN turns t on c.turn_id = t.turn_id
+    JOIN activities a on a.activity_id = c.activity_id
+    JOIN instructors i on i.instructor_ci = c.instructor_ci
+    JOIN class_session cs on c.class_id = cs.class_id
+    WHERE i.instructor_ci = %s
+    """
+    cursor.execute(query, (instructor_ci, ))
+    data = cursor.fetchall()
+    
+    for current_data in data:
+        current_data['start_time'] = cast_time(current_data['start_time'])
+        current_data['end_time'] = cast_time(current_data['end_time'])
+        current_data['class_date'] = cast_date(current_data['class_date'])
+    return data
+
+def get_days(class_info):
+    days = []
+    for current_class in class_info:
+        days.append(current_class['day_id'])
+    return days
