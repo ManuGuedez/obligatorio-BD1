@@ -197,7 +197,7 @@ def modify_class(id):
         if turn_id == class_info[0]["turn_id"]:
             return jsonify({'error': 'La clase ya se encunetra en el turno y instructor especificados.'}), 400
             
-        instructor_schedule = services.get_instructor_schedule(instructor_id, turn_id, days) # falta pasarle parametros, para eso pasar los days que devuelve la info de la clase pasarlos a una única lista y mandarlo como parámentros.
+        instructor_schedule = services.get_instructor_schedule(instructor_id, turn_id, days)
         if len(instructor_schedule) > 0:
             return jsonify({'error': 'No es posible modificar el turno de la clase porque el instructor se encuentra ocupado en ese horario.'}), 400
         is_instructor_modified = False
@@ -524,6 +524,34 @@ def get_instructor_classes():
     else:
         return jsonify({'error': data}), 400
     
+
+@app.route('/activities/add-activity', methods=['GET']) 
+@jwt_required()
+def add_activity():
+    '''
+    cuerpo requerido:
+        - description: nombre de la neuva actividad
+        - cost: costo de la actividad
+    '''
+    
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "admin"):
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
+        
+    data = request.get_json()
+    description = data.get('description')
+    cost = data.get('cost')
+    
+    if not description or not cost:
+        return jsonify({'error': 'Faltan datos requeridos'}), 400
+        
+    result, message = services.add_activity(description, cost)
+    if result > 0: 
+        return jsonify({'msg': message}), 200
+    else:
+        return jsonify({'error': message}), 400    
     
 if __name__ == '__main__':
     app.run(debug=True)

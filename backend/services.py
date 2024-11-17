@@ -827,3 +827,15 @@ def get_class_data_from_an_instructor(instructor_ci):
         return 0, "El instructor no tiene clases asignadas."
     else:
         return 1, data
+    
+def add_activity(description, cost):
+    insert = 'INSERT INTO activities (description, cost) VALUES (%s, %s)'
+    cursor.execute(insert, (description, cost))
+    
+    cnx.commit()  
+    if cursor.rowcount > 0:
+        return 1, "Nueva actividad agregada exitosamente"
+    else:
+        return -1, "No Fue posible agregar la nueva actividad"
+    
+    print(1)
