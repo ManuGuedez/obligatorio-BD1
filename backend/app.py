@@ -3,8 +3,10 @@ from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity
 import services
 from datetime import timedelta
 import smtp
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 app.config['JWT_SECRET_KEY'] = 'obligatorio-bd-2024'
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30) # esto para que el token expire cada 30 min
@@ -31,7 +33,17 @@ def login():
         person_data = services.get_person_data(user_ci)
         # se crea un token de acceso JWT
         access_token = create_access_token(identity=user_ci, additional_claims={'role_id': role_id})
-        return jsonify({'access_token': access_token, 'user_data': person_data}), 200
+        
+        user_details = {
+            "id": user_ci,
+            "role_id": role_id,
+            "email": email
+        }
+        
+        return jsonify({
+            "access_token": access_token,
+            "user": user_details
+        }), 200
     else:
         return jsonify({"error": "Credenciales incorrectas"}), 401
 
