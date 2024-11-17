@@ -535,4 +535,4 @@ WHERE
     AND (c.start_date <= '2024-12-20' AND '2024-12-02' <= c.end_date );
     --                  fecha inicio                fecha fin
 
-delete from student_class where student_ci = 43158769 and class_id = 13
+update classes set dictated = null where class_id = 13
