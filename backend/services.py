@@ -1,6 +1,6 @@
 import mysql.connector as mysql
 
-cnx = mysql.connect(user='root', password='rootpassword', host='127.0.0.1', database='snowSchool')
+cnx = mysql.connect(user='root', password='rootpassword', host='mysql', database='snowSchool')
 cursor = cnx.cursor(dictionary=True) # devuelve la info en formato key-value
 from mysql.connector.errors import IntegrityError
 import algoritmo

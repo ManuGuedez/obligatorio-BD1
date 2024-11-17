@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-route
 import Register from './Pages/Register.jsx';
 import LogIn from './Pages/LogIn.jsx';
 import Alumno from './Pages/Alumno.jsx';
-import NavBar from './Components/NavBar'; 
+import NavBar from './Components/NavBar.jsx'; 
 import Instructor from './Pages/Instructor.jsx';
 import Home from './Pages/Home.jsx';
 import Admin from './Pages/Admin.jsx';

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Admin.css';
 
 const Admin = () => {
@@ -30,8 +30,38 @@ const Admin = () => {
         setNewInstructor({ name: '', email: '' }); // Reinicia el formulario si se cierra el modal
     };
 
-    const handleRemoveInstructor = (id) => { /* Lógica para eliminar instructor */ };
-    const handleEditInstructor = (id) => { /* Lógica para editar instructor */ };
+    const handleRemoveInstructor = (id) => { /* Lógica para eliminar instructor */
+
+    };
+
+
+    useEffect(() => {
+        fetchInstructors(); 
+    }, []);
+
+
+    const fetchInstructors = async () => {
+        try {
+            const response = await fetch('http://localhost:5000/api/instructors');
+            const data = await response.json();
+            setInstructors(data);
+        }
+        catch (error) {
+            console.error('Error al obtener los instructores:', error);
+        }
+    }
+
+
+    // const handleEditInstructor = (id) => { /* Lógica para editar instructor */
+    //     const response = await fetch(`http://localhost:5000/api/instructors/${id}`, {
+
+    //     }
+
+
+    // };
+
+
+
     const handleAddSchedule = () => { /* Lógica para agregar turno */ };
     const handleAssignInstructorToSchedule = () => { /* Lógica para asignar instructor a turno */ };
     const handleAddActivity = () => { /* Lógica para agregar actividad */ };

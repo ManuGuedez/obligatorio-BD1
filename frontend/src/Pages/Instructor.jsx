@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Instructor.css';
-import Clases from "./../Components/Clases";
-import CalendarioClases from './../Components/CalendarioClases';
+import Clases from "../Components/Clases";
+import CalendarioClases from '../Components/CalendarioClases';
 
 const Instructor = () => {
     const [classes, setClasses] = useState([]);
