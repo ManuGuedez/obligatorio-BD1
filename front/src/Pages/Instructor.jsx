@@ -5,6 +5,7 @@ import CalendarioClases from './../Components/CalendarioClases';
 
 const Instructor = () => {
     const [classes, setClasses] = useState([]);
+    const [instructorName, setInstructorName] = useState("");
 
     const actualDate = new Date();
     console.log(actualDate.toDateString())
@@ -20,7 +21,11 @@ const Instructor = () => {
 
     useEffect(() => {
         // Simulación de datos de ejemplo
-
+        const storedUser = localStorage.getItem("user");
+        const user = JSON.parse(storedUser); // Parsear el JSON
+        const email = user.email
+        const nameFromEmail = email.split('.')[0]; // Toma la parte antes del primer '.'
+        setInstructorName(nameFromEmail);
         const exampleClasses = [
             {   
                 fecha: '2024-11-14',
@@ -71,13 +76,15 @@ const Instructor = () => {
         setClasses(exampleClasses);
     }, []);
 
+    
+
     return (
         <div className="instructor-dashboard">
             <div className='instructor-dashboard2'>
                 <div className='instructor'>
                     <div className="encabezadoInstructor">
                         <p id="inspecciona">Inspecciona tus clases</p>
-                        <h1>Bienvenido, Donald Trump</h1>
+                        <h1>Bienvenido, {instructorName} </h1>
                     </div>
                     <section className="schedule">
                         <h2>Clases de Hoy</h2>

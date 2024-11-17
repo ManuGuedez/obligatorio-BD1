@@ -18,7 +18,7 @@ const App = () => {
         <div>
             <div className="app-container">
             {!noNavBarRoutes.includes(location.pathname) && <NavBar />}
-                <Routes>
+                <Routes>    
                     <Route path="/" element={<Home />} />
                     <Route path="/Register" element={<Register />} />
                     <Route path="/LogIn" element={<LogIn />} />

@@ -59,6 +59,13 @@
     display: flex;
     justify-content: center;
     margin-top: 1.5rem;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .register-btn-container p{
+    font-size: solid 3px;
+    color: red;
   }
   
   .register-btn {

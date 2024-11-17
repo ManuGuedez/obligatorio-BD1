@@ -1,7 +1,7 @@
 import origin_url from "./origin";
 
-const default_url = `${origin_url}/api`;
-
+const default_url = `${origin_url}`;
+console.log("URL de API:", default_url);
 const ApiService = {
     get: async (resource, token) => {
         const request = {

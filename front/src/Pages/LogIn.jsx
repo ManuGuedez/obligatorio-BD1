@@ -1,7 +1,20 @@
+/*Functions*/
 import React, { useState } from 'react';
+import { Link, useNavigate } from "react-router-dom";
+
 import './LogIn.css';
+/* Services */
+import AuthService from "../Services/authService";
 
 const LogIn = () => {
+    // Mensaje de error en la tarjeta
+    const [err_msg, setErrorMsg] = useState("");
+    const [isHidden, setHidden] = useState(true);
+    
+
+    // Para redireccionar
+    const navigate = useNavigate();
+
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -15,10 +28,40 @@ const LogIn = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
-        
-        if (formData.username == "" || formData.password){
-            
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // Validación de campos vacíos
+        if (!formData.email || !formData.password) {
+            setErrorMsg("Los campos no pueden estar vacíos.");
+            setHidden(false);
+            return;
+        }
+
+        setErrorMsg("");
+        setHidden(true);
+
+        try {
+            const user = await AuthService.login(formData.email, formData.password);
+
+            if (user.code === 200) {
+                localStorage.setItem("token", user.data.token); // Guardar el token
+                localStorage.setItem("user", JSON.stringify(user.data.user)); // Guardar datos del usuario
+                console.log("Respuesta del servidor:", user);
+                // Redirigir según el rol
+                if (user.data.user.role_id === 1) {
+                    navigate("/instructor");
+                } else if (user.data.user.role_id === 2) {
+                    navigate("/alumno");
+                } else {
+                    setErrorMsg("Rol no válido. Contacta al administrador.");
+                    setHidden(false);
+                }
+            }            
+        } catch (error) {
+            setErrorMsg("Ocurrió un error durante el inicio de sesión.");
+            setHidden(false);
+            console.error("Login error:", error);
         }
     };
 
@@ -30,11 +73,11 @@ const LogIn = () => {
                     <label>Mail:</label>
                     <input
                         type="text"
-                        name="mail"
-                        value={formData.mail}
+                        name="email"
+                        value={formData.email}
                         onChange={handleChange}
                         required
-                        placeholder="Ingrese su mail"
+                        placeholder="Ingrese su email"
                     />
                 </div>
                 <div className="form-group">
@@ -50,10 +93,11 @@ const LogIn = () => {
                 </div>
                 <div className="register-btn-container">
                     <button type="submit" className="register-btn">Iniciar Sesión</button>
+                    {!isHidden && <p className="error-message">{err_msg}</p>}
                 </div>
             </form>
             <div className="register-link-container">
-                <p>¿No tienes cuenta aún? <a href="http://localhost:5173/Register" className="register-link">Registrarse aquí</a></p>
+                <p>¿No tienes cuenta aún? <Link to="/Register" className="register-link">Registrarse aquí</Link></p>
             </div>
         </div>
     );
