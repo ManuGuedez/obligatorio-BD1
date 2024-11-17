@@ -5,7 +5,8 @@ const Register = () => {
     const [formData, setFormData] = useState({
         name: '',
         lastname: '',
-        username: '',
+        rol: '', // Agregamos rol como un campo select
+        birthday: '', // Nuevo campo para la fecha de nacimiento
         ci: '',
         email: '',
         password: '',
@@ -20,24 +21,14 @@ const Register = () => {
     };
 
     const handleSubmit = async (e) => {
-        if (formData.username === "" || formData.email === "" || formData.passwd === "") {
-            setErrorMsg("Fields can't be left empty.");
-            setHidden(false);
+        e.preventDefault(); // Previene la recarga de la página
+        if (formData.name === "" || formData.email === "" || formData.password === "") {
+            alert("Fields can't be left empty.");
             return;
         }
 
-        setErrorMsg("");
-        setHidden(true);
-
-        const user = await AuthService.register(username, email, passwd);
-
-        if (user.code === 400) { // El usuario existe
-            setErrorMsg("User already exists.");
-            setHidden(false);
-        } else {
-            setHidden(true);
-            navigate("/login");
-        }
+        // Simulación de registro (ejemplo)
+        console.log("User Registered:", formData);
     };
 
     return (
@@ -67,14 +58,26 @@ const Register = () => {
                     />
                 </div>
                 <div className="form-group">
-                    <label>Usuario:</label>
-                    <input
-                        type="text"
-                        name="username"
-                        value={formData.username}
+                    <label>Rol:</label>
+                    <select
+                        name="rol"
+                        value={formData.rol}
                         onChange={handleChange}
                         required
-                        placeholder="Ingrese su usuario"
+                    >
+                        <option value="">Seleccione un rol</option>
+                        <option value="Instructor">Instructor</option>
+                        <option value="Alumno">Alumno</option>
+                    </select>
+                </div>
+                <div className="form-group">
+                    <label>Fecha de Nacimiento:</label>
+                    <input
+                        type="date"
+                        name="birthday"
+                        value={formData.birthday}
+                        onChange={handleChange}
+                        required
                     />
                 </div>
                 <div className="form-group">

@@ -1,3 +1,4 @@
+/* Admin.css */
 .admin-dashboard {
     padding: 20px;
     font-family: 'Arial', sans-serif;
@@ -11,24 +12,38 @@
 
 .admin-card-container {
     display: flex;
-    flex-wrap: wrap; /* Permite que las tarjetas se muevan a la siguiente fila si no hay suficiente espacio */
-    gap: 20px; /* Espacio entre tarjetas */
-    justify-content: center; /* Centra las tarjetas horizontalmente */
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 20px; /* Espaciado entre las tarjetas */
+}
+
+.admin-card, .admin-subcard {
+    width: 300px;
+    height: 250px; /* Establece una altura fija para todas las tarjetas */
+    background-color: #b3c7e6;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .admin-card {
-    background-color: #7ba7e4;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    width: 300px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para dar profundidad */
-    text-align: center;
+    background-color: #5c85d6;
+    color: #ffffff;
+    font-weight: bold;
 }
 
-.admin-card h2 {
-    font-size: 1.5em;
-    margin-bottom: 10px;
+.admin-subcard {
+    background-color: #f0f4fa;
+    border: 1px solid #ddd;
+    color: #2c5282;
+    font-weight: bold;
+    padding: 20px;
+    margin-top: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 button {
@@ -65,7 +80,7 @@ button:hover {
 }
 
 .modal-content {
-    background: #7ba7e4;
+    background: #2c5282;
     padding: 20px;
     border-radius: 8px;
     width: 300px;
@@ -76,5 +91,25 @@ button:hover {
     display: flex;
     justify-content: space-between;
     margin-top: 20px;
+    gap: 8px;
 }
 
+.modal-content h2 {
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
