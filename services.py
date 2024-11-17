@@ -510,10 +510,11 @@ def retrieve_student_classes_by_turn_and_days(student_id, turn_id, days_id, star
             s.person_id = %s
             AND c.turn_id = %s
             AND (c.start_date <= %s and %s <= c.end_date)
-            AND cd.day_id IN (1, 2, 3)
+            AND cd.day_id IN 
     """
     
     days = '('+ str(days_id)[1:-1] + ')'
+    query = query + days
     
     cursor.execute(query, (student_id, turn_id, end_date, start_date))
     data = cursor.fetchall()
@@ -602,7 +603,7 @@ def get_available_classes(student_ci):
                 AND c.turn_id = c2.turn_id
                 AND d.day_id = d2.day_id
                 AND c.start_date <= c2.end_date
-                AND c2.end_date <= c.start_date
+                AND c2.start_date <= c.end_date
             );
     """
     cursor.execute(query, (student_ci, student_ci))

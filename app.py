@@ -13,6 +13,11 @@ jwt = JWTManager(app)
 
 @app.route('/login', methods=['POST'])
 def login():
+    '''
+    cuerpo requerido:
+        - email
+        - password
+    '''
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
@@ -135,6 +140,14 @@ def create_class():
 @app.route('/classes/<int:id>/modify-class', methods=['PATCH']) 
 @jwt_required()
 def modify_class(id):
+    '''
+    cuerpo requerido:
+        - turn_id: (id del turno que se desea actualizar)
+        - instructor_id: (id del instructor que se desea actualizar)
+        
+    ¡¡¡ el endpoint no soporta actualizaciones simultáneas (turno e instructor) !!! 
+        --> hacer uno primero y luego otro en caso de querer modificar ambos
+    '''
     # primero se verifica que quien intenta crear una clase es el administrador 
     claims = get_jwt()
     role = services.get_role(claims.get("role_id"))
@@ -340,8 +353,6 @@ def remove_student_from_class(id):
         return jsonify({'error': message}), 400
 
 
-
-
 @app.route('/students/available-classes', methods=['GET']) 
 @jwt_required()
 def get_available_classes(): # pensado para que lo use el estudiante
@@ -480,6 +491,7 @@ def get_class_calendar():
     instructor_calendar = services.get_class_calendar(user_ci)
     
     return jsonify(instructor_calendar), 200
+    
     
 @app.route('/instructor/class-information', methods=['GET']) 
 @jwt_required()
