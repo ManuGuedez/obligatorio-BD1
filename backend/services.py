@@ -857,4 +857,12 @@ def modify_activity_cost(activity_id, cost):
     else:
         return -1, 'Hubo un error al modificar la actividad.'
     
-    print("a")
+def add_turn(start_time, end_time):
+    insert = 'INSERT INTO turns (start_time, end_time) VALUES (%s, %s)'
+    cursor.execute(insert, (start_time, end_time))
+    
+    cnx.commit()  
+    if cursor.rowcount > 0:
+        return 1, "Nuevo turno agregado exitosamente."
+    else:
+        return -1, "No Fue posible agregar el nuevo turno."

@@ -42,7 +42,8 @@ def login():
         
         return jsonify({
             "access_token": access_token,
-            "user": user_details
+            "user": user_details,
+            "user_data": person_data
         }), 200
     else:
         return jsonify({"error": "Credenciales incorrectas"}), 401
@@ -584,6 +585,9 @@ def modify_cost(id):
     data = request.get_json()
     cost = data.get('cost')
     
+    if not cost:
+        return jsonify({'error': 'Faltan datos requeridos.'}), 400
+        
     result, message = services.modify_activity_cost(id, cost)
     
     if result >= 0:
@@ -591,6 +595,34 @@ def modify_cost(id):
     else:
         return jsonify({'error': message}), 400
     
+    
+@app.route('/turns/add-turn', methods=['POST']) 
+@jwt_required()
+def add_turn():
+    '''
+    cuerpo requerido:
+        - start_time: ej. '09:00:00'
+        - end_time
+    '''
+    
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "admin"):
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
+        
+    data = request.get_json()
+    description = data.get('start_time')
+    cost = data.get('end_time')
+    
+    if not description or not cost:
+        return jsonify({'error': 'Faltan datos requeridos'}), 400
+        
+    result, message = services.add_activity(description, cost)
+    if result > 0: 
+        return jsonify({'msg': message}), 200
+    else:
+        return jsonify({'error': message}), 400  
     
     
 if __name__ == '__main__':
