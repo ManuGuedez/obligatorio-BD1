@@ -16,7 +16,7 @@ const Admin = () => {
                 {/* Gestión de Instructores */}
                 <div>
                     <div className="admin-card">
-                        <h2>Gestión de Instructores</h2>
+                        <h2>Instructores</h2>
                         <button>Agregar Instructor</button>
                         <button>Modificar Instructor</button>
                         <button>Eliminar Instructor</button>
@@ -30,7 +30,7 @@ const Admin = () => {
                 {/* Gestión de Turnos y Horarios */}
                 <div>
                     <div className="admin-card">
-                        <h2>Gestión de Turnos y Horarios</h2>
+                        <h2>Turnos y Horarios</h2>
                         <button>Crear Turno</button>
                         <button>Asignar Instructor a Turno</button>
                     </div>
@@ -43,7 +43,7 @@ const Admin = () => {
                 {/* Gestión de Actividades */}
                 <div>
                     <div className="admin-card">
-                        <h2>Gestión de Actividades</h2>
+                        <h2>Actividades</h2>
                         <button>Agregar Actividad</button>
                         <button>Eliminar Actividad</button>
                     </div>
@@ -56,7 +56,7 @@ const Admin = () => {
                 {/* Gestión de Alumnos */}
                 <div>
                     <div className="admin-card">
-                        <h2>Gestión de Alumnos</h2>
+                        <h2>Alumnos</h2>
                         <button>Agregar Alumno</button>
                         <button>Eliminar Alumno</button>
                     </div>
