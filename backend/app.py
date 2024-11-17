@@ -567,6 +567,31 @@ def get_all_activities():
     
     return jsonify(all_activities), 200
     
+
+@app.route('/activities/<int:id>/modify-cost', methods=['PATCH']) 
+@jwt_required()
+def modify_cost(id):    
+    '''
+    cuerpo requerido:
+        - cost: nuevo costo de la acitvidad
+    '''
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "admin"):
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
+    
+    data = request.get_json()
+    cost = data.get('cost')
+    
+    result, message = services.modify_activity_cost(id, cost)
+    
+    if result >= 0:
+        return  jsonify({'msg': message}), 200
+    else:
+        return jsonify({'error': message}), 400
+    
+    
     
 if __name__ == '__main__':
     app.run(debug=True)

@@ -844,3 +844,17 @@ def get_all_activities():
     activities = cursor.fetchall()
     
     return activities
+
+def modify_activity_cost(activity_id, cost):
+    update = 'UPDATE activities SET cost = %s WHERE activity_id = %s'
+    cursor.execute(update, (cost, activity_id))
+    cnx.commit() 
+    
+    if cursor.rowcount > 0 :
+        return 1, 'Costo de la actividad modificado correctamente.'
+    elif cursor.rowcount == 0:
+        return 1, 'La actividad ya tenía ese costo previamente.'
+    else:
+        return -1, 'Hubo un error al modificar la actividad.'
+    
+    print("a")
