@@ -525,7 +525,7 @@ def get_instructor_classes():
         return jsonify({'error': data}), 400
     
 
-@app.route('/activities/add-activity', methods=['GET']) 
+@app.route('/activities/add-activity', methods=['POST']) 
 @jwt_required()
 def add_activity():
     '''
@@ -552,6 +552,21 @@ def add_activity():
         return jsonify({'msg': message}), 200
     else:
         return jsonify({'error': message}), 400    
+    
+
+@app.route('/activities', methods=['GET']) 
+@jwt_required()
+def get_all_activities():    
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "admin"):
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
+
+    all_activities = services.get_all_activities()
+    
+    return jsonify(all_activities), 200
+    
     
 if __name__ == '__main__':
     app.run(debug=True)

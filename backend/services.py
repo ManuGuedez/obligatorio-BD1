@@ -838,4 +838,9 @@ def add_activity(description, cost):
     else:
         return -1, "No Fue posible agregar la nueva actividad"
     
-    print(1)
+def get_all_activities():
+    query = 'SELECT * FROM activities'
+    cursor.execute(query)
+    activities = cursor.fetchall()
+    
+    return activities
