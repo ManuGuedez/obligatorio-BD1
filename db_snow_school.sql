@@ -535,4 +535,5 @@ WHERE
     AND (c.start_date <= '2024-12-20' AND '2024-12-02' <= c.end_date );
     --                  fecha inicio                fecha fin
 
-update classes set dictated = null where class_id = 13
+SELECT person_id, name AS first_name, last_name
+FROM person WHERE person_ci = 500000005

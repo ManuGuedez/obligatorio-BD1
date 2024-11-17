@@ -138,6 +138,15 @@ def create_instructor_account(instructor, email, password):
  
     return result, message
 
+def get_person_data(person_id):
+    query = """
+    SELECT person_id, name AS first_name, last_name
+    FROM person WHERE person_ci = %s
+    """
+    cursor.execute(query, (person_id,))
+    data = cursor.fetchall()
+    return data
+
 def get_role(role_id):
     query = f'SELECT roles.role_name FROM roles WHERE roles.role_id = {role_id}'
     cursor.execute(query)

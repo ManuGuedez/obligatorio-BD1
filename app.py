@@ -23,9 +23,10 @@ def login():
     user_ci, role_id = services.validate_user(email, password)
     
     if user_ci and role_id: 
+        person_data = services.get_person_data(user_ci)
         # se crea un token de acceso JWT
         access_token = create_access_token(identity=user_ci, additional_claims={'role_id': role_id})
-        return jsonify(access_token=access_token), 200
+        return jsonify({'access_token': access_token, 'user_data': person_data}), 200
     else:
         return jsonify({"error": "Credenciales incorrectas"}), 401
 
