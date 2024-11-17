@@ -1,6 +1,6 @@
 import mysql.connector as mysql
 
-cnx = mysql.connect(user='root', password='rootpassword', host='mysql', database='snowSchool')
+cnx = mysql.connect(user='root', password='rootpassword', host='127.0.0.1', database='snowSchool')
 cursor = cnx.cursor(dictionary=True) # devuelve la info en formato key-value
 from mysql.connector.errors import IntegrityError
 import algoritmo
@@ -138,6 +138,15 @@ def create_instructor_account(instructor, email, password):
  
     return result, message
 
+def get_person_data(person_id):
+    query = """
+    SELECT person_id, name AS first_name, last_name
+    FROM person WHERE person_ci = %s
+    """
+    cursor.execute(query, (person_id,))
+    data = cursor.fetchall()
+    return data
+
 def get_role(role_id):
     query = f'SELECT roles.role_name FROM roles WHERE roles.role_id = {role_id}'
     cursor.execute(query)
@@ -203,38 +212,6 @@ def modify_class_turn(class_id, new_turn_id):
             return -1, "No se encontró la clase con el ID especificado o el turno ya estaba actualizado."
     except mysql.Error as err:
         return -1, f"Error al modificar la clase: {err}"
-    
-def modify_students_class(class_id, student_ci, action):
-    match action:
-        case 'add':
-            query = f"INSERT INTO student_class (class_id, student_ci) VALUES ({class_id}, {student_ci})"
-            try:
-                cursor.execute(query)
-                cnx.commit()
-                return 1, "Alumno agregado a la clase exitosamente."
-            except mysql.Error as err:
-                return -1, f"Error al agregar el alumno: {err}"
-        case 'delete':    
-            query = f"DELETE FROM student_class WHERE class_id = {class_id} AND student_ci = {student_ci}"
-            try:
-                cursor.execute(query)
-                cnx.commit()
-                if cursor.rowcount > 0:
-                    return 1, "Alumno quitado de la clase exitosamente."
-                else:
-                    return -1, "No se encontró el alumno en la clase especificada."
-            except mysql.Error as err:
-                return -1, f"Error al quitar el alumno: {err}"
-        case _:
-            return -1, "Acción no válida. Use 'add' o 'delete'."
-        
-def get_instructor_schedules(instructor_id): # quedó obsoleto porque agregamos nuevas tablas
-    query = 'SELECT turn_id FROM classes WHERE instructor_ci = %s'
-    cursor.execute(query, (instructor_id,))
-    data = cursor.fetchall()
-    
-    turns_ids = {turn["turn_id"] for turn in data} # hago un set con los horarios del instructor
-    return turns_ids
 
 def modify_class_instructor(class_id, instructor_ci):
     query = f"UPDATE classes SET instructor_ci = {instructor_ci} WHERE class_id = {class_id}"
@@ -837,3 +814,15 @@ def get_days(class_info):
     for current_class in class_info:
         days.append(current_class['day_id'])
     return days
+
+def get_class_data_from_an_instructor(instructor_ci):
+    query = 'SELECT * FROM classes WHERE instructor_ci = %s'
+    cursor.execute(query, (instructor_ci,))
+    data = cursor.fetchall()
+    
+    if len(data) < 0:
+        return -1, "Hubo un error al obtener las clases del instructor."
+    elif len(data) == 0:
+        return 0, "El instructor no tiene clases asignadas."
+    else:
+        return 1, data

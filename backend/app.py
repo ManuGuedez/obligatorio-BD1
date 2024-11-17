@@ -25,9 +25,10 @@ def login():
     user_ci, role_id = services.validate_user(email, password)
     
     if user_ci and role_id: 
+        person_data = services.get_person_data(user_ci)
         # se crea un token de acceso JWT
         access_token = create_access_token(identity=user_ci, additional_claims={'role_id': role_id})
-        
+
         user_details = {
             "id": user_ci,
             "role_id": role_id,
@@ -36,8 +37,10 @@ def login():
         
         return jsonify({
             "access_token": access_token,
-            "user": user_details
+            "user": user_details,
+            "user_data": person_data
         }), 200
+
     else:
         return jsonify({"error": "Credenciales incorrectas"}), 401
 
@@ -73,40 +76,6 @@ def register_user():
             return jsonify({'error': 'Rol no reconocido'}), 400
     
     if result > 0:
-        return jsonify({'msg': message}), 200
-    else:
-        return jsonify({'error': message}), 400
-
-# no se usa todavía
-@app.route('/classes/<id>/students', methods=['PUT'])
-@jwt_required()
-def modify_class_students(id):
-    data = request.get_json()
-    user_ci = get_jwt_identity()
-    claims = get_jwt() 
-    action = data.get('action') 
-    
-    if not action:
-        return jsonify({"error": "Debe ingresar la acción a realizar"}), 400
-
-    role = services.get_role(claims.get('role_id'))
-    
-    # agregar opción para administrator
-    match role:
-        case 'instructor':
-            student_ci = data.get('student_ci')
-                        
-            if not student_ci:
-                return jsonify({"error": "Debe ingresar la ci del estudiante."}), 400
-            
-            result, message = services.modify_students_class(id, student_ci, action)            
-        case 'student': 
-            result, message = services.modify_students_class(id, user_ci, action)
-        case _:
-            return jsonify({"error": "Rol inadecuado para realizar esta acción"}), 400
-
-    # modificación exitosa
-    if result > 0: 
         return jsonify({'msg': message}), 200
     else:
         return jsonify({'error': message}), 400
@@ -526,8 +495,26 @@ def get_class_calendar():
     
     return jsonify(instructor_calendar), 200
     
+@app.route('/instructor/class-information', methods=['GET']) 
+@jwt_required()
+def get_instructor_classes():
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
     
-        
+    if(role != "instructor"):
+        return jsonify({'error': 'Debes ser instructor para poder acceder a las clases.'}), 400
+    
+    user_ci = get_jwt_identity()
+    result, data = services.get_class_data_from_an_instructor(user_ci)
+    
+    if result > 0:
+        return jsonify(data), 200
+    elif result == 0:
+        return  jsonify({'msg': data}), 200
+    else:
+        return jsonify({'error': data}), 400
+    
+    
 if __name__ == '__main__':
     app.run(debug=True)
 
