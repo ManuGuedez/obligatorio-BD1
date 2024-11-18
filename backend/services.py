@@ -885,4 +885,16 @@ def get_turn_id(start_time, end_time):
     cursor.execute(query, (start_time, end_time))    
     return cursor.fetchall()
         
+def get_all_instructors():
+    query = 'SELECT person_id AS instructor_id, first_name, last_name FROM instructors'
+    cursor.execute(query)
+    instructors = cursor.fetchall()
     
+    return instructors
+
+def get_all_students():
+    query = 'SELECT person_id AS student_id, first_name, last_name FROM students'
+    cursor.execute(query)
+    students = cursor.fetchall()
+    
+    return students

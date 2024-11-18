@@ -670,7 +670,40 @@ def get_student_classes():
     else:
         return jsonify({'error': data}), 400
     
+
+@app.route('/instructors', methods=['GET']) 
+@jwt_required()
+def get_all_instructors(): 
+    '''
+    devuelve todos los instructores 
+    '''   
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
     
+    if(role != "admin"):
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
+
+    all_instructors = services.get_all_instructors()
+    
+    return jsonify(all_instructors), 200    
+
+
+@app.route('/students', methods=['GET']) 
+@jwt_required()
+def get_all_students(): 
+    '''
+    devuelve todos los estudiantes
+    '''   
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "admin"):
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
+
+    all_students = services.get_all_students()
+    
+    return jsonify(all_students), 200   
+
 if __name__ == '__main__':
     app.run(debug=True)
 
