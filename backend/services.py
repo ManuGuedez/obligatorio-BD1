@@ -1,6 +1,6 @@
 import mysql.connector as mysql
 
-cnx = mysql.connect(user='root', password='rootpassword', host='mysql', database='snowSchool')
+cnx = mysql.connect(user='root', password='rootpassword', host='127.0.0.1', database='snowSchool')
 cursor = cnx.cursor(dictionary=True) # devuelve la info en formato key-value
 from mysql.connector.errors import IntegrityError
 import algoritmo
@@ -274,7 +274,7 @@ def retrieve_instructor_classes_by_turn_and_days(instructor_id, turn_id, days_id
     joins = 'JOIN instructors i ON i.instructor_ci = c.instructor_ci JOIN class_day cd ON cd.class_id = c.class_id '
     where = 'WHERE i.person_id = %s AND c.turn_id = %s AND (c.start_date <= %s and %s <= c.end_date) AND cd.day_id IN '
     
-    days = '('+ str(days)[1:-1] + ')'
+    days = '('+ str(days_id)[1:-1] + ')'
     
     query = select + joins + where + days
     cursor.execute(query, (instructor_id, turn_id, end_date, start_date))
@@ -810,7 +810,7 @@ def get_class_calendar(instructor_ci):
         current_data['class_date'] = cast_date(current_data['class_date'])
     return data
 
-def get_days(class_info):
+def get_days_from_class(class_info):
     days = []
     for current_class in class_info:
         days.append(current_class['day_id'])

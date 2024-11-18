@@ -320,7 +320,7 @@ def enroll_student(id):
     if enrolled_students_count >= 10:
         return jsonify({"error": "La clase ya está llena."}), 400
 
-    days_ids = services.get_days(class_info)
+    days_ids = services.get_days_from_class(class_info)
     if services.is_student_busy(student_id, class_info[0]['turn_id'], days_ids, class_info[0]['start_date'], class_info[0]['end_date']):
         return jsonify({"error": "El alumno ya está ocupado en el turno y los días seleccionados."}), 400    
             
