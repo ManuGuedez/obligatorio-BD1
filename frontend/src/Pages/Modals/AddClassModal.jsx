@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ApiService from '../../Services/apiServices';
 import './AddClassModal.css'
 
@@ -11,6 +11,15 @@ const AddClassModal = ({ show, handleClose }) => {
         turn: '',
         days: ''
     });
+    const [turns, setTurns] = useState([])
+
+    useEffect(() => {
+        const getTurns = async () => {
+            const data = await ApiService.get('turns', localStorage.getItem("token"))
+            setTurns(data.data);
+        }
+        getTurns();
+    },[])
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -113,10 +122,9 @@ const AddClassModal = ({ show, handleClose }) => {
                                     onChange={handleInputChange}
                                     required
                                 >
-                                    <option value="">Seleccione un turno</option>
-                                    <option value="1">Turno 1</option>
-                                    <option value="2">Turno 2</option>
-                                    <option value="3">Turno 3</option>
+                                    {turns?.map((current_turn, index) => {
+                                        return <option key={index} value={current_turn.turn_id}>{`${current_turn.start_time} - ${current_turn.end_time}`}</option>
+                                    })}
                                 </select>
                             </div>
 
