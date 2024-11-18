@@ -237,6 +237,7 @@ def get_person_id_with_ci(person_ci):
     return -1
 
 def get_days():
+    
     query = 'SELECT * FROM days'
     cursor.execute(query)
     data = cursor.fetchall()

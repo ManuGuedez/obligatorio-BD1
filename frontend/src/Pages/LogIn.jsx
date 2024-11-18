@@ -10,7 +10,7 @@ const LogIn = () => {
     // Mensaje de error en la tarjeta
     const [err_msg, setErrorMsg] = useState("");
     const [isHidden, setHidden] = useState(true);
-    
+
 
     // Para redireccionar
     const navigate = useNavigate();
@@ -45,19 +45,21 @@ const LogIn = () => {
             const user = await AuthService.login(formData.email, formData.password);
 
             if (user.code === 200) {
-                localStorage.setItem("token", user.data.token); // Guardar el token
-                localStorage.setItem("user", JSON.stringify(user.data.user)); // Guardar datos del usuario
+                localStorage.setItem("token", user.data.access_token); // Guardar el token
+                localStorage.setItem("user", JSON.stringify(user.data.user_data)); // Guardar datos del usuario
                 console.log("Respuesta del servidor:", user);
                 // Redirigir según el rol
                 if (user.data.user.role_id === 1) {
                     navigate("/instructor");
                 } else if (user.data.user.role_id === 2) {
                     navigate("/alumno");
+                } else if (user.data.user.role_id === 3) {
+                    navigate("/Admin");
                 } else {
                     setErrorMsg("Rol no válido. Contacta al administrador.");
                     setHidden(false);
                 }
-            }            
+            }
         } catch (error) {
             setErrorMsg("Ocurrió un error durante el inicio de sesión.");
             setHidden(false);
