@@ -858,6 +858,10 @@ def modify_activity_cost(activity_id, cost):
         return -1, 'Hubo un error al modificar la actividad.'
     
 def add_turn(start_time, end_time):
+    turn_id = get_turn_id(start_time, end_time)
+    if len(turn_id) > 0: # se verifica que no se vaya a duplicar el turno
+        return -1, 'Ya hay un turno en ese horario, tiene el siguiente id: ' + str(turn_id[0])
+    
     insert = 'INSERT INTO turns (start_time, end_time) VALUES (%s, %s)'
     cursor.execute(insert, (start_time, end_time))
     
@@ -866,3 +870,19 @@ def add_turn(start_time, end_time):
         return 1, "Nuevo turno agregado exitosamente."
     else:
         return -1, "No Fue posible agregar el nuevo turno."
+    
+def get_all_turns():
+    query = 'SELECT * FROM turns'
+    cursor.execute(query)
+    turns = cursor.fetchall()
+    for turn in turns:
+        turn['start_time'] = cast_time(turn['start_time'])
+        turn['end_time'] = cast_time(turn['end_time'])
+    return turns
+
+def get_turn_id(start_time, end_time):
+    query = 'SELECT turn_id FROM turns WHERE start_time = %s AND end_time = %s'
+    cursor.execute(query, (start_time, end_time))    
+    return cursor.fetchall()
+        
+    
