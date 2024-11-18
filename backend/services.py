@@ -275,7 +275,7 @@ def retrieve_instructor_classes_by_turn_and_days(instructor_id, turn_id, days_id
     joins = 'JOIN instructors i ON i.instructor_ci = c.instructor_ci JOIN class_day cd ON cd.class_id = c.class_id '
     where = 'WHERE i.person_id = %s AND c.turn_id = %s AND (c.start_date <= %s and %s <= c.end_date) AND cd.day_id IN '
     
-    days = '('+ str(days)[1:-1] + ')'
+    days = '('+ str(days_id)[1:-1] + ')'
     
     query = select + joins + where + days
     cursor.execute(query, (instructor_id, turn_id, end_date, start_date))
@@ -511,10 +511,11 @@ def retrieve_student_classes_by_turn_and_days(student_id, turn_id, days_id, star
             s.person_id = %s
             AND c.turn_id = %s
             AND (c.start_date <= %s and %s <= c.end_date)
-            AND cd.day_id IN (1, 2, 3)
+            AND cd.day_id IN 
     """
     
     days = '('+ str(days_id)[1:-1] + ')'
+    query = query + days
     
     cursor.execute(query, (student_id, turn_id, end_date, start_date))
     data = cursor.fetchall()
@@ -603,7 +604,7 @@ def get_available_classes(student_ci):
                 AND c.turn_id = c2.turn_id
                 AND d.day_id = d2.day_id
                 AND c.start_date <= c2.end_date
-                AND c2.end_date <= c.start_date
+                AND c2.start_date <= c.end_date
             );
     """
     cursor.execute(query, (student_ci, student_ci))
@@ -810,8 +811,7 @@ def get_class_calendar(instructor_ci):
         current_data['class_date'] = cast_date(current_data['class_date'])
     return data
 
-def get_days(class_info):
-    print("CLASS INFO!",class_info)
+def get_days_from_class(class_info):
     days = []
     for current_class in class_info:
         days.append(current_class['day_id'])
@@ -828,3 +828,74 @@ def get_class_data_from_an_instructor(instructor_ci):
         return 0, "El instructor no tiene clases asignadas."
     else:
         return 1, data
+    
+def add_activity(description, cost):
+    insert = 'INSERT INTO activities (description, cost) VALUES (%s, %s)'
+    cursor.execute(insert, (description, cost))
+    
+    cnx.commit()  
+    if cursor.rowcount > 0:
+        return 1, "Nueva actividad agregada exitosamente"
+    else:
+        return -1, "No Fue posible agregar la nueva actividad"
+    
+def get_all_activities():
+    query = 'SELECT * FROM activities'
+    cursor.execute(query)
+    activities = cursor.fetchall()
+    
+    return activities
+
+def modify_activity_cost(activity_id, cost):
+    update = 'UPDATE activities SET cost = %s WHERE activity_id = %s'
+    cursor.execute(update, (cost, activity_id))
+    cnx.commit() 
+    
+    if cursor.rowcount > 0 :
+        return 1, 'Costo de la actividad modificado correctamente.'
+    elif cursor.rowcount == 0:
+        return 1, 'La actividad ya tenía ese costo previamente.'
+    else:
+        return -1, 'Hubo un error al modificar la actividad.'
+    
+def add_turn(start_time, end_time):
+    turn_id = get_turn_id(start_time, end_time)
+    if len(turn_id) > 0: # se verifica que no se vaya a duplicar el turno
+        return -1, 'Ya hay un turno en ese horario, tiene el siguiente id: ' + str(turn_id[0])
+    
+    insert = 'INSERT INTO turns (start_time, end_time) VALUES (%s, %s)'
+    cursor.execute(insert, (start_time, end_time))
+    
+    cnx.commit()  
+    if cursor.rowcount > 0:
+        return 1, "Nuevo turno agregado exitosamente."
+    else:
+        return -1, "No Fue posible agregar el nuevo turno."
+    
+def get_all_turns():
+    query = 'SELECT * FROM turns'
+    cursor.execute(query)
+    turns = cursor.fetchall()
+    for turn in turns:
+        turn['start_time'] = cast_time(turn['start_time'])
+        turn['end_time'] = cast_time(turn['end_time'])
+    return turns
+
+def get_turn_id(start_time, end_time):
+    query = 'SELECT turn_id FROM turns WHERE start_time = %s AND end_time = %s'
+    cursor.execute(query, (start_time, end_time))    
+    return cursor.fetchall()
+        
+def get_all_instructors():
+    query = 'SELECT person_id AS instructor_id, first_name, last_name FROM instructors'
+    cursor.execute(query)
+    instructors = cursor.fetchall()
+    
+    return instructors
+
+def get_all_students():
+    query = 'SELECT person_id AS student_id, first_name, last_name FROM students'
+    cursor.execute(query)
+    students = cursor.fetchall()
+    
+    return students

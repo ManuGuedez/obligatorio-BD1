@@ -536,4 +536,7 @@ WHERE
     --                  fecha inicio                fecha fin
 
 SELECT person_id, name AS first_name, last_name
-FROM person WHERE person_ci = 500000005
+FROM person WHERE person_ci = 500000005;
+
+use snowSchool
+SELECT person_id AS student_id, first_name, last_name FROM students
