@@ -237,6 +237,7 @@ def get_person_id_with_ci(person_ci):
     return -1
 
 def get_days():
+    
     query = 'SELECT * FROM days'
     cursor.execute(query)
     data = cursor.fetchall()
@@ -810,6 +811,7 @@ def get_class_calendar(instructor_ci):
     return data
 
 def get_days(class_info):
+    print("CLASS INFO!",class_info)
     days = []
     for current_class in class_info:
         days.append(current_class['day_id'])

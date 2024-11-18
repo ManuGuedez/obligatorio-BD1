@@ -6,12 +6,24 @@ import smtp
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
+
+# Configura CORS para todo el servidor
+CORS(app, origins=["http://localhost:5173"])
+
 
 app.config['JWT_SECRET_KEY'] = 'obligatorio-bd-2024'
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30) # esto para que el token expire cada 30 min
 
 jwt = JWTManager(app)
+
+@app.after_request
+def after_request(response):
+    # Añadir CORS globalmente a todas las respuestas
+    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:5173'  # Asegúrate de usar tu dominio
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS, PUT, PATCH'  # Permitir métodos necesarios
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'  # Permitir cabeceras necesarias
+    return response
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -27,7 +39,9 @@ def login():
     if user_ci and role_id: 
         person_data = services.get_person_data(user_ci)
         # se crea un token de acceso JWT
-        access_token = create_access_token(identity=user_ci, additional_claims={'role_id': role_id})
+        access_token = create_access_token(identity=str(user_ci), additional_claims={'role_id': role_id})
+
+        #access_token = create_access_token(identity=user_ci, additional_claims={'role_id': role_id})
 
         user_details = {
             "id": user_ci,
@@ -40,6 +54,8 @@ def login():
             "user": user_details,
             "user_data": person_data
         }), 200
+        
+        
 
     else:
         return jsonify({"error": "Credenciales incorrectas"}), 401
@@ -114,14 +130,15 @@ def create_class():
     activity = str(data.get('activity')).strip().capitalize() # premier letra en may y resto en min
     activities = services.get_activities()
     activity = activities.get(activity)
-    
     if not activity:
         return jsonify({'error': 'La actividad ingresada no es válida'}), 400        
     
     turn = data.get('turn')
-    days = data.get('days') # lista con los días en los que se quiere dictar la clase
-    days_ids = services.get_days() # devuelve diccionario con días y sus respectivos ids
-    
+    days = data.get('days') 
+
+    days_ids = services.get_days()
+ # devuelve diccionario con días y sus respectivos ids
+
     # reemplazo los días con los ids
     for i in range(len(days)):
         id = days_ids.get(str(days[i]).lower())
@@ -224,6 +241,8 @@ def modify_class(id):
 @app.route('/add_user', methods=['POST']) 
 @jwt_required()
 def add_user():
+    data = request.get_json()
+
     '''
     Cuerpo requerido:
     {
@@ -248,7 +267,9 @@ def add_user():
     user_type = data.get('user_type')
     
     if not ci or not first_name or not last_name or not user_type:
+        print("Datos recibidos:", data)  # Agregar log para depurar
         return jsonify({'error': 'Faltan datos obligatorios'}), 400
+
     
     person_id = services.add_person(ci, first_name, last_name) 
     

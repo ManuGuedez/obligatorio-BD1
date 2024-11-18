@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import ApiService from '../Services/apiServices';
+import ApiService from '../../Services/apiServices';
 import './AddInstructorModal.css';
 
 
-const AddInstructorModal = ({ show, handleClose, onInstructorAdded }) => {
+const AddInstructorModal = ({ show, handleClose }) => {
     const [formData, setFormData] = useState({
         ci: '',
         first_name: '',
@@ -20,23 +20,25 @@ const AddInstructorModal = ({ show, handleClose, onInstructorAdded }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         try {
+
             const newInstructor = {
-                ci: parseInt(formData.ci),
+                ci: formData.ci,
                 first_name: formData.first_name,
                 last_name: formData.last_name,
                 user_type: "instructor"
             };
-    
-            const response = await ApiService.post(
-                "add_user",
+
+            const response = await ApiService.post("add_user",
                 newInstructor,
                 "application/json",
                 localStorage.getItem("token")
             );
+            
     
             if (response.code === 201) {
-                onInstructorAdded();
+                
                 handleClose();
                 setFormData({
                     ci: '',
@@ -49,17 +51,12 @@ const AddInstructorModal = ({ show, handleClose, onInstructorAdded }) => {
         }
     };
     
-
-
-    // Solo renderiza el modal si `show` es true
-    if (!show) return null;
-
     return (
+        show && ( 
         <div className="modal-overlay">
             <div className="modal-container">
                 <div className="modal-header">
                     <h2>Agregar Nuevo Instructor</h2>
-                    <button className="close-button" onClick={handleClose}>&times;</button>
                 </div>
                 <div className="modal-body">
                     <form onSubmit={handleSubmit}>
@@ -108,6 +105,7 @@ const AddInstructorModal = ({ show, handleClose, onInstructorAdded }) => {
                 </div>
             </div>
         </div>
+        )
     );
 };
 

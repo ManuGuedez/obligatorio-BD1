@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import './Admin.css';
+import AddInstructorModal from './Modals/AddInstructorModal';
+import RemoveInstructorModal from './Modals/RemoveInstructorModal';
+import AddClassModal from './Modals/AddClassModal';
+
 
 const Admin = () => {
     const [instructors, setInstructors] = useState([]);
@@ -7,67 +11,37 @@ const Admin = () => {
     const [activities, setActivities] = useState([]);
     const [students, setStudents] = useState([]);
     const [reports, setReports] = useState({});
-    const [isModalOpen, setIsModalOpen] = useState(false); // Controla la visibilidad del modal
-    const [newInstructor, setNewInstructor] = useState({ name: '', email: '' }); // Almacena los datos del nuevo instructor
 
+    // Modal para añadir instructor
+    const [showAddModal, setShowAddModal] = useState(false);
+    const handleCloseAddModal = () => setShowAddModal(false);
     const handleAddInstructor = () => {
-        setIsModalOpen(true); // Abre el modal al hacer clic en "Agregar Instructor"
+        setShowAddModal(true);
     };
 
-    const handleSaveInstructor = () => {
-        setInstructors([...instructors, newInstructor]); // Agrega el nuevo instructor a la lista
-        setNewInstructor({ name: '', email: '' }); // Reinicia el formulario
-        setIsModalOpen(false); // Cierra el modal
+    // Modal para eliminar un instructor
+    const [showRemoveModal, setShowRemoveModal] = useState(false);
+    const handleCloseRemoveModal = () => setShowRemoveModal(false);
+    const handleRemoveInstructor = () => {
+        setShowRemoveModal(true)
     };
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setNewInstructor((prev) => ({ ...prev, [name]: value })); // Actualiza los datos del instructor
+    // Modal para crear una clase 
+    const [showAddClass, setShowAddClass] = useState(false);
+    const handleCloseAddClassModal = () => setShowAddClass(false);
+    const handleAddClass = () => {
+        setShowAddClass(true);
     };
-
-    const handleCloseModal = () => {
-        setIsModalOpen(false); // Cierra el modal sin guardar
-        setNewInstructor({ name: '', email: '' }); // Reinicia el formulario si se cierra el modal
-    };
-
-    const handleRemoveInstructor = (id) => { /* Lógica para eliminar instructor */
-
-    };
-
-
-    useEffect(() => {
-        fetchInstructors(); 
-    }, []);
-
-
-    const fetchInstructors = async () => {
-        try {
-            const response = await fetch('http://localhost:5000/api/instructors');
-            const data = await response.json();
-            setInstructors(data);
-        }
-        catch (error) {
-            console.error('Error al obtener los instructores:', error);
-        }
-    }
-
-
-    // const handleEditInstructor = (id) => { /* Lógica para editar instructor */
-    //     const response = await fetch(`http://localhost:5000/api/instructors/${id}`, {
-
-    //     }
-
-
-    // };
 
 
 
     const handleAddSchedule = () => { /* Lógica para agregar turno */ };
     const handleAssignInstructorToSchedule = () => { /* Lógica para asignar instructor a turno */ };
     const handleAddActivity = () => { /* Lógica para agregar actividad */ };
-    const handleRemoveActivity = (id) => { /* Lógica para eliminar actividad */ };
+    const handleViewActivities = () => { /* Lógica para eliminar actividad */ };
     const handleAddStudent = () => { /* Lógica para agregar alumno */ };
     const handleRemoveStudent = (id) => { /* Lógica para eliminar alumno */ };
+    const handleModifyTurn = () => { /* Lógica para modificar clase */ };
     const generateReports = () => { /* Lógica para generar reportes */ };
 
     return (
@@ -79,7 +53,7 @@ const Admin = () => {
                     <h2>Gestión de Instructores</h2>
                     <button onClick={handleAddInstructor}>Agregar Instructor</button>
                     <button onClick={() => handleEditInstructor(1)}>Modificar Instructor</button>
-                    <button onClick={() => handleRemoveInstructor(1)}>Eliminar Instructor</button>
+                    <button onClick={() => handleRemoveInstructor()}>Eliminar Instructor</button>
                 </div>
 
                 {/* Gestión de Turnos y Horarios */}
@@ -87,13 +61,14 @@ const Admin = () => {
                     <h2>Gestión de Turnos y Horarios</h2>
                     <button onClick={handleAddSchedule}>Crear Turno</button>
                     <button onClick={handleAssignInstructorToSchedule}>Asignar Instructor a Turno</button>
+                    <button onClick={handleModifyTurn}>Modificar Turno</button>
                 </div>
 
                 {/* Gestión de Actividades */}
                 <div className="admin-card">
                     <h2>Gestión de Actividades</h2>
                     <button onClick={handleAddActivity}>Agregar Actividad</button>
-                    <button onClick={() => handleRemoveActivity(1)}>Eliminar Actividad</button>
+                    <button onClick={() => handleViewActivities}>Ver Actividades</button>
                 </div>
 
                 {/* Gestión de Alumnos */}
@@ -101,6 +76,16 @@ const Admin = () => {
                     <h2>Gestión de Alumnos</h2>
                     <button onClick={handleAddStudent}>Agregar Alumno</button>
                     <button onClick={() => handleRemoveStudent(1)}>Eliminar Alumno</button>
+                </div>
+
+                {/* Gestión de Clases*/}
+                <div className="admin-card">
+
+                    {/* MODIFICAR LOS HANDLERS */}
+                    <h2>Gestión de Clases</h2>
+                    <button onClick={handleAddClass}>Crear Clase</button>
+                    <button onClick={handleAssignInstructorToSchedule}>Modificar Clase</button>
+                    <button onClick={handleModifyTurn}>Añadir alumno</button>
                 </div>
 
                 {/* Reportes */}
@@ -115,40 +100,21 @@ const Admin = () => {
                 </div>
             </div>
 
-            {/* Modal para agregar instructor */}
-            {isModalOpen && (
-                <div className="modal">
-                    <div className="modal-content">
-                        <h2>Nuevo Instructor</h2>
-                        <div className="form-group">
-                            <label>Nombre:</label>
-                            <input
-                                type="text"
-                                name="name"
-                                value={newInstructor.name}
-                                onChange={handleChange}
-                                placeholder="Ingrese el nombre"
-                                required
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label>Email:</label>
-                            <input
-                                type="email"
-                                name="email"
-                                value={newInstructor.email}
-                                onChange={handleChange}
-                                placeholder="Ingrese el email"
-                                required
-                            />
-                        </div>
-                        <div className="modal-buttons">
-                            <button onClick={handleSaveInstructor}>Guardar</button>
-                            <button onClick={handleCloseModal}>Cancelar</button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <AddInstructorModal
+                show={showAddModal}
+                handleClose={handleCloseAddModal}
+            />
+
+            {/* <RemoveInstructorModal
+                show={showRemoveModal}
+                handleClose={handleCloseRemoveModal}
+            /> */}
+
+            <AddClassModal 
+                show={showAddClass}
+                handleClose={handleCloseAddClassModal}
+            />
+
         </div>
     );
 };
