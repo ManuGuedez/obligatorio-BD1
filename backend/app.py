@@ -12,7 +12,7 @@ CORS(app, origins=["http://localhost:5173"])
 
 
 app.config['JWT_SECRET_KEY'] = 'obligatorio-bd-2024'
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30) # esto para que el token expire cada 30 min
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=59) # esto para que el token expire cada 30 min
 
 jwt = JWTManager(app)
 
