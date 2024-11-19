@@ -41,7 +41,6 @@ const Admin = () => {
     const handleRemoveStudent = () => { /* Lógica para eliminar alumno */ };
     const handleModifyTurn = () => { /* Lógica para modificar clase */ };
     const generateReports = () => { /* Lógica para generar reportes */ };
-
     const handleModifyActivity = () => { /* Lógica para modificar actividad */ };
     const handleEditInstructor = () => { /* Lógica para editar instructor */ };
 
