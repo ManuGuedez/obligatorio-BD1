@@ -1,0 +1,56 @@
+/* Estilos para el modal de reportes */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+    z-index: 1000; /* Asegura que esté encima de otros elementos */
+}
+
+.modal-content {
+    background: #ffffff; /* Fondo blanco para el modal */
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Sombra para dar profundidad */
+    text-align: center;
+}
+
+.modal-content h2 {
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    color: #1a365d; /* Tono azul oscuro para el título */
+}
+
+.modal-content p {
+    font-size: 1.2em;
+    margin: 10px 0;
+    color: #333; /* Texto en un tono gris oscuro */
+}
+
+.modal-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.modal-buttons button {
+    padding: 10px 20px;
+    background-color: #1a365d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.modal-buttons button:hover {
+    background-color: #1d3778; /* Azul ligeramente más claro al pasar el cursor */
+}

@@ -3,17 +3,19 @@
     font-family: 'Arial', sans-serif;
 }
 
-.admin-dashboard h1 {
-    font-size: 2em;
+.admin-title {
+    font-size: 4em;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 40px; /* Más separación con las tarjetas */
+    font-family: 'Georgia', serif; /* Cambia la fuente */
+    color: white;
 }
 
 .admin-card-container {
     display: flex;
-    flex-wrap: wrap; /* Permite que las tarjetas se muevan a la siguiente fila si no hay suficiente espacio */
-    gap: 20px; /* Espacio entre tarjetas */
-    justify-content: center; /* Centra las tarjetas horizontalmente */
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
 }
 
 .admin-card {
@@ -22,7 +24,7 @@
     border-radius: 8px;
     padding: 20px;
     width: 300px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para dar profundidad */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
 
@@ -47,11 +49,29 @@ button:hover {
     background-color: #1d3778;
 }
 
-.report-content p {
+.generate-reports-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 20px; /* Tamaño compacto */
+    background-color: #1a365d;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
     font-size: 1em;
-    margin-top: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    width: auto; /* No ocupa todo el ancho */
+    text-align: center;
 }
 
+.generate-reports-button:hover {
+    background-color: #1d3778;
+}
+
+
+/* Estilo del modal */
 .modal {
     position: fixed;
     top: 0;
@@ -62,19 +82,20 @@ button:hover {
     align-items: center;
     justify-content: center;
     background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
 }
 
 .modal-content {
-    background: #7ba7e4;
+    background: #fefefe;
     padding: 20px;
     border-radius: 8px;
-    width: 300px;
+    width: 400px;
     text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .modal-buttons {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     margin-top: 20px;
 }
-
