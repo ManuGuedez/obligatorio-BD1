@@ -899,3 +899,49 @@ def get_all_students():
     students = cursor.fetchall()
     
     return students
+
+def modify_start_time(turn_id, start_time):
+    turn_time = get_turn_time(turn_id)
+    if turn_time == -1:
+        return -1, "No hay un turno con el id especificado."
+    
+    old_start_turn = cast_time(turn_time['start_time'])
+    end_time = cast_time(turn_time['end_time'])
+    
+    if old_start_turn == start_time:
+        return -1, "El turno ya tenía ese horario de inicio."
+    elif end_time <= start_time:
+        return -1, "El horario de inicio debe ser anterior a " + str(end_time)
+    elif len(get_turn_id(start_time, end_time)) > 0: # en caso de que ya haya otro turno con los horarios especificados
+        return -1, f"Ya hay un turno con el horario {start_time} - {end_time}."
+    else:
+        update = 'UPDATE turns SET start_time = %s WHERE turn_id = %s'
+        cursor.execute(update, (start_time, turn_id ))
+        cnx.commit() 
+        if cursor.rowcount > 0:
+            return 1, "Turno modificado exitosamente."
+        else:
+            return -1, "Hubo un error al modificar el turno."
+        
+def modify_end_time(turn_id, end_time):
+    turn_time = get_turn_time(turn_id)
+    if turn_time == -1:
+        return -1, "No hay un turno con el id especificado."
+    
+    start_time = cast_time(turn_time['start_time'])
+    old_end_time = cast_time(turn_time['end_time'])
+    
+    if old_end_time == end_time:
+        return -1, "El turno ya tenía ese horario de fin."
+    elif end_time <= start_time:
+        return -1, "El horario de fin debe ser posterior a " + str(start_time)
+    elif len(get_turn_id(start_time, end_time)) > 0: # en caso de que ya haya otro turno con los horarios especificados
+        return -1, f"Ya hay un turno con el horario {start_time} - {end_time}."
+    else:
+        update = 'UPDATE turns SET end_time = %s WHERE turn_id = %s'
+        cursor.execute(update, (end_time, turn_id ))
+        cnx.commit() 
+        if cursor.rowcount > 0:
+            return 1, "Turno modificado exitosamente."
+        else:
+            return -1, "Hubo un error al modificar el turno."
