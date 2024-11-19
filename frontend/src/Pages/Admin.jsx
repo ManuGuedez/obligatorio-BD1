@@ -1,3 +1,4 @@
+// Admin.js
 import React, { useEffect, useState } from 'react';
 import './Admin.css';
 import AddInstructorModal from './Modals/AddInstructorModal';
@@ -12,70 +13,61 @@ const Admin = () => {
     const [students, setStudents] = useState([]);
     const [reports, setReports] = useState({});
 
-    // Modal para añadir instructor
-    const [showAddModal, setShowAddModal] = useState(false);
-    const handleCloseAddModal = () => setShowAddModal(false);
-    const handleAddInstructor = () => {
-        setShowAddModal(true);
-    };
-
-    // Modal para eliminar un instructor
-    const [showRemoveModal, setShowRemoveModal] = useState(false);
-    const handleCloseRemoveModal = () => setShowRemoveModal(false);
-    const handleRemoveInstructor = () => {
-        setShowRemoveModal(true)
-    };
-
-    // Modal para crear una clase 
-    const [showAddClass, setShowAddClass] = useState(false);
-    const handleCloseAddClassModal = () => setShowAddClass(false);
-    const handleAddClass = () => {
-        setShowAddClass(true);
-    };
-
-
-
-    const handleAddSchedule = () => { /* Lógica para agregar turno */ };
-    const handleAssignInstructorToSchedule = () => { /* Lógica para asignar instructor a turno */ };
-    const handleAddActivity = () => { /* Lógica para agregar actividad */ };
-    const handleViewActivities = () => { /* Lógica para eliminar actividad */ };
-    const handleAddStudent = () => { /* Lógica para agregar alumno */ };
-    const handleRemoveStudent = (id) => { /* Lógica para eliminar alumno */ };
-    const handleModifyTurn = () => { /* Lógica para modificar clase */ };
-    const generateReports = () => { /* Lógica para generar reportes */ };
-
     return (
         <div className="admin-dashboard">
             <h1>Panel de Administración</h1>
             <div className="admin-card-container">
                 {/* Gestión de Instructores */}
-                <div className="admin-card">
-                    <h2>Gestión de Instructores</h2>
-                    <button onClick={handleAddInstructor}>Agregar Instructor</button>
-                    <button onClick={() => handleEditInstructor(1)}>Modificar Instructor</button>
-                    <button onClick={() => handleRemoveInstructor()}>Eliminar Instructor</button>
+                <div>
+                    <div className="admin-card">
+                        <h2>Instructores</h2>
+                        <button>Agregar Instructor</button>
+                        <button>Modificar Instructor</button>
+                        <button>Eliminar Instructor</button>
+                    </div>
+                    <div className="admin-subcard">
+                        <h3>Instructores</h3>
+                        {/* Listado de instructores */}
+                    </div>
                 </div>
 
                 {/* Gestión de Turnos y Horarios */}
-                <div className="admin-card">
-                    <h2>Gestión de Turnos y Horarios</h2>
-                    <button onClick={handleAddSchedule}>Crear Turno</button>
-                    <button onClick={handleAssignInstructorToSchedule}>Asignar Instructor a Turno</button>
-                    <button onClick={handleModifyTurn}>Modificar Turno</button>
+                <div>
+                    <div className="admin-card">
+                        <h2>Turnos y Horarios</h2>
+                        <button>Crear Turno</button>
+                        <button>Asignar Instructor a Turno</button>
+                    </div>
+                    <div className="admin-subcard">
+                        <h3>Turnos y Horarios</h3>
+                        {/* Listado de turnos y horarios */}
+                    </div>
                 </div>
 
                 {/* Gestión de Actividades */}
-                <div className="admin-card">
-                    <h2>Gestión de Actividades</h2>
-                    <button onClick={handleAddActivity}>Agregar Actividad</button>
-                    <button onClick={() => handleViewActivities}>Ver Actividades</button>
+                <div>
+                    <div className="admin-card">
+                        <h2>Actividades</h2>
+                        <button>Agregar Actividad</button>
+                        <button>Eliminar Actividad</button>
+                    </div>
+                    <div className="admin-subcard">
+                        <h3>Actividades</h3>
+                        {/* Listado de actividades */}
+                    </div>
                 </div>
 
                 {/* Gestión de Alumnos */}
-                <div className="admin-card">
-                    <h2>Gestión de Alumnos</h2>
-                    <button onClick={handleAddStudent}>Agregar Alumno</button>
-                    <button onClick={() => handleRemoveStudent(1)}>Eliminar Alumno</button>
+                <div>
+                    <div className="admin-card">
+                        <h2>Alumnos</h2>
+                        <button>Agregar Alumno</button>
+                        <button>Eliminar Alumno</button>
+                    </div>
+                    <div className="admin-subcard">
+                        <h3>Alumnos</h3>
+                        {/* Listado de alumnos */}
+                    </div>
                 </div>
 
                 {/* Gestión de Clases*/}
@@ -89,32 +81,17 @@ const Admin = () => {
                 </div>
 
                 {/* Reportes */}
-                <div className="admin-card">
-                    <h2>Reportes</h2>
-                    <button onClick={generateReports}>Generar Reportes</button>
-                    <div className="report-content">
-                        {reports.mostPopularActivity && <p>Actividad más popular: {reports.mostPopularActivity}</p>}
-                        {reports.highestIncomeActivity && <p>Actividad con más ingresos: {reports.highestIncomeActivity}</p>}
-                        {reports.mostClassesSchedule && <p>Turno con más clases dictadas: {reports.mostClassesSchedule}</p>}
+                <div>
+                    <div className="admin-card">
+                        <h2>Reportes</h2>
+                        <button>Generar Reportes</button>
+                    </div>
+                    <div className="admin-subcard">
+                        <h3>Reportes</h3>
+                        {/* Mostrar reportes generados */}
                     </div>
                 </div>
             </div>
-
-            <AddInstructorModal
-                show={showAddModal}
-                handleClose={handleCloseAddModal}
-            />
-
-            {/* <RemoveInstructorModal
-                show={showRemoveModal}
-                handleClose={handleCloseRemoveModal}
-            /> */}
-
-            <AddClassModal 
-                show={showAddClass}
-                handleClose={handleCloseAddClassModal}
-            />
-
         </div>
     );
 };

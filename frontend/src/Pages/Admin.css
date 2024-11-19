@@ -1,80 +1,109 @@
-.admin-dashboard {
-    padding: 20px;
-    font-family: 'Arial', sans-serif;
-}
-
-.admin-dashboard h1 {
-    font-size: 2em;
+/* Contenedor principal del título */
+.admin-title {
     text-align: center;
-    margin-bottom: 20px;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-top: 30px; /* Ajusta el título hacia arriba */
+    margin-bottom: 20px; /* Espacio adicional entre el título y las tarjetas */
+    color: #ffffff;
 }
 
+/* Contenedor de las tarjetas */
 .admin-card-container {
     display: flex;
-    flex-wrap: wrap; /* Permite que las tarjetas se muevan a la siguiente fila si no hay suficiente espacio */
-    gap: 20px; /* Espacio entre tarjetas */
-    justify-content: center; /* Centra las tarjetas horizontalmente */
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 20px; /* Espaciado uniforme entre las tarjetas */
+    width: 100%;
+    margin-top: 40px; /* Espaciado adicional respecto al título */
 }
 
+/* Tarjetas principales (fondo celeste) */
 .admin-card {
-    background-color: #7ba7e4;
-    border: 1px solid #ddd;
+    width: 300px; /* Tamaño uniforme para todas las tarjetas */
+    flex: 1 1 auto; /* Se adapta al espacio disponible */
+    background-color: #5c85d6; /* Fondo celeste */
     border-radius: 8px;
     padding: 20px;
-    width: 300px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para dar profundidad */
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    color: #ffffff;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.admin-card h2 {
-    font-size: 1.5em;
-    margin-bottom: 10px;
+/* Subtarjetas internas (fondo blanco) */
+.admin-subcard {
+    background-color: #ffffff; /* Fondo blanco */
+    border: 1px solid #ddd; /* Borde ligero */
+    color: #2c5282; /* Texto oscuro */
+    font-weight: bold;
+    margin-top: 20px; /* Espaciado entre subtarjetas y tarjetas principales */
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-button {
+/* Botones dentro de las tarjetas */
+.admin-card button, .admin-subcard button {
     display: block;
     width: 100%;
-    margin: 10px 0;
+    margin-top: 10px;
     padding: 10px;
     border: none;
     border-radius: 5px;
     background-color: #1a365d;
     color: white;
     cursor: pointer;
+    transition: background-color 0.2s;
 }
 
-button:hover {
+.admin-card button:hover, .admin-subcard button:hover {
     background-color: #1d3778;
 }
 
-.report-content p {
-    font-size: 1em;
-    margin-top: 8px;
+/* Diseño responsivo para pantallas pequeñas */
+@media (max-width: 768px) {
+    .admin-card {
+        width: 100%; /* Tarjetas ocupan el ancho completo */
+        margin-bottom: 20px; /* Espaciado adicional entre tarjetas */
+    }
+
+    .admin-subcard {
+        margin-top: 15px; /* Reduce espacio entre cajas en pantallas pequeñas */
+    }
+
+    .admin-card-container {
+        gap: 15px; /* Reduce el espacio entre tarjetas */
+    }
+
+    .admin-title {
+        font-size: 1.8rem; /* Ajusta el tamaño del texto para pantallas pequeñas */
+        margin-top: 20px; /* Reduce el espacio superior */
+    }
 }
 
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.5);
-}
+/* Diseño responsivo para pantallas muy pequeñas */
+@media (max-width: 480px) {
+    .admin-title {
+        font-size: 1.5rem;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
 
-.modal-content {
-    background: #7ba7e4;
-    padding: 20px;
-    border-radius: 8px;
-    width: 300px;
-    text-align: center;
-}
+    .admin-card-container {
+        flex-direction: column; /* Todas las tarjetas en una sola columna */
+        align-items: center; /* Centra las tarjetas */
+    }
 
-.modal-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-}
+    .admin-card {
+        width: 90%; /* Reduce el ancho de las tarjetas */
+    }
 
+    .admin-subcard {
+        margin-top: 10px;
+    }
+}

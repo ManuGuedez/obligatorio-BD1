@@ -8,7 +8,8 @@ from flask_cors import CORS
 app = Flask(__name__)
 
 # Configura CORS para todo el servidor
-CORS(app, origins=["http://localhost:5173"])
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+
 
 
 app.config['JWT_SECRET_KEY'] = 'obligatorio-bd-2024'
@@ -84,7 +85,7 @@ def register_user():
     last_name = data.get('last_name')
     email = data.get('email')
     password = data.get('password')
-    
+
     match (rol):
         case 'instructor':
             instructor = {'ci': ci, 'first_name': first_name, 'last_name': last_name}
@@ -546,7 +547,7 @@ def get_instructor_classes():
     else:
         return jsonify({'error': data}), 400
     
-    
+"""
 @app.route('/instructor/class-information', methods=['GET']) 
 @jwt_required()
 def get_instructor_classes():
@@ -569,7 +570,7 @@ def get_instructor_classes():
     else:
         return jsonify({'error': data}), 400
     
-
+"""
 @app.route('/activities/add-activity', methods=['POST']) 
 @jwt_required()
 def add_activity():

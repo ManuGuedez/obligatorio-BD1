@@ -6,77 +6,29 @@ import CalendarioClases from '../Components/CalendarioClases';
 const Instructor = () => {
     const [classes, setClasses] = useState([]);
     const [instructorName, setInstructorName] = useState("");
+    const token = localStorage.getItem("token"); // Recuperar token del localStorage
+    const user = JSON.parse(localStorage.getItem("user")); // Recuperar datos del usuario del localStorage
 
-    const actualDate = new Date();
-    console.log(actualDate.toDateString())
-    const todayClasses = classes.filter(
-        (classData) =>
-            classData.fecha === actualDate.toISOString().split('T')[0]
-    );
     const calendario = [
         { fecha: '2024-11-05', deporte: 'Snow Ski', horario: '10:00 - 12:00' },
         { fecha: '2024-11-06', deporte: 'Snowboard', horario: '14:00 - 16:00' },
         // Agrega más clases con diferentes fechas
     ];
 
+    const actualDate = new Date();
+    const todayClasses = classes.filter(
+        (classData) =>
+            classData.fecha === actualDate.toISOString().split('T')[0]
+    );
+
     useEffect(() => {
-        // Simulación de datos de ejemplo
-        const storedUser = localStorage.getItem("user");
-        const user = JSON.parse(storedUser); // Parsear el JSON
-        const email = user.email
-        const nameFromEmail = email.split('.')[0]; // Toma la parte antes del primer '.'
-        setInstructorName(nameFromEmail);
-        const exampleClasses = [
-            {   
-                fecha: '2024-11-14',
-                turno: "Lunes 10:00 - 12:00",
-                dictada: "Sí",
-                deporte: "Snow Ski",
-                maxAlumnos: "15",
-                cantAlumnos: [
-                    { name: "Juan Pérez", email: "juan@example.com" },
-                    { name: "Ana López", email: "ana@example.com" }
-                ]
-            },
-            {
-                fecha: '2024-11-14',
-                turno: "Martes 14:00 - 16:00",
-                dictada: "No",
-                deporte: "Snowboard",
-                maxAlumnos: "10",
-                cantAlumnos: [
-                    { name: "Carlos Gómez", email: "carlos@example.com" },
-                    { name: "Luisa Fernanda", email: "luisa@example.com" }
-                ]
-            },
-            {
-                fecha: '2024-11-14',
-                turno: "Martes 14:00 - 16:00",
-                dictada: "No",
-                deporte: "Snowboard",
-                maxAlumnos: "10",
-                cantAlumnos: [
-                    { name: "Carlos Gómez", email: "carlos@example.com" },
-                    { name: "Luisa Fernanda", email: "luisa@example.com" }
-                ]
-            },
-            {
-                fecha: '2024-11-14',
-                turno: "Martes 14:00 - 16:00",
-                dictada: "No",
-                deporte: "Snowboard",
-                maxAlumnos: "10",
-                cantAlumnos: [
-                    { name: "Carlos Gómez", email: "carlos@example.com" },
-                    { name: "Luisa Fernanda", email: "luisa@example.com" }
-                ]
-            }
-        ];
-
-        setClasses(exampleClasses);
-    }, []);
-
-    
+        if (!token || !user) {
+            console.error("No token or user found. User must be logged in.");
+            return;
+        }
+        // Establece el nombre del instructor usando los datos del usuario
+        setInstructorName(user[0].first_name);
+    }, [token]);
 
     return (
         <div className="instructor-dashboard">
@@ -84,7 +36,7 @@ const Instructor = () => {
                 <div className='instructor'>
                     <div className="encabezadoInstructor">
                         <p id="inspecciona">Inspecciona tus clases</p>
-                        <h1>Bienvenido, {instructorName} </h1>
+                        <h1>Bienvenido,  {instructorName}</h1>
                     </div>
                     <section className="schedule">
                         <h2>Clases de Hoy</h2>
