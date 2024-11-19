@@ -18,15 +18,12 @@ const AddTurnModal = ({ isOpen, onClose }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Form submitted with data:', turnData);
         
         try {
             const newTurn = {
                 start_time: turnData.start_time + ':00',
                 end_time: turnData.end_time + ':00'
             };
-            console.log('Formatted turn data:', newTurn);
-            console.log('Token:', localStorage.getItem("token"));
     
             const response = await ApiService.post(
                 "turns/add-turn", 
@@ -34,9 +31,8 @@ const AddTurnModal = ({ isOpen, onClose }) => {
                 "application/json",
                 localStorage.getItem("token")
             );
-            console.log('API Response:', response);
-    
-    
+
+
             if (response.code === 201) {
                 onClose();
                 setTurnData({

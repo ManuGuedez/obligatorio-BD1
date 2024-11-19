@@ -563,12 +563,14 @@ def add_activity():
     cost = data.get('cost')
     
     if not description or not cost:
+        print("Aca2")
         return jsonify({'error': 'Faltan datos requeridos'}), 400
         
     result, message = services.add_activity(description, cost)
     if result > 0: 
         return jsonify({'msg': message}), 200
     else:
+        
         return jsonify({'error': message}), 400    
     
 
@@ -721,7 +723,7 @@ def get_all_students():
     return jsonify(all_students), 200   
 
 
-@app.route('/turns/<int:id>/modify-turn', methods=['POST']) 
+@app.route('/turns/<int:id>/modify-turn', methods=['PATCH']) 
 @jwt_required()
 def modify_turn(id):
     '''

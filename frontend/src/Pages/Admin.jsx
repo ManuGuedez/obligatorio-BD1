@@ -4,8 +4,9 @@ import AddInstructorModal from './Modals/AddInstructorModal';
 import RemoveInstructorModal from './Modals/RemoveInstructorModal';
 import AddClassModal from './Modals/AddClassModal';
 import AddTurnModal from './Modals/AddTurnModal';
-import ModifyTurnModal from './Modals/AddTurnModal';
-
+import ModifyTurnModal from './Modals/ModifyTurnModal';
+import AddStudentModal from './Modals/AddStudentModal';
+import AddActivityModal from './Modals/AddActivityModal';
 
 const Admin = () => {
     const [instructors, setInstructors] = useState([]);
@@ -47,11 +48,22 @@ const Admin = () => {
         setShowModifyTurn(true);
     };
 
+    const [showAddStudent, setShowAddStudent] = useState(false);
+    const handleCloseAddStudentModal = () => setShowAddStudent(false);
+    const handleAddStudent = () => {
+        setShowAddStudent(true);
+    };
+
+    const [showAddActivity, setShowAddActivity] = useState(false);
+    const handleCloseAddActivityModal = () => setShowAddActivity(false);
+    const handleAddActivity = () => {
+        setShowAddActivity(true);
+    };
+
+
     const handleAddSchedule = () => { /* Lógica para agregar turno */ };
     const handleAssignInstructorToSchedule = () => { /* Lógica para asignar instructor a turno */ };
-    const handleAddActivity = () => { /* Lógica para agregar actividad */ };
     const handleViewActivities = () => { /* Lógica para eliminar actividad */ };
-    const handleAddStudent = () => { /* Lógica para agregar alumno */ };
     const handleRemoveStudent = () => { /* Lógica para eliminar alumno */ };
     const generateReports = () => { /* Lógica para generar reportes */ };
     const handleModifyActivity = () => { /* Lógica para modificar actividad */ };
@@ -127,10 +139,22 @@ const Admin = () => {
                 isOpen={showAddTurn}
                 onClose={() => handleCloseAddTurnModal(false)}
             />
+
             <ModifyTurnModal
                 isOpen={showModifyTurn}
                 onClose={() => handleCloseModifyTurnModal(false)}
             />
+
+            <AddStudentModal
+                isOpen={showAddStudent}
+                onClose={() => handleCloseAddStudentModal(false)}
+            />
+
+            <AddActivityModal
+                isOpen={showAddActivity}
+                onClose={() => handleCloseAddActivityModal(false)}
+            />
+
 
         </div>
     );

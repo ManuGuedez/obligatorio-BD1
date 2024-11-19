@@ -21,12 +21,6 @@ const ApiService = {
     },
 
     post: async (resource, data, content_type, token) => {
-        console.log('API Request Details:', {
-            url: `${default_url}/${resource}`,
-            data: data,
-            content_type: content_type,
-            token: token
-        });
     
         const request = {
             method: "POST",
@@ -36,12 +30,8 @@ const ApiService = {
                 "Content-Type": `${content_type}`,
             },
         };
-    
-        console.log('About to fetch:', {
-            fullUrl: `${default_url}/${resource}`,
-            requestObject: request
-        });
         
+        console.log("HOLA",request);
         const api_response = await fetch(`${default_url}/${resource}`, request);
         
     
@@ -93,6 +83,28 @@ const ApiService = {
         const api_response = await fetch(`${default_url}/${resource}`, request);
 
         console.log(`PUT: ${api_response.status}, ${api_response.statusText}`);
+
+        const response = { code: api_response.status, data: null };
+
+        if (api_response.ok)
+            response.data = await api_response.json();
+
+        return response;
+    },
+
+    patch: async (resource, data, token) => {
+        const request = {
+            method: "PATCH",
+            body: JSON.stringify(data),
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        };
+
+        const api_response = await fetch(`${default_url}/${resource}`, request);
+
+        console.log(`PATCH: ${api_response.status}, ${api_response.statusText}`);
 
         const response = { code: api_response.status, data: null };
 
