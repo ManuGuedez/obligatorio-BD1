@@ -527,25 +527,6 @@ def get_class_calendar():
     
     return jsonify(instructor_calendar), 200
     
-@app.route('/instructor/class-information', methods=['GET']) 
-@jwt_required()
-def get_instructor_classes():
-    claims = get_jwt()
-    role = services.get_role(claims.get("role_id"))
-    
-    if(role != "instructor"):
-        return jsonify({'error': 'Debes ser instructor para poder acceder a las clases.'}), 400
-    
-    user_ci = get_jwt_identity()
-    result, data = services.get_class_data_from_an_instructor(user_ci)
-    
-    if result > 0:
-        return jsonify(data), 200
-    elif result == 0:
-        return  jsonify({'msg': data}), 200
-    else:
-        return jsonify({'error': data}), 400
-    
     
 @app.route('/instructor/class-information', methods=['GET']) 
 @jwt_required()

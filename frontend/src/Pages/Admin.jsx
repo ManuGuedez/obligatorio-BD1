@@ -33,16 +33,17 @@ const Admin = () => {
         setShowAddClass(true);
     };
 
-
-
     const handleAddSchedule = () => { /* Lógica para agregar turno */ };
     const handleAssignInstructorToSchedule = () => { /* Lógica para asignar instructor a turno */ };
     const handleAddActivity = () => { /* Lógica para agregar actividad */ };
     const handleViewActivities = () => { /* Lógica para eliminar actividad */ };
     const handleAddStudent = () => { /* Lógica para agregar alumno */ };
-    const handleRemoveStudent = (id) => { /* Lógica para eliminar alumno */ };
+    const handleRemoveStudent = () => { /* Lógica para eliminar alumno */ };
     const handleModifyTurn = () => { /* Lógica para modificar clase */ };
     const generateReports = () => { /* Lógica para generar reportes */ };
+
+    const handleModifyActivity = () => { /* Lógica para modificar actividad */ };
+    const handleEditInstructor = () => { /* Lógica para editar instructor */ };
 
     return (
         <div className="admin-dashboard">
@@ -52,15 +53,13 @@ const Admin = () => {
                 <div className="admin-card">
                     <h2>Gestión de Instructores</h2>
                     <button onClick={handleAddInstructor}>Agregar Instructor</button>
-                    <button onClick={() => handleEditInstructor(1)}>Modificar Instructor</button>
-                    <button onClick={() => handleRemoveInstructor()}>Eliminar Instructor</button>
+                    <button onClick={handleEditInstructor}>Modificar Instructor</button>
                 </div>
 
                 {/* Gestión de Turnos y Horarios */}
                 <div className="admin-card">
                     <h2>Gestión de Turnos y Horarios</h2>
                     <button onClick={handleAddSchedule}>Crear Turno</button>
-                    <button onClick={handleAssignInstructorToSchedule}>Asignar Instructor a Turno</button>
                     <button onClick={handleModifyTurn}>Modificar Turno</button>
                 </div>
 
@@ -68,14 +67,14 @@ const Admin = () => {
                 <div className="admin-card">
                     <h2>Gestión de Actividades</h2>
                     <button onClick={handleAddActivity}>Agregar Actividad</button>
-                    <button onClick={() => handleViewActivities}>Ver Actividades</button>
+                    <button onClick={handleViewActivities}>Ver Actividades</button>
+                    <button onClick={handleModifyActivity}>Modificar Actividad</button>
                 </div>
 
                 {/* Gestión de Alumnos */}
                 <div className="admin-card">
                     <h2>Gestión de Alumnos</h2>
                     <button onClick={handleAddStudent}>Agregar Alumno</button>
-                    <button onClick={() => handleRemoveStudent(1)}>Eliminar Alumno</button>
                 </div>
 
                 {/* Gestión de Clases*/}
@@ -86,6 +85,7 @@ const Admin = () => {
                     <button onClick={handleAddClass}>Crear Clase</button>
                     <button onClick={handleAssignInstructorToSchedule}>Modificar Clase</button>
                     <button onClick={handleModifyTurn}>Añadir alumno</button>
+                    <button onClick={handleRemoveStudent}>Eliminar Alumno</button>
                 </div>
 
                 {/* Reportes */}
