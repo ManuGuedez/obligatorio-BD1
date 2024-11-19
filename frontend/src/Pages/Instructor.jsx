@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import './Instructor.css';
 import Clases from "../Components/Clases";
 import CalendarioClases from '../Components/CalendarioClases';
+import ServiceInstructor from '../Services/instructorServices';
 
 const Instructor = () => {
     const [classes, setClasses] = useState([]);
     const [instructorName, setInstructorName] = useState("");
     const token = localStorage.getItem("token"); // Recuperar token del localStorage
+    const [error, setError] = useState("")
     const user = JSON.parse(localStorage.getItem("user")); // Recuperar datos del usuario del localStorage
 
     const calendario = [
@@ -22,13 +24,32 @@ const Instructor = () => {
     );
 
     useEffect(() => {
-        if (!token || !user) {
-            console.error("No token or user found. User must be logged in.");
-            return;
-        }
-        // Establece el nombre del instructor usando los datos del usuario
-        setInstructorName(user[0].first_name);
-    }, [token]);
+        const fetchInstructorData = async () => {
+            if (!token || !user) {
+                console.error("No token or user found. User must be logged in.");
+                setError("Debe iniciar sesión para acceder a esta página.");
+                return;
+            }
+
+            // Establece el nombre del instructor usando los datos del usuario
+            setInstructorName(user.first_name);
+
+            try {
+                const response = await ServiceInstructor.getInstructorClasses(token);
+                console.log(response)
+                if (response.code === 200) {
+                    setClasses(response.data); // Asigna las clases obtenidas al estado
+                } else {
+                    setError(response.data?.error || "Error al obtener las clases.");
+                }
+            } catch (error) {
+                setError("Ocurrió un error al obtener las clases.");
+                console.error(error);
+            }
+        };
+
+        fetchInstructorData();
+    }, []);
 
     return (
         <div className="instructor-dashboard">
