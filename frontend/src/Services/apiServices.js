@@ -12,9 +12,6 @@ const ApiService = {
         };
 
         const api_response = await fetch(`${default_url}/${resource}`, request);
-
-        console.log(`POST: ${api_response.status}, ${api_response.statusText}`);
-
         const response = { code: api_response.status, data: null };
 
         if (api_response.ok)
@@ -24,6 +21,13 @@ const ApiService = {
     },
 
     post: async (resource, data, content_type, token) => {
+        console.log('API Request Details:', {
+            url: `${default_url}/${resource}`,
+            data: data,
+            content_type: content_type,
+            token: token
+        });
+    
         const request = {
             method: "POST",
             body: JSON.stringify(data),
@@ -33,17 +37,20 @@ const ApiService = {
             },
         };
     
+        console.log('About to fetch:', {
+            fullUrl: `${default_url}/${resource}`,
+            requestObject: request
+        });
+        
         const api_response = await fetch(`${default_url}/${resource}`, request);
-        console.log('Request:', request);
-        console.log('Request body:', data);
+        
     
         const response = { code: api_response.status, data: null };
         
-        // Get the response body regardless of status
         const responseBody = await api_response.json();
-        console.log('Response body:', responseBody);
         
         response.data = responseBody;
+        
         return response;
     },
     

@@ -5,25 +5,17 @@ from datetime import timedelta
 import smtp
 from flask_cors import CORS
 
+
 app = Flask(__name__)
 
 # Configura CORS para todo el servidor
-CORS(app, origins=["http://localhost:5173"])
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 
 
 app.config['JWT_SECRET_KEY'] = 'obligatorio-bd-2024'
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=59) # esto para que el token expire cada 30 min
 
 jwt = JWTManager(app)
-
-@app.after_request
-def after_request(response):
-    # Añadir CORS globalmente a todas las respuestas
-    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:5173'  # Asegúrate de usar tu dominio
-    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS, PUT, PATCH'  # Permitir métodos necesarios
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'  # Permitir cabeceras necesarias
-    return response
-
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -627,6 +619,8 @@ def modify_cost(id):
 @app.route('/turns/add-turn', methods=['POST']) 
 @jwt_required()
 def add_turn():
+    print("Request received - Method:", request.method)
+    print("Request headers:", dict(request.headers))
     '''
     cuerpo requerido:
         - start_time: ej. '09:00:00'
@@ -640,13 +634,13 @@ def add_turn():
         return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
         
     data = request.get_json()
-    description = data.get('start_time')
-    cost = data.get('end_time')
+    start_time = data.get('start_time')
+    end_time = data.get('end_time')
     
-    if not description or not cost:
+    if not start_time or not end_time:
         return jsonify({'error': 'Faltan datos requeridos'}), 400
         
-    result, message = services.add_activity(description, cost)
+    result, message = services.add_turn(start_time, end_time)
     if result > 0: 
         return jsonify({'msg': message}), 200
     else:

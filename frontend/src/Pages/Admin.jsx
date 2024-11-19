@@ -3,6 +3,8 @@ import './Admin.css';
 import AddInstructorModal from './Modals/AddInstructorModal';
 import RemoveInstructorModal from './Modals/RemoveInstructorModal';
 import AddClassModal from './Modals/AddClassModal';
+import AddTurnModal from './Modals/AddTurnModal';
+import ModifyTurnModal from './Modals/AddTurnModal';
 
 
 const Admin = () => {
@@ -33,13 +35,24 @@ const Admin = () => {
         setShowAddClass(true);
     };
 
+    const [showAddTurn, setShowAddTurn] = useState(false);
+    const handleCloseAddTurnModal = () => setShowAddTurn(false);
+    const handleAddTurn = () => {
+        setShowAddTurn(true);
+    };
+
+    const [showModifyTurn, setShowModifyTurn] = useState(false);
+    const handleCloseModifyTurnModal = () => setShowModifyTurn(false);
+    const handleModifyTurn = () => {
+        setShowModifyTurn(true);
+    };
+
     const handleAddSchedule = () => { /* Lógica para agregar turno */ };
     const handleAssignInstructorToSchedule = () => { /* Lógica para asignar instructor a turno */ };
     const handleAddActivity = () => { /* Lógica para agregar actividad */ };
     const handleViewActivities = () => { /* Lógica para eliminar actividad */ };
     const handleAddStudent = () => { /* Lógica para agregar alumno */ };
     const handleRemoveStudent = () => { /* Lógica para eliminar alumno */ };
-    const handleModifyTurn = () => { /* Lógica para modificar clase */ };
     const generateReports = () => { /* Lógica para generar reportes */ };
     const handleModifyActivity = () => { /* Lógica para modificar actividad */ };
     const handleEditInstructor = () => { /* Lógica para editar instructor */ };
@@ -52,13 +65,13 @@ const Admin = () => {
                 <div className="admin-card">
                     <h2>Gestión de Instructores</h2>
                     <button onClick={handleAddInstructor}>Agregar Instructor</button>
-                    <button onClick={handleEditInstructor}>Modificar Instructor</button>
+                    <button onClick={handleEditInstructor}>Modificar Instructor</button> {/* EN VEMOS */}
                 </div>
 
                 {/* Gestión de Turnos y Horarios */}
                 <div className="admin-card">
                     <h2>Gestión de Turnos y Horarios</h2>
-                    <button onClick={handleAddSchedule}>Crear Turno</button>
+                    <button onClick={handleAddTurn}>Crear Turno</button>
                     <button onClick={handleModifyTurn}>Modificar Turno</button>
                 </div>
 
@@ -104,14 +117,19 @@ const Admin = () => {
                 handleClose={handleCloseAddModal}
             />
 
-            {/* <RemoveInstructorModal
-                show={showRemoveModal}
-                handleClose={handleCloseRemoveModal}
-            /> */}
-
-            <AddClassModal 
+            <AddClassModal
                 show={showAddClass}
                 handleClose={handleCloseAddClassModal}
+            />
+
+
+            <AddTurnModal
+                isOpen={showAddTurn}
+                onClose={() => handleCloseAddTurnModal(false)}
+            />
+            <ModifyTurnModal
+                isOpen={showModifyTurn}
+                onClose={() => handleCloseModifyTurnModal(false)}
             />
 
         </div>

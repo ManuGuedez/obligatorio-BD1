@@ -20,11 +20,13 @@ const AddClassModal = ({ show, handleClose }) => {
         "turns",
         localStorage.getItem("token")
       );
+      
       setTurns(turnsData.data);
       const activitiesData = await ApiService.get(
         "activities",
         localStorage.getItem("token")
       );
+
       setAtivities(activitiesData.data);
     };
     getInfo();
@@ -51,6 +53,7 @@ const AddClassModal = ({ show, handleClose }) => {
         days: formData.days.split(",").map((day) => day.trim().toLowerCase()),
         type: formData.type || null,
       };
+
 
       const response = await ApiService.post(
         "classes/new-class",
@@ -123,7 +126,7 @@ const AddClassModal = ({ show, handleClose }) => {
                 >
                   {ativities?.map((activity, index) => {
                     return (
-                      <option key={index} value={activity.activity_id}>
+                      <option key={index} value={activity.description}>
                         {activity.description}
                       </option>
                     );
