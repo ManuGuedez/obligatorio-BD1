@@ -1,4 +1,5 @@
 
+CREATE schema snowSchool;
 USE snowSchool;
 
 CREATE TABLE activities (

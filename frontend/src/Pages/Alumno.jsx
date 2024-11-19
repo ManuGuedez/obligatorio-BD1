@@ -1,32 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Actividad from '../Components/Actividad';
+import alumnoService from '../Services/alumnoService'; // Importar el servicio
 import './Alumno.css';
 
-const activities = [
-    {
-        id: 1,
-        name: 'Taller de Programación',
-        shortDescription: 'Aprende sobre programación avanzada.',
-        schedule: 'Lunes 10:00 - 12:00',
-        instructor: 'Prof. Juan Pérez',
-        details: 'En este taller, abordaremos temas avanzados de programación, incluyendo algoritmos y estructuras de datos.',
-        price: 15,
-    },
-    {
-        id: 2,
-        name: 'Laboratorio de Redes',
-        shortDescription: 'Explora las redes de comunicación.',
-        schedule: 'Miércoles 14:00 - 16:00',
-        instructor: 'Ing. Ana García',
-        details: 'Laboratorio práctico para comprender el funcionamiento de redes de datos y protocolos de comunicación.',
-        price: 20,
-    },
-];
-
 const Alumno = () => {
+    const [activities, setActivities] = useState([]); // Estado para actividades
+    const [isLoading, setIsLoading] = useState(true); // Estado para la carga
+    const [error, setError] = useState(null); // Estado para errores
+
     const [showModal, setShowModal] = useState(false);
     const [selectedActivity, setSelectedActivity] = useState(null);
     const [enrolledActivities, setEnrolledActivities] = useState([]);
+
+    useEffect(() => {
+        // Obtener actividades del backend
+        const fetchActivities = async () => {
+            try {
+                const token = localStorage.getItem('token'); // Obtener token del almacenamiento
+                const response = await alumnoService.getAlumnos(43158769, token); // Llamada al backend
+                setActivities(response); // Actualizar actividades
+            } catch (err) {
+                setError('Error al cargar actividades.'); // Manejo de errores
+                console.error(err);
+            } finally {
+                setIsLoading(false); // Finalizar estado de carga
+            }
+        };
+
+        fetchActivities();
+    }, []);
 
     const openModal = (activity) => {
         setSelectedActivity(activity);
@@ -39,7 +41,6 @@ const Alumno = () => {
     };
 
     const handleOverlayClick = (e) => {
-        // Cierra el modal solo si se hace clic en la superposición, no en el contenido del modal
         if (e.target.classList.contains('modal-overlay')) {
             closeModal();
         }
@@ -52,6 +53,9 @@ const Alumno = () => {
             setEnrolledActivities([...enrolledActivities, activityId]);
         }
     };
+
+    if (isLoading) return <p>Cargando actividades...</p>;
+    if (error) return <p>{error}</p>;
 
     return (
         <div className="alumno-container">

@@ -6,14 +6,15 @@ const ApiService = {
     get: async (resource, token) => {
         const request = {
             headers: {
-                "Authorization": `Bearer: ${token}`,
+                "Authorization": `Bearer ${token}`,
                 // Para los GET que no   token, como el login, no pasa nada si mandamos un undefined
             },
-        };
+        };        
+
+        console.log("ApiService GET - Full request:", request);
 
         const api_response = await fetch(`${default_url}/${resource}`, request);
-
-        console.log(`POST: ${api_response.status}, ${api_response.statusText}`);
+        console.log(`GET: ${api_response.status}, ${api_response.statusText}`);
 
         const response = { code: api_response.status, data: null };
 
@@ -28,7 +29,7 @@ const ApiService = {
             method: "POST",
             body: JSON.stringify(data),
             headers: {
-                "Authorization": `Bearer: ${token}`,
+                "Authorization": `Bearer ${token}`,
                 "Content-Type": `${content_type}`,
             },
         };
@@ -49,7 +50,7 @@ const ApiService = {
         const request = {
             method: "DELETE",
             headers: {
-                "Authorization": `Bearer: ${token}`,
+                "Authorization": `Bearer ${token}`,
             },
         };
 
@@ -70,7 +71,7 @@ const ApiService = {
             method: "PUT",
             body: JSON.stringify(data),
             headers: {
-                "Authorization": `Bearer: ${token}`,
+                "Authorization": `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
         };
