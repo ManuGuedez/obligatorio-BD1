@@ -640,13 +640,13 @@ def add_turn():
         return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
         
     data = request.get_json()
-    description = data.get('start_time')
-    cost = data.get('end_time')
+    start_time = data.get('start_time')
+    end_time = data.get('end_time')
     
-    if not description or not cost:
+    if not start_time or not end_time:
         return jsonify({'error': 'Faltan datos requeridos'}), 400
         
-    result, message = services.add_activity(description, cost)
+    result, message = services.add_turn(start_time, end_time)
     if result > 0: 
         return jsonify({'msg': message}), 200
     else:
@@ -726,7 +726,41 @@ def get_all_students():
     
     return jsonify(all_students), 200   
 
-  
+
+@app.route('/turns/<int:id>/modify-turn', methods=['POST']) 
+@jwt_required()
+def modify_turn(id):
+    '''
+    cuerpo requerido: (tiene que haber uno si o si, no ambos)
+        # start_time: ej. '09:00:00'
+        # end_time
+    '''
+    
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "admin"):
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
+        
+    data = request.get_json()
+    start_time = data.get('start_time')
+    end_time = data.get('end_time')
+    
+    if not start_time and not end_time:
+        return jsonify({'error': 'Faltan datos requeridos'}), 400
+    
+    if start_time and not end_time:
+        result, message = services.modify_start_time(id, start_time)
+    elif end_time and not start_time:
+        result, message = services.modify_end_time(id, end_time)
+    else: # en caso de que estén los dos
+        return jsonify({'error': 'No es posible cambiar inicio y fin de manera simultánea, puede crear un nuevo turno.'}), 400
+        
+    if result > 0: 
+        return jsonify({'msg': message}), 200
+    else:
+        return jsonify({'error': message}), 400  
+    
 if __name__ == '__main__':
     app.run(debug=True)
 
