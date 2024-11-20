@@ -31,9 +31,10 @@ const ApiService = {
             },
         };
         
-        console.log("HOLA",request);
+        console.log("HOLA",request,resource);
         const api_response = await fetch(`${default_url}/${resource}`, request);
         
+        console.log("HOLA",api_response);
     
         const response = { code: api_response.status, data: null };
         
