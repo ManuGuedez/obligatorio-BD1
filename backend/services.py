@@ -707,6 +707,7 @@ def get_extended_class_info(class_id):
     
     current_class["start_date"] = cast_date(current_class["start_date"])
     current_class["end_date"] = cast_date(current_class["end_date"])
+    current_class['is_group'] = current_class['is_group'] == 1
     
     return data
 
@@ -818,16 +819,21 @@ def get_days_from_class(class_info):
     return days
 
 def get_class_data_from_an_instructor(instructor_ci):
-    query = 'SELECT * FROM classes WHERE instructor_ci = %s'
+    query = 'SELECT class_id FROM classes WHERE instructor_ci = %s'
     cursor.execute(query, (instructor_ci,))
-    data = cursor.fetchall()
+    data = cursor.fetchall()  
+    print(data)
     
     if len(data) < 0:
         return -1, "Hubo un error al obtener las clases del instructor."
     elif len(data) == 0:
         return 0, "El instructor no tiene clases asignadas."
     else:
-        return 1, data
+        classes = dict()
+        for current_data in data:
+            id = current_data['class_id']
+            classes[id] = get_extended_class_info(id)[0]
+        return 1, classes
     
 def add_activity(description, cost):
     insert = 'INSERT INTO activities (description, cost) VALUES (%s, %s)'
@@ -899,3 +905,67 @@ def get_all_students():
     students = cursor.fetchall()
     
     return students
+
+def modify_start_time(turn_id, start_time):
+    turn_time = get_turn_time(turn_id)
+    if turn_time == -1:
+        return -1, "No hay un turno con el id especificado."
+    
+    old_start_turn = cast_time(turn_time['start_time'])
+    end_time = cast_time(turn_time['end_time'])
+    
+    if old_start_turn == start_time:
+        return -1, "El turno ya tenía ese horario de inicio."
+    elif end_time <= start_time:
+        return -1, "El horario de inicio debe ser anterior a " + str(end_time)
+    elif len(get_turn_id(start_time, end_time)) > 0: # en caso de que ya haya otro turno con los horarios especificados
+        return -1, f"Ya hay un turno con el horario {start_time} - {end_time}."
+    else:
+        update = 'UPDATE turns SET start_time = %s WHERE turn_id = %s'
+        cursor.execute(update, (start_time, turn_id ))
+        cnx.commit() 
+        if cursor.rowcount > 0:
+            return 1, "Turno modificado exitosamente."
+        else:
+            return -1, "Hubo un error al modificar el turno."
+        
+def modify_end_time(turn_id, end_time):
+    turn_time = get_turn_time(turn_id)
+    if turn_time == -1:
+        return -1, "No hay un turno con el id especificado."
+    
+    start_time = cast_time(turn_time['start_time'])
+    old_end_time = cast_time(turn_time['end_time'])
+    
+    if old_end_time == end_time:
+        return -1, "El turno ya tenía ese horario de fin."
+    elif end_time <= start_time:
+        return -1, "El horario de fin debe ser posterior a " + str(start_time)
+    elif len(get_turn_id(start_time, end_time)) > 0: # en caso de que ya haya otro turno con los horarios especificados
+        return -1, f"Ya hay un turno con el horario {start_time} - {end_time}."
+    else:
+        update = 'UPDATE turns SET end_time = %s WHERE turn_id = %s'
+        cursor.execute(update, (end_time, turn_id ))
+        cnx.commit() 
+        if cursor.rowcount > 0:
+            return 1, "Turno modificado exitosamente."
+        else:
+            return -1, "Hubo un error al modificar el turno."
+        
+def get_student_classes(student_ci):
+    query = """
+    SELECT c.class_id
+    FROM classes c
+    JOIN student_class sc ON c.class_id = sc.class_id
+    WHERE sc.student_ci = %s
+    """
+    cursor.execute(query, (student_ci, ))
+    classes = cursor.fetchall()
+    result = []
+    
+    for current_class in classes:
+        id = current_class['class_id']
+        result.append(get_extended_class_info(id)[0])
+    
+    return result
+        

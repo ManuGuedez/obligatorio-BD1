@@ -5,26 +5,17 @@ from datetime import timedelta
 import smtp
 from flask_cors import CORS
 
+
 app = Flask(__name__)
 
 # Configura CORS para todo el servidor
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 
 
-
 app.config['JWT_SECRET_KEY'] = 'obligatorio-bd-2024'
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=30) # esto para que el token expire cada 30 min
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=59) # esto para que el token expire cada 30 min
 
 jwt = JWTManager(app)
-
-@app.after_request
-def after_request(response):
-    # Añadir CORS globalmente a todas las respuestas
-    response.headers['Access-Control-Allow-Origin'] = 'http://localhost:5173'  # Asegúrate de usar tu dominio
-    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS, PUT, PATCH'  # Permitir métodos necesarios
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'  # Permitir cabeceras necesarias
-    return response
-
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -281,7 +272,6 @@ def add_user():
     user_type = data.get('user_type')
     
     if not ci or not first_name or not last_name or not user_type:
-        print("Datos recibidos:", data)  # Agregar log para depurar
         return jsonify({'error': 'Faltan datos obligatorios'}), 400
 
     
@@ -597,6 +587,7 @@ def add_activity():
     if result > 0: 
         return jsonify({'msg': message}), 200
     else:
+        
         return jsonify({'error': message}), 400    
     
 
@@ -652,7 +643,6 @@ def add_turn():
         - start_time: ej. '09:00:00'
         - end_time
     '''
-    
     claims = get_jwt()
     role = services.get_role(claims.get("role_id"))
     
@@ -660,13 +650,13 @@ def add_turn():
         return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
         
     data = request.get_json()
-    description = data.get('start_time')
-    cost = data.get('end_time')
+    start_time = data.get('start_time')
+    end_time = data.get('end_time')
     
-    if not description or not cost:
+    if not start_time or not end_time:
         return jsonify({'error': 'Faltan datos requeridos'}), 400
         
-    result, message = services.add_activity(description, cost)
+    result, message = services.add_turn(start_time, end_time)
     if result > 0: 
         return jsonify({'msg': message}), 200
     else:
@@ -694,7 +684,7 @@ def get_turn():
 @jwt_required()
 def get_student_classes(): 
     '''
-    dado un estudiante (que inició sesión) se devuelven todas las clases de las que es responsable 
+    dado un estudiante (que inició sesión) se devuelven todas las clases en las que está inscripto
     '''
     claims = get_jwt()
     role = services.get_role(claims.get("role_id"))
@@ -702,15 +692,10 @@ def get_student_classes():
     if(role != "student"):
         return jsonify({'error': 'Debes ser estudiante para poder acceder a las clases.'}), 400
     
-    user_ci = int(get_jwt_identity())
-    result, data = -1, 'aún no implementado' # services.get_class_data_from_an_instructor(user_ci)
+    student_ci = int(get_jwt_identity())
+    classes = services.get_student_classes(student_ci)
     
-    if result > 0:
-        return jsonify(data), 200
-    elif result == 0:
-        return  jsonify({'msg': data}), 200
-    else:
-        return jsonify({'error': data}), 400
+    return jsonify(classes), 200
     
 
 @app.route('/instructors', methods=['GET']) 
@@ -746,7 +731,41 @@ def get_all_students():
     
     return jsonify(all_students), 200   
 
-  
+
+@app.route('/turns/<int:id>/modify-turn', methods=['PATCH']) 
+@jwt_required()
+def modify_turn(id):
+    '''
+    cuerpo requerido: (tiene que haber uno si o si, no ambos)
+        # start_time: ej. '09:00:00'
+        # end_time
+    '''
+    
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "admin"):
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
+        
+    data = request.get_json()
+    start_time = data.get('start_time')
+    end_time = data.get('end_time')
+    
+    if not start_time and not end_time:
+        return jsonify({'error': 'Faltan datos requeridos'}), 400
+    
+    if start_time and not end_time:
+        result, message = services.modify_start_time(id, start_time)
+    elif end_time and not start_time:
+        result, message = services.modify_end_time(id, end_time)
+    else: # en caso de que estén los dos
+        return jsonify({'error': 'No es posible cambiar inicio y fin de manera simultánea, puede crear un nuevo turno.'}), 400
+        
+    if result > 0: 
+        return jsonify({'msg': message}), 200
+    else:
+        return jsonify({'error': message}), 400  
+    
 if __name__ == '__main__':
     app.run(debug=True)
 

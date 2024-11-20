@@ -4,7 +4,10 @@ import './Admin.css';
 import AddInstructorModal from './Modals/AddInstructorModal';
 import RemoveInstructorModal from './Modals/RemoveInstructorModal';
 import AddClassModal from './Modals/AddClassModal';
-
+import AddTurnModal from './Modals/AddTurnModal';
+import ModifyTurnModal from './Modals/ModifyTurnModal';
+import AddStudentModal from './Modals/AddStudentModal';
+import AddActivityModal from './Modals/AddActivityModal';
 
 const Admin = () => {
     const [instructors, setInstructors] = useState([]);
@@ -13,61 +16,90 @@ const Admin = () => {
     const [students, setStudents] = useState([]);
     const [reports, setReports] = useState({});
 
+    // Modal para añadir instructor
+    const [showAddModal, setShowAddModal] = useState(false);
+    const handleCloseAddModal = () => setShowAddModal(false);
+    const handleAddInstructor = () => {
+        setShowAddModal(true);
+    };
+
+    // Modal para eliminar un instructor
+    const [showRemoveModal, setShowRemoveModal] = useState(false);
+    const handleCloseRemoveModal = () => setShowRemoveModal(false);
+    const handleRemoveInstructor = () => {
+        setShowRemoveModal(true)
+    };
+
+    // Modal para crear una clase 
+    const [showAddClass, setShowAddClass] = useState(false);
+    const handleCloseAddClassModal = () => setShowAddClass(false);
+    const handleAddClass = () => {
+        setShowAddClass(true);
+    };
+
+    const [showAddTurn, setShowAddTurn] = useState(false);
+    const handleCloseAddTurnModal = () => setShowAddTurn(false);
+    const handleAddTurn = () => {
+        setShowAddTurn(true);
+    };
+
+    const [showModifyTurn, setShowModifyTurn] = useState(false);
+    const handleCloseModifyTurnModal = () => setShowModifyTurn(false);
+    const handleModifyTurn = () => {
+        setShowModifyTurn(true);
+    };
+
+    const [showAddStudent, setShowAddStudent] = useState(false);
+    const handleCloseAddStudentModal = () => setShowAddStudent(false);
+    const handleAddStudent = () => {
+        setShowAddStudent(true);
+    };
+
+    const [showAddActivity, setShowAddActivity] = useState(false);
+    const handleCloseAddActivityModal = () => setShowAddActivity(false);
+    const handleAddActivity = () => {
+        setShowAddActivity(true);
+    };
+
+
+    const handleAddSchedule = () => { /* Lógica para agregar turno */ };
+    const handleAssignInstructorToSchedule = () => { /* Lógica para asignar instructor a turno */ };
+    const handleViewActivities = () => { /* Lógica para eliminar actividad */ };
+    const handleRemoveStudent = () => { /* Lógica para eliminar alumno */ };
+    const generateReports = () => { /* Lógica para generar reportes */ };
+    const handleModifyActivity = () => { /* Lógica para modificar actividad */ };
+    const handleEditInstructor = () => { /* Lógica para editar instructor */ };
+
     return (
         <div className="admin-dashboard">
             <h1>Panel de Administración</h1>
             <div className="admin-card-container">
                 {/* Gestión de Instructores */}
-                <div>
-                    <div className="admin-card">
-                        <h2>Instructores</h2>
-                        <button>Agregar Instructor</button>
-                        <button>Modificar Instructor</button>
-                        <button>Eliminar Instructor</button>
-                    </div>
-                    <div className="admin-subcard">
-                        <h3>Instructores</h3>
-                        {/* Listado de instructores */}
-                    </div>
+                <div className="admin-card">
+                    <h2>Gestión de Instructores</h2>
+                    <button onClick={handleAddInstructor}>Agregar Instructor</button>
+                    <button onClick={handleEditInstructor}>Modificar Instructor</button> {/* EN VEMOS */}
                 </div>
 
                 {/* Gestión de Turnos y Horarios */}
-                <div>
-                    <div className="admin-card">
-                        <h2>Turnos y Horarios</h2>
-                        <button>Crear Turno</button>
-                        <button>Asignar Instructor a Turno</button>
-                    </div>
-                    <div className="admin-subcard">
-                        <h3>Turnos y Horarios</h3>
-                        {/* Listado de turnos y horarios */}
-                    </div>
+                <div className="admin-card">
+                    <h2>Gestión de Turnos y Horarios</h2>
+                    <button onClick={handleAddTurn}>Crear Turno</button>
+                    <button onClick={handleModifyTurn}>Modificar Turno</button>
                 </div>
 
                 {/* Gestión de Actividades */}
-                <div>
-                    <div className="admin-card">
-                        <h2>Actividades</h2>
-                        <button>Agregar Actividad</button>
-                        <button>Eliminar Actividad</button>
-                    </div>
-                    <div className="admin-subcard">
-                        <h3>Actividades</h3>
-                        {/* Listado de actividades */}
-                    </div>
+                <div className="admin-card">
+                    <h2>Gestión de Actividades</h2>
+                    <button onClick={handleAddActivity}>Agregar Actividad</button>
+                    <button onClick={handleViewActivities}>Ver Actividades</button>
+                    <button onClick={handleModifyActivity}>Modificar Actividad</button>
                 </div>
 
                 {/* Gestión de Alumnos */}
-                <div>
-                    <div className="admin-card">
-                        <h2>Alumnos</h2>
-                        <button>Agregar Alumno</button>
-                        <button>Eliminar Alumno</button>
-                    </div>
-                    <div className="admin-subcard">
-                        <h3>Alumnos</h3>
-                        {/* Listado de alumnos */}
-                    </div>
+                <div className="admin-card">
+                    <h2>Gestión de Alumnos</h2>
+                    <button onClick={handleAddStudent}>Agregar Alumno</button>
                 </div>
 
                 {/* Gestión de Clases*/}
@@ -78,6 +110,7 @@ const Admin = () => {
                     <button onClick={handleAddClass}>Crear Clase</button>
                     <button onClick={handleAssignInstructorToSchedule}>Modificar Clase</button>
                     <button onClick={handleModifyTurn}>Añadir alumno</button>
+                    <button onClick={handleRemoveStudent}>Eliminar Alumno</button>
                 </div>
 
                 {/* Reportes */}
@@ -92,6 +125,39 @@ const Admin = () => {
                     </div>
                 </div>
             </div>
+
+            <AddInstructorModal
+                show={showAddModal}
+                handleClose={handleCloseAddModal}
+            />
+
+            <AddClassModal
+                show={showAddClass}
+                handleClose={handleCloseAddClassModal}
+            />
+
+
+            <AddTurnModal
+                isOpen={showAddTurn}
+                onClose={() => handleCloseAddTurnModal(false)}
+            />
+
+            <ModifyTurnModal
+                isOpen={showModifyTurn}
+                onClose={() => handleCloseModifyTurnModal(false)}
+            />
+
+            <AddStudentModal
+                isOpen={showAddStudent}
+                onClose={() => handleCloseAddStudentModal(false)}
+            />
+
+            <AddActivityModal
+                isOpen={showAddActivity}
+                onClose={() => handleCloseAddActivityModal(false)}
+            />
+
+
         </div>
     );
 };
