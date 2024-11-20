@@ -9,7 +9,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 
 # Configura CORS para todo el servidor
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+CORS(app)
 
 
 app.config['JWT_SECRET_KEY'] = 'obligatorio-bd-2024'

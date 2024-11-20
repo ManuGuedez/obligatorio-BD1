@@ -1,6 +1,6 @@
 import mysql.connector as mysql
 
-cnx = mysql.connect(user='root', password='rootpassword', host='127.0.0.1', database='snowSchool')
+cnx = mysql.connect(user='root', password='rootpassword', host='127.0.0.1', database='snowSchool') #host.docker.internal #mysql
 cursor = cnx.cursor(dictionary=True) # devuelve la info en formato key-value
 from mysql.connector.errors import IntegrityError
 import algoritmo
@@ -313,6 +313,7 @@ def get_activities():
     return result
 
 def add_class(instructor_ci, activity_id, turn_id, start_date, end_date, days_ids, type):
+    
     try:
         if type:
             is_group = False

@@ -1,4 +1,5 @@
-CREATE DATABASE snowSchool;
+CREATE DATABASE IF NOT EXISTS snowSchool;
+
 USE snowSchool;
 
 CREATE TABLE activities (
@@ -470,6 +471,7 @@ SELECT sc.student_ci
 FROM student_class sc
 WHERE sc.student_ci = 43158769 AND sc.class_id = 1;
 
+INSERT INTO student_class (class_id, student_ci) VALUE (1, 500000005);
 
 SELECT activities.description, turns.start_time, turns.end_time,
        c.start_date, c.end_date, c.is_group, i.first_name as instructor_first_name, i.last_name as instructor_last_name
@@ -497,12 +499,12 @@ AND cs.class_date = '2024-11-15';
 
 update classes set classes.end_date = '2024-11-14' WHERE class_id = 5;
 
--- insert into student_class (class_id, student_ci) values
--- (13, 44751236), -- Rodrigo en la clase de Julia Méndez (Skiing, 09:00-11:00)
--- (13, 41657890); -- Paula en la clase de Julia Méndez (Skiing, 09:00-11:00)
+insert into student_class (class_id, student_ci) values
+(13, 44751236), -- Rodrigo en la clase de Julia Méndez (Skiing, 09:00-11:00)
+(13, 41657890); -- Paula en la clase de Julia Méndez (Skiing, 09:00-11:00)
 
--- INSERT INTO class_attendance (id_class_session, student_id, attended) VALUES
--- (13, 12, TRUE);
+INSERT INTO class_attendance (id_class_session, student_id, attended) VALUES
+(13, 12, TRUE);
 
 SELECT c.class_id, c.start_date, c.end_date, a.description, t.start_time, t.end_time, cs.class_date
 FROM classes c
