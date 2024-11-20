@@ -1,0 +1,123 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-container {
+    background-color: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.modal-content {
+    padding: 20px;
+}
+
+.edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.edit-form h3 {
+    color: #444;
+    margin-bottom: 15px;
+}
+
+.edit-form div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.edit-form label {
+    font-weight: bold;
+    color: #555;
+}
+
+.edit-form input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.classes-list {
+    display: grid;
+    gap: 15px;
+}
+
+.class-item {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: #f8f8f8;
+}
+
+.class-item div {
+    margin-bottom: 8px;
+}
+
+.modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+}
+
+button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+.edit-form button {
+    background-color: #4CAF50;
+    color: white;
+    margin-right: 10px;
+}
+
+.edit-form button:last-child {
+    background-color: #f44336;
+}
+
+.class-item button {
+    background-color: #2196F3;
+    color: white;
+    margin-top: 10px;
+}
+
+.modal-footer button {
+    background-color: #757575;
+    color: white;
+}

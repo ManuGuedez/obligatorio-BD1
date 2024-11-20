@@ -10,6 +10,7 @@ import AddStudentModal from './Modals/AddStudentModal';
 import AddActivityModal from './Modals/AddActivityModal';
 import ShowActivitiesModal from './Modals/ShowActivitiesModal';
 import ModifyActivityModal from './Modals/ModifyActivityModal';
+import ModifyClassModal from './Modals/ModifyClassModal';
 
 const Admin = () => {
     const [instructors, setInstructors] = useState([]);
@@ -81,6 +82,12 @@ const Admin = () => {
         setShowModifyActivity(true);
     };
 
+    const [showModifyClass, setShowModifyClass] = useState(false);
+    const handleCloseModifyClassModal = () => setShowModifyClass(false);
+    const handleModifyClass = () => {
+        setShowModifyClass(true);
+    };
+
 
     const handleAddSchedule = () => { /* Lógica para agregar turno */ };
     const handleAssignInstructorToSchedule = () => { /* Lógica para asignar instructor a turno */ };
@@ -126,7 +133,7 @@ const Admin = () => {
                     {/* MODIFICAR LOS HANDLERS */}
                     <h2>Gestión de Clases</h2>
                     <button onClick={handleAddClass}>Crear Clase</button>
-                    <button onClick={handleAssignInstructorToSchedule}>Modificar Clase</button>
+                    <button onClick={handleModifyClass}>Modificar Clase</button>
                     <button onClick={handleModifyTurn}>Añadir alumno</button>
                     <button onClick={handleRemoveStudent}>Eliminar Alumno</button>
                 </div>
@@ -182,6 +189,11 @@ const Admin = () => {
             <ModifyActivityModal
                 isOpen={showModifyActivity}
                 onClose={() => handleCloseModifyActivityModal(false)}
+            />
+
+            <ModifyClassModal
+                isOpen={showModifyClass}
+                onClose={() => handleCloseModifyClassModal(false)}
             />
 
 
