@@ -707,6 +707,7 @@ def get_extended_class_info(class_id):
     
     current_class["start_date"] = cast_date(current_class["start_date"])
     current_class["end_date"] = cast_date(current_class["end_date"])
+    current_class['is_group'] = current_class['is_group'] == 1
     
     return data
 
@@ -818,16 +819,21 @@ def get_days_from_class(class_info):
     return days
 
 def get_class_data_from_an_instructor(instructor_ci):
-    query = 'SELECT * FROM classes WHERE instructor_ci = %s'
+    query = 'SELECT class_id FROM classes WHERE instructor_ci = %s'
     cursor.execute(query, (instructor_ci,))
-    data = cursor.fetchall()
+    data = cursor.fetchall()  
+    print(data)
     
     if len(data) < 0:
         return -1, "Hubo un error al obtener las clases del instructor."
     elif len(data) == 0:
         return 0, "El instructor no tiene clases asignadas."
     else:
-        return 1, data
+        classes = dict()
+        for current_data in data:
+            id = current_data['class_id']
+            classes[id] = get_extended_class_info(id)[0]
+        return 1, classes
     
 def add_activity(description, cost):
     insert = 'INSERT INTO activities (description, cost) VALUES (%s, %s)'
@@ -945,3 +951,21 @@ def modify_end_time(turn_id, end_time):
             return 1, "Turno modificado exitosamente."
         else:
             return -1, "Hubo un error al modificar el turno."
+        
+def get_student_classes(student_ci):
+    query = """
+    SELECT c.class_id
+    FROM classes c
+    JOIN student_class sc ON c.class_id = sc.class_id
+    WHERE sc.student_ci = %s
+    """
+    cursor.execute(query, (student_ci, ))
+    classes = cursor.fetchall()
+    result = []
+    
+    for current_class in classes:
+        id = current_class['class_id']
+        result.append(get_extended_class_info(id)[0])
+    
+    return result
+        

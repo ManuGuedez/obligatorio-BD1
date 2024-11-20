@@ -538,5 +538,15 @@ WHERE
 SELECT person_id, name AS first_name, last_name
 FROM person WHERE person_ci = 500000005;
 
-use snowSchool
-SELECT person_id AS student_id, first_name, last_name FROM students
+use snowSchool;
+SELECT person_id AS student_id, first_name, last_name FROM students;
+
+SELECT c.start_date, c.end_date, i.first_name as instructor_name, i.last_name as instructor_surname,
+        t.start_time, t.end_time, a.description
+FROM classes c
+JOIN instructors i ON c.instructor_ci = i.instructor_ci
+JOIN turns t ON c.turn_id = t.turn_id
+JOIN activities a ON c.activity_id = a.activity_id
+JOIN student_class sc ON c.class_id = sc.class_id
+WHERE sc.student_ci = 41657890;
+

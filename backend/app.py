@@ -274,7 +274,6 @@ def add_user():
     user_type = data.get('user_type')
     
     if not ci or not first_name or not last_name or not user_type:
-        print("Datos recibidos:", data)  # Agregar log para depurar
         return jsonify({'error': 'Faltan datos obligatorios'}), 400
 
     
@@ -565,7 +564,6 @@ def add_activity():
     cost = data.get('cost')
     
     if not description or not cost:
-        print("Aca2")
         return jsonify({'error': 'Faltan datos requeridos'}), 400
         
     result, message = services.add_activity(description, cost)
@@ -623,14 +621,11 @@ def modify_cost(id):
 @app.route('/turns/add-turn', methods=['POST']) 
 @jwt_required()
 def add_turn():
-    print("Request received - Method:", request.method)
-    print("Request headers:", dict(request.headers))
     '''
     cuerpo requerido:
         - start_time: ej. '09:00:00'
         - end_time
     '''
-    
     claims = get_jwt()
     role = services.get_role(claims.get("role_id"))
     
@@ -672,7 +667,7 @@ def get_turn():
 @jwt_required()
 def get_student_classes(): 
     '''
-    dado un estudiante (que inició sesión) se devuelven todas las clases de las que es responsable 
+    dado un estudiante (que inició sesión) se devuelven todas las clases en las que está inscripto
     '''
     claims = get_jwt()
     role = services.get_role(claims.get("role_id"))
@@ -680,15 +675,10 @@ def get_student_classes():
     if(role != "student"):
         return jsonify({'error': 'Debes ser estudiante para poder acceder a las clases.'}), 400
     
-    user_ci = int(get_jwt_identity())
-    result, data = -1, 'aún no implementado' # services.get_class_data_from_an_instructor(user_ci)
+    student_ci = int(get_jwt_identity())
+    classes = services.get_student_classes(student_ci)
     
-    if result > 0:
-        return jsonify(data), 200
-    elif result == 0:
-        return  jsonify({'msg': data}), 200
-    else:
-        return jsonify({'error': data}), 400
+    return jsonify(classes), 200
     
 
 @app.route('/instructors', methods=['GET']) 
