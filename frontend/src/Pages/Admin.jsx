@@ -8,6 +8,8 @@ import AddTurnModal from './Modals/AddTurnModal';
 import ModifyTurnModal from './Modals/ModifyTurnModal';
 import AddStudentModal from './Modals/AddStudentModal';
 import AddActivityModal from './Modals/AddActivityModal';
+import ShowActivitiesModal from './Modals/ShowActivitiesModal';
+import ModifyActivityModal from './Modals/ModifyActivityModal';
 
 const Admin = () => {
     const [instructors, setInstructors] = useState([]);
@@ -23,12 +25,12 @@ const Admin = () => {
         setShowAddModal(true);
     };
 
-    // Modal para eliminar un instructor
-    const [showRemoveModal, setShowRemoveModal] = useState(false);
-    const handleCloseRemoveModal = () => setShowRemoveModal(false);
-    const handleRemoveInstructor = () => {
-        setShowRemoveModal(true)
-    };
+    // // Modal para eliminar un instructor
+    // const [showRemoveModal, setShowRemoveModal] = useState(false);
+    // const handleCloseRemoveModal = () => setShowRemoveModal(false);
+    // const handleRemoveInstructor = () => {
+    //     setShowRemoveModal(true)
+    // };
 
     // Modal para crear una clase 
     const [showAddClass, setShowAddClass] = useState(false);
@@ -37,37 +39,53 @@ const Admin = () => {
         setShowAddClass(true);
     };
 
+    // Modal para crear un turno  
     const [showAddTurn, setShowAddTurn] = useState(false);
     const handleCloseAddTurnModal = () => setShowAddTurn(false);
     const handleAddTurn = () => {
         setShowAddTurn(true);
     };
 
+    // Modal para modificar un turno
     const [showModifyTurn, setShowModifyTurn] = useState(false);
     const handleCloseModifyTurnModal = () => setShowModifyTurn(false);
     const handleModifyTurn = () => {
         setShowModifyTurn(true);
     };
 
+    // Modal para crear un estudiante
     const [showAddStudent, setShowAddStudent] = useState(false);
     const handleCloseAddStudentModal = () => setShowAddStudent(false);
     const handleAddStudent = () => {
         setShowAddStudent(true);
     };
 
+    // Modal para crear una actividad
     const [showAddActivity, setShowAddActivity] = useState(false);
     const handleCloseAddActivityModal = () => setShowAddActivity(false);
     const handleAddActivity = () => {
         setShowAddActivity(true);
     };
 
+    // Modal para mostrar actividades
+    const [showShowActivities, setShowShowActivities] = useState(false);
+    const handleCloseShowActivitiesModal = () => setShowShowActivities(false);
+    const handleShowActivities = () => {
+        setShowShowActivities(true);
+    };
+
+    // Modal para modificar una actividad
+    const [showModifyActivity, setShowModifyActivity] = useState(false);
+    const handleCloseModifyActivityModal = () => setShowModifyActivity(false);
+    const handleModifyActivity = () => {
+        setShowModifyActivity(true);
+    };
+
 
     const handleAddSchedule = () => { /* Lógica para agregar turno */ };
     const handleAssignInstructorToSchedule = () => { /* Lógica para asignar instructor a turno */ };
-    const handleViewActivities = () => { /* Lógica para eliminar actividad */ };
     const handleRemoveStudent = () => { /* Lógica para eliminar alumno */ };
     const generateReports = () => { /* Lógica para generar reportes */ };
-    const handleModifyActivity = () => { /* Lógica para modificar actividad */ };
     const handleEditInstructor = () => { /* Lógica para editar instructor */ };
 
     return (
@@ -92,7 +110,7 @@ const Admin = () => {
                 <div className="admin-card">
                     <h2>Gestión de Actividades</h2>
                     <button onClick={handleAddActivity}>Agregar Actividad</button>
-                    <button onClick={handleViewActivities}>Ver Actividades</button>
+                    <button onClick={handleShowActivities}>Ver Actividades</button>
                     <button onClick={handleModifyActivity}>Modificar Actividad</button>
                 </div>
 
@@ -155,6 +173,15 @@ const Admin = () => {
             <AddActivityModal
                 isOpen={showAddActivity}
                 onClose={() => handleCloseAddActivityModal(false)}
+            />
+
+            <ShowActivitiesModal
+                isOpen={showShowActivities}
+                onClose={() => handleCloseShowActivitiesModal(false)}
+            />
+            <ModifyActivityModal
+                isOpen={showModifyActivity}
+                onClose={() => handleCloseModifyActivityModal(false)}
             />
 
 

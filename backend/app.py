@@ -96,6 +96,7 @@ def register_user():
 @app.route('/classes/new-class', methods=['POST'])
 @jwt_required()
 def create_class():
+    
     '''
         cuerpo requerido:
             - instructor_id
@@ -116,6 +117,7 @@ def create_class():
     
     # en caso de que sea el adminsitrador
     data = request.get_json()
+    print(data)
     instructor_id = data.get('instructor_id')
     instructor_ci = services.get_person_ci_with_id(instructor_id)
     if instructor_ci == -1:

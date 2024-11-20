@@ -11,6 +11,7 @@ const AddClassModal = ({ show, handleClose }) => {
     turn: "",
     days: "",
   });
+
   const [turns, setTurns] = useState([]);
   const [ativities, setAtivities] = useState([]);
 
@@ -20,7 +21,7 @@ const AddClassModal = ({ show, handleClose }) => {
         "turns",
         localStorage.getItem("token")
       );
-      
+
       setTurns(turnsData.data);
       const activitiesData = await ApiService.get(
         "activities",
@@ -46,13 +47,14 @@ const AddClassModal = ({ show, handleClose }) => {
     try {
       const newClass = {
         instructor_id: parseInt(formData.instructor_id),
-        start_date: formData.start_date,
-        end_date: formData.end_date,
+        start_date: new Date(formData.start_date).toISOString().split('T')[0],
+        end_date: new Date(formData.end_date).toISOString().split('T')[0],
         activity: formData.activity,
         turn: parseInt(formData.turn),
         days: formData.days.split(",").map((day) => day.trim().toLowerCase()),
         type: formData.type || null,
       };
+
 
 
       const response = await ApiService.post(
