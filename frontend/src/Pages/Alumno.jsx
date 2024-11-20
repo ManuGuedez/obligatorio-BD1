@@ -1,32 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Actividad from '../Components/Actividad';
+import alumnoService from '../Services/alumnoService';
 import './Alumno.css';
 
-const activities = [
-    {
-        id: 1,
-        name: 'Taller de Programación',
-        shortDescription: 'Aprende sobre programación avanzada.',
-        schedule: 'Lunes 10:00 - 12:00',
-        instructor: 'Prof. Juan Pérez',
-        details: 'En este taller, abordaremos temas avanzados de programación, incluyendo algoritmos y estructuras de datos.',
-        price: 15,
-    },
-    {
-        id: 2,
-        name: 'Laboratorio de Redes',
-        shortDescription: 'Explora las redes de comunicación.',
-        schedule: 'Miércoles 14:00 - 16:00',
-        instructor: 'Ing. Ana García',
-        details: 'Laboratorio práctico para comprender el funcionamiento de redes de datos y protocolos de comunicación.',
-        price: 20,
-    },
-];
-
 const Alumno = () => {
+    const [activities, setActivities] = useState([]); // Estado para actividades
+    const [isLoading, setIsLoading] = useState(true); // Estado para la carga
+    const [error, setError] = useState(null); // Estado para errores
+
     const [showModal, setShowModal] = useState(false);
     const [selectedActivity, setSelectedActivity] = useState(null);
-    const [enrolledActivities, setEnrolledActivities] = useState([]);
+    const [enrolledActivities, setEnrolledActivities] = useState([]); // Inscripciones
+
+    useEffect(() => {
+        const fetchActivities = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await alumnoService.getAlumnos(token);
+
+                if (response && response.code === 200 && Array.isArray(response.data)) {
+                    console.log("Actividades recibidas:", response.data);
+                    setActivities(response.data);
+                } else {
+                    console.error("Error: estructura inesperada en los datos", response);
+                    setError('El formato de datos no es válido.');
+                }
+            } catch (err) {
+                console.error("Error al cargar actividades:", err);
+                setError('Error al cargar actividades.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchActivities();
+    }, []);
 
     const openModal = (activity) => {
         setSelectedActivity(activity);
@@ -39,7 +47,6 @@ const Alumno = () => {
     };
 
     const handleOverlayClick = (e) => {
-        // Cierra el modal solo si se hace clic en la superposición, no en el contenido del modal
         if (e.target.classList.contains('modal-overlay')) {
             closeModal();
         }
@@ -53,16 +60,25 @@ const Alumno = () => {
         }
     };
 
+    if (isLoading) return <p>Cargando actividades...</p>;
+    if (error) return <p>{error}</p>;
+
     return (
         <div className="alumno-container">
             <div className="actividades-header">
                 <h2 className="actividades-title">Actividades</h2>
             </div>
             <div className="activities-container">
-                {activities.map(activity => (
+                {Array.isArray(activities) && activities.map((activity) => (
                     <Actividad
-                        key={activity.id}
-                        activity={activity}
+                        key={activity.class_id} // Usar class_id como key
+                        activity={{
+                            id: activity.class_id,
+                            name: activity.activity_title || activity.activity_description || "Sin descripción", // Mostrar título o descripción
+                            shortDescription: activity.activity_description, // Descripción breve
+                            schedule: `${activity.start_time} - ${activity.end_time}`, // Horario
+                            price: activity.equipment_price || 0 // Precio del equipamiento
+                        }}
                         openModal={openModal}
                         toggleEnrollment={toggleEnrollment}
                         enrolledActivities={enrolledActivities}
@@ -76,9 +92,9 @@ const Alumno = () => {
                     <div className="modal-content">
                         <span className="close-btn" onClick={closeModal}>&times;</span>
                         <h3>{selectedActivity.name}</h3>
+                        <p><strong>Descripción:</strong> {selectedActivity.shortDescription}</p>
                         <p><strong>Horario:</strong> {selectedActivity.schedule}</p>
-                        <p><strong>Instructor:</strong> {selectedActivity.instructor}</p>
-                        <p>{selectedActivity.details}</p>
+                        <p><strong>Precio del equipamiento:</strong> ${selectedActivity.price}</p>
                     </div>
                 </div>
             )}

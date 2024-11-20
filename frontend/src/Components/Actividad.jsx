@@ -11,7 +11,6 @@ const Actividad = ({ activity, openModal, toggleEnrollment, enrolledActivities }
     return (
         <div className="activity-card">
             <h3>{activity.name}</h3>
-            <p>{activity.shortDescription}</p>
             <p><strong>Horario:</strong> {activity.schedule}</p>
 
             <button className="details-btn" onClick={() => openModal(activity)}>Ver Detalles</button>
