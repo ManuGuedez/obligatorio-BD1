@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import ApiService from '../../Services/apiServices';
-import './AddActivityModal.css';
+import ApiService from './../../../Services/apiServices';
+import classes from './AddActivityModal.module.css';
 
-const AddActivityModal = ({ isOpen, onClose }) => {
+const AddActivityModal = ({ onClose }) => {
     const [formData, setFormData] = useState({
         description: '',
         cost: ''
@@ -40,15 +40,12 @@ const AddActivityModal = ({ isOpen, onClose }) => {
         }
     };
     
-
-    if (!isOpen) return null;
-
     return (
-        <div className="modal-overlay">
-            <div className="modal-content">
+        <div className={classes.modalOverlay} onClick={onClose}>
+            <div className={classes.modalContent} onClick={(e) => e.stopPropagation()}>
                 <h2>Añadir Nueva Actividad</h2>
                 <form onSubmit={handleSubmit}>
-                    <div className="form-group">
+                    <div className={classes.formGroup}>
                         <label>Nombre de la Actividad:</label>
                         <input
                             type="text"
@@ -58,7 +55,7 @@ const AddActivityModal = ({ isOpen, onClose }) => {
                             required
                         />
                     </div>
-                    <div className="form-group">
+                    <div className={classes.formGroup}>
                         <label>Costo:</label>
                         <input
                             type="number"
@@ -70,9 +67,9 @@ const AddActivityModal = ({ isOpen, onClose }) => {
                             step="0.01"
                         />
                     </div>
-                    <div className="modal-buttons">
-                        <button type="submit" className="submit-btn">Guardar</button>
-                        <button type="button" onClick={onClose} className="cancel-btn">Cancelar</button>
+                    <div className={classes.modalButtons}>
+                        <button type="button" onClick={onClose} className={classes.cancelBtn}>Cancelar</button>
+                        <button type="submit" className={classes.submitBtn}>Guardar</button>
                     </div>
                 </form>
             </div>

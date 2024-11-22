@@ -1,4 +1,4 @@
-.modal-overlay {
+.modalOverlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -8,54 +8,73 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1000;
 }
 
-.modal-container {
+.modalContainer {
     background-color: white;
     padding: 20px;
     border-radius: 8px;
-    width: 400px;
+    width: 500px;
+    max-width: 90%;
 }
 
-.modal-header {
+.modalHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
 }
 
-.close-button {
+.closeButton {
     background: none;
     border: none;
     font-size: 24px;
     cursor: pointer;
+    width: 30px;
+    color: black;
 }
 
-.form-group {
+.formGroup {
     margin-bottom: 15px;
 }
 
-.form-group label {
+.formGroup label {
     display: block;
     margin-bottom: 5px;
+    font-weight: bold;
 }
 
-.form-group input {
+.formGroup input,
+.formGroup select {
     width: 100%;
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
 }
 
-.modal-footer {
-    margin-top: 20px;
+.modalFooter {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+    margin-top: 20px;
 }
 
-.modal-footer button {
+.submitButton,
+.cancelButton {
     padding: 8px 16px;
     border-radius: 4px;
     cursor: pointer;
+}
+
+.submitButton {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+}
+
+.cancelButton {
+    background-color: #f44336;
+    color: white;
+    border: none;
 }

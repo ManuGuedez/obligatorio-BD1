@@ -752,9 +752,12 @@ def modify_turn(id):
         return jsonify({'error': message}), 400  
     
     
-@app.route('/class-information', methods=['GET']) 
+@app.route('/classes', methods=['GET']) 
 @jwt_required()
 def get__classes():
+    '''
+    devuelve información detallada de todas las clases ingresadas en el sistema
+    '''
 
     claims = get_jwt()
     role = services.get_role(claims.get("role_id"))

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import ApiService from '../../Services/apiServices';
-import './AddStudentModal.css';
+import ApiService from './../../../Services/apiServices';
+import classes from './AddStudentModal.module.css';
 
-const AddStudentModal = ({ isOpen, onClose }) => {
+const AddStudentModal = ({ onClose }) => {
     const [formData, setFormData] = useState({
         ci: '',
         first_name: '',
@@ -42,19 +42,16 @@ const AddStudentModal = ({ isOpen, onClose }) => {
             }
         } catch (error) {
             console.error('Error adding student:', error);
-            // You can add error notification here
         }
     };
 
-    if (!isOpen) return null;
-
     return (
-        <div className="modal-overlay">
-            <div className="modal-content">
+        <div className={classes.modalOverlay} onClick={onClose}>
+            <div className={classes.modalContent} onClick={e => e.stopPropagation()}>
                 <h2>Añadir Estudiante</h2>
                 <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label>Cédula:</label>
+                    <div className={classes.formGroup}>
+                        <label>CI:</label>
                         <input
                             type="text"
                             name="ci"
@@ -63,7 +60,7 @@ const AddStudentModal = ({ isOpen, onClose }) => {
                             required
                         />
                     </div>
-                    <div className="form-group">
+                    <div className={classes.formGroup}>
                         <label>Nombre:</label>
                         <input
                             type="text"
@@ -73,7 +70,7 @@ const AddStudentModal = ({ isOpen, onClose }) => {
                             required
                         />
                     </div>
-                    <div className="form-group">
+                    <div className={classes.formGroup}>
                         <label>Apellido:</label>
                         <input
                             type="text"
@@ -83,7 +80,7 @@ const AddStudentModal = ({ isOpen, onClose }) => {
                             required
                         />
                     </div>
-                    <div className="form-group">
+                    <div className={classes.formGroup}>
                         <label>Fecha de Nacimiento:</label>
                         <input
                             type="date"
@@ -93,9 +90,9 @@ const AddStudentModal = ({ isOpen, onClose }) => {
                             required
                         />
                     </div>
-                    <div className="modal-buttons">
-                        <button type="submit" className="submit-btn">Guardar</button>
-                        <button type="button" onClick={onClose} className="cancel-btn">Cancelar</button>
+                    <div className={classes.modalFooter}>
+                        <button type="button" onClick={onClose} className={classes.cancelBtn}>Cancelar</button>
+                        <button type="submit" className={classes.submitBtn}>Guardar</button>
                     </div>
                 </form>
             </div>
