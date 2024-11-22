@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AddNewInstructor from "../Components/Modals/AddNewInstructor/AddNewInstructor";
 import AddStudentToClassModal from "../Components/Modals/AddStudentToClassModal/AddStudentToClassModal";
 import ModifyActivityModal from "../Components/Modals/ModifyActivityModal/ModifyActivityModal";
 import ModifyClassModal from "../Components/Modals/ModifyClassModal/ModifyClassModal";
+import ModifyTurnModal from "../Components/Modals/ModifyTurnModal/ModifyTurnModal";
 import ShowActivitiesModal from "../Components/Modals/ShowActivitiesModal/ShowActivitiesModal";
+import NavBar from "../Components/NavBar";
 import AddActivityModal from "./../Components/Modals/AddActivityModal/AddActivityModal";
 import AddClassModal from "./../Components/Modals/AddClassModal/AddClassModal";
 import AddStudentModal from "./../Components/Modals/AddStudent/AddStudentModal";
 import AddTurnModal from "./../Components/Modals/AddTurnModal/AddTurnModal";
 import "./Admin.css";
-import ModifyTurnModal from "./Modals/ModifyTurnModal";
-import { useNavigate } from "react-router-dom";
-import NavBar from "../Components/NavBar";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -33,10 +33,6 @@ const Admin = () => {
 
   // Modal para modificar un turno
   const [showModifyTurn, setShowModifyTurn] = useState(false);
-  const handleCloseModifyTurnModal = () => setShowModifyTurn(false);
-  const handleModifyTurn = () => {
-    setShowModifyTurn(true);
-  };
 
   useEffect(() => {
     if (!localStorage.getItem("token")) {
@@ -62,7 +58,7 @@ const Admin = () => {
 
   return (
     <div className="admin-dashboard">
-    <NavBar />
+      <NavBar />
       <h1>Panel de Administración</h1>
       <div className="admin-card-container">
         {/* Gestión de Instructores */}
@@ -79,7 +75,9 @@ const Admin = () => {
         <div className="admin-card">
           <h2>Gestión de Turnos y Horarios</h2>
           <button onClick={() => setAddTurnIsOpen(true)}>Crear Turno</button>
-          <button onClick={handleModifyTurn}>Modificar Turno</button>
+          <button onClick={() => setShowModifyTurn(true)}>
+            Modificar Turno
+          </button>
         </div>
 
         {/* Gestión de Actividades */}
@@ -150,10 +148,9 @@ const Admin = () => {
         <AddTurnModal onClose={() => setAddTurnIsOpen(false)} />
       )}
 
-      <ModifyTurnModal
-        isOpen={showModifyTurn}
-        onClose={() => handleCloseModifyTurnModal(false)}
-      />
+      {showModifyTurn && (
+        <ModifyTurnModal onClose={() => setShowModifyTurn(false)} />
+      )}
 
       {addStudentIsOpen && (
         <AddStudentModal onClose={() => setAddStudentIsOpen(false)} />
