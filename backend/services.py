@@ -835,6 +835,22 @@ def get_class_data_from_an_instructor(instructor_ci):
             id = current_data['class_id']
             classes[id] = get_extended_class_info(id)[0]
         return 1, classes
+
+
+def get_class_data():
+    query = 'SELECT * FROM classes'
+    cursor.execute(query, ())
+    data = cursor.fetchall()  
+    
+    if len(data) <= 0:
+        return -1, "Hubo un error al obtener las clases."
+    else:
+        classes = dict()
+        for current_data in data:
+            id = current_data['class_id']
+            classes[id] = get_extended_class_info(id)[0]
+        return 1, classes
+
     
 def add_activity(description, cost):
     insert = 'INSERT INTO activities (description, cost) VALUES (%s, %s)'

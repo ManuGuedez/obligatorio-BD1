@@ -117,7 +117,7 @@ def create_class():
     
     # en caso de que sea el adminsitrador
     data = request.get_json()
-    print(data)
+
     instructor_id = data.get('instructor_id')
     instructor_ci = services.get_person_ci_with_id(instructor_id)
     if instructor_ci == -1:
@@ -204,6 +204,8 @@ def modify_class(id):
         return jsonify({'error': 'Es necesario ingresar turno a modificar o instructor'}), 400  
         
     current_class_instructor = class_info[0]['instructor_id']
+    result = -1
+    message = "Hubo un error."
     
     # si lo que se intenta modificar es el turno de la clase
     if turn_id and instructor_id == int(current_class_instructor):
@@ -748,6 +750,26 @@ def modify_turn(id):
         return jsonify({'msg': message}), 200
     else:
         return jsonify({'error': message}), 400  
+    
+    
+@app.route('/class-information', methods=['GET']) 
+@jwt_required()
+def get__classes():
+
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "admin"):
+        return jsonify({'error': 'Debes ser admin para poder acceder a las clases.'}), 400
+    
+    result, data = services.get_class_data()
+    
+    if result > 0:
+        return jsonify(data), 200
+    elif result == 0:
+        return  jsonify({'msg': data}), 200
+    else:
+        return jsonify({'error': data}), 400
     
 if __name__ == '__main__':
     app.run(debug=True)
