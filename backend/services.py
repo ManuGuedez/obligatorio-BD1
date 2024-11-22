@@ -192,6 +192,7 @@ def get_class_information_for_instructor(class_id):
         JOIN login ON (classes.instructor_ci = login.person_ci) 
     WHERE classes.class_id = %s
     """
+    
     cursor.execute(query, (class_id,))
     data = cursor.fetchall()
     

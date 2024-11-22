@@ -6,6 +6,7 @@ const AddStudentToClassModal = ({ onClose }) => {
   const [studentId, setStudentId] = useState("");
   const [allClasses, setAllClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState("");
+  const [message, setMessage] = useState({ text: "", isError: false });
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -26,17 +27,28 @@ const AddStudentToClassModal = ({ onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await ApiService.post(
-      `classes/${selectedClass}/enroll-student`,
-      { student_id: parseInt(studentId) },
-      "application/json",
-      token
-    );
+    try {
+      const response = await ApiService.post(
+        `classes/${selectedClass}/enroll-student`,
+        { student_id: parseInt(studentId) },
+        "application/json",
+        token
+      );
 
-    if (response.code === 200) {
-      onClose();
-      setStudentId("");
-      setSelectedClass("");
+
+      if (response.code === 200) {
+        setMessage({ text: "Estudiante inscrito exitosamente", isError: false });
+        setTimeout(() => {
+          onClose();
+          setStudentId("");
+          setSelectedClass("");
+          setMessage({ text: "", isError: false });
+        }, 2000);
+      } else {
+        setMessage({ text: response.message || "Error al inscribir estudiante", isError: true });
+      }
+    } catch (error) {
+      setMessage({ text: error.message || "Error al procesar la solicitud", isError: true });
     }
   };
 
@@ -46,6 +58,12 @@ const AddStudentToClassModal = ({ onClose }) => {
         <div className={classes.modalHeader}>
           <h2>Inscribir alumno</h2>
         </div>
+
+        {message.text && (
+          <div className={`${classes.message} ${message.isError ? classes.error : classes.success}`}>
+            {message.text}
+          </div>
+        )}
 
         <div className="modal-body">
           <form onSubmit={handleSubmit}>
@@ -69,7 +87,7 @@ const AddStudentToClassModal = ({ onClose }) => {
                 required
               >
                 <option value="">Select a class</option>
-                {allClasses.map((classItem ) => (
+                {allClasses.map((classItem) => (
                   <option key={classItem.class_id} value={classItem.class_id}>
                     {`${classItem.description} (${classItem.start_time} - ${classItem.end_time}) - ${classItem.instructor_first_name} ${classItem.instructor_last_name} `}
                   </option>

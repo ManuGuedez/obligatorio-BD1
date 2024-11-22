@@ -230,18 +230,20 @@ def modify_class(id):
     if result > 0: 
         if is_instructor_modified:
             class_information = services.get_class_information_for_instructor(id)
-            description = class_information["description"]
-            start_time = class_information["start_time"]
-            end_time = class_information["end_time"]
             
-            # estoy sacando el email del login, deberíamos tenerlo guardado en instructor o persona
-            email = class_information["instructor_email"] 
-            
-            subject = "Nueva clase para dictar como instructor"
-            content = f"Has sido asingado para dictar {description} desde {start_time} hasta {end_time}" # agergar info de los días
-            
-            smtp.send_email("manuelaguedez18@gmail.com", subject, email + ": " + content) # para testear que el mensaje llega correctamente
-            smtp.send_email(email, subject, content)
+            if class_information != -1:          
+                description = class_information["description"]
+                start_time = class_information["start_time"]
+                end_time = class_information["end_time"]
+                
+                # estoy sacando el email del login, deberíamos tenerlo guardado en instructor o persona
+                email = class_information["instructor_email"] 
+                
+                subject = "Nueva clase para dictar como instructor"
+                content = f"Has sido asingado para dictar {description} desde {start_time} hasta {end_time}" # agergar info de los días
+                
+                smtp.send_email("manuelaguedez18@gmail.com", subject, email + ": " + content) # para testear que el mensaje llega correctamente
+                smtp.send_email(email, subject, content)
         return jsonify({'msg': message}), 200
     else:
         return jsonify({'error': message}), 400
