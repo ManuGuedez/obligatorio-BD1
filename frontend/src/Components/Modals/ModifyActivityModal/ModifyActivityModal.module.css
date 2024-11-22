@@ -1,4 +1,60 @@
-.modaOverlay {
+.modalContent {
+    margin-bottom: 20px;
+    align-content: center;
+}
+
+.editForm {
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+}
+
+.editForm input {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.editForm h3 {
+    text-align: center;
+}
+.activityItem {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.editButton {
+    padding: 5px 10px 5px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width:fit-content;
+}
+
+.editButton:hover {
+    background-color: #45a049;
+}
+
+.modalFooter {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modalFooter button {
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.modalOverlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -8,6 +64,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1000;
 }
 
 .modalContainer {
@@ -23,13 +80,6 @@
     justify-content: center;
     align-items: center;
     margin-bottom: 20px;
-}
-
-.closeButton {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
 }
 
 .formGroup {

@@ -1,16 +1,15 @@
 import React, { useState } from "react";
-import "./Admin.css";
-import RemoveInstructorModal from "./Modals/RemoveInstructorModal";
-import AddClassModal from "./../Components/Modals/AddClassModal/AddClassModal";
-import AddTurnModal from "./../Components/Modals/AddTurnModal/AddTurnModal";
-import ModifyTurnModal from "./Modals/ModifyTurnModal";
-import AddStudentModal from "./../Components/Modals/AddStudent/AddStudentModal";
-import AddActivityModal from "./../Components/Modals/AddActivityModal/AddActivityModal";
-import ShowActivitiesModal from "./Modals/ShowActivitiesModal";
-import ModifyActivityModal from "./Modals/ModifyActivityModal";
-import ModifyClassModal from "./Modals/ModifyClassModal";
-import AddStudentToClassModal from "../Components/Modals/AddStudentToClassModal/AddStudentToClassModal";
 import AddNewInstructor from "../Components/Modals/AddNewInstructor/AddNewInstructor";
+import AddStudentToClassModal from "../Components/Modals/AddStudentToClassModal/AddStudentToClassModal";
+import ModifyActivityModal from "../Components/Modals/ModifyActivityModal/ModifyActivityModal";
+import AddActivityModal from "./../Components/Modals/AddActivityModal/AddActivityModal";
+import AddClassModal from "./../Components/Modals/AddClassModal/AddClassModal";
+import AddStudentModal from "./../Components/Modals/AddStudent/AddStudentModal";
+import AddTurnModal from "./../Components/Modals/AddTurnModal/AddTurnModal";
+import "./Admin.css";
+import ModifyClassModal from "./Modals/ModifyClassModal";
+import ModifyTurnModal from "./Modals/ModifyTurnModal";
+import ShowActivitiesModal from "./Modals/ShowActivitiesModal";
 
 const Admin = () => {
   const [reports, setReports] = useState({});
@@ -20,6 +19,7 @@ const Admin = () => {
   const [addStudentIsOpen, setAddStudentIsOpen] = useState(false);
   const [addClassIsOpen, setAddClassIsOpen] = useState(false);
   const [addStudentToClass, setAddStudentToClass] = useState(false);
+  const [showModifyActivity, setShowModifyActivity] = useState(false);
 
   // // Modal para eliminar un instructor
   // const [showRemoveModal, setShowRemoveModal] = useState(false);
@@ -40,13 +40,6 @@ const Admin = () => {
   const handleCloseShowActivitiesModal = () => setShowShowActivities(false);
   const handleShowActivities = () => {
     setShowShowActivities(true);
-  };
-
-  // Modal para modificar una actividad
-  const [showModifyActivity, setShowModifyActivity] = useState(false);
-  const handleCloseModifyActivityModal = () => setShowModifyActivity(false);
-  const handleModifyActivity = () => {
-    setShowModifyActivity(true);
   };
 
   // Modal para modificar una clase
@@ -102,7 +95,7 @@ const Admin = () => {
             Agregar Actividad
           </button>
           <button onClick={handleShowActivities}>Ver Actividades</button>
-          <button onClick={handleModifyActivity}>Modificar Actividad</button>
+          <button onClick={() => setShowModifyActivity(true)}>Modificar Actividad</button>
         </div>
 
         {/* Gestión de Alumnos */}
@@ -119,7 +112,9 @@ const Admin = () => {
           <h2>Gestión de Clases</h2>
           <button onClick={() => setAddClassIsOpen(true)}>Crear Clase</button>
           <button onClick={handleModifyClass}>Modificar Clase</button>
-          <button onClick={() => setAddStudentToClass(true)}>Añadir alumno</button>
+          <button onClick={() => setAddStudentToClass(true)}>
+            Inscribir alumno
+          </button>
           <button onClick={handleRemoveStudent}>Eliminar Alumno</button>
         </div>
 
@@ -172,23 +167,20 @@ const Admin = () => {
         isOpen={showShowActivities}
         onClose={() => handleCloseShowActivitiesModal(false)}
       />
-      
-      <ModifyActivityModal
-        isOpen={showModifyActivity}
-        onClose={() => handleCloseModifyActivityModal(false)}
-      />
 
+      {showModifyActivity && (
+        <ModifyActivityModal
+          onClose={() => setShowModifyActivity(false)}
+        />
+      )}
       <ModifyClassModal
         isOpen={showModifyClass}
         onClose={() => handleCloseModifyClassModal(false)}
       />
 
       {addStudentToClass && (
-        <AddStudentToClassModal
-          onClose={() => setAddStudentToClass(false)}
-        />
+        <AddStudentToClassModal onClose={() => setAddStudentToClass(false)} />
       )}
-
     </div>
   );
 };

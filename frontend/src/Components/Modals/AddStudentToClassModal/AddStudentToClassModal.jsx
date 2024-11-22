@@ -47,16 +47,13 @@ const AddStudentToClassModal = ({ onClose }) => {
     <div className={classes.modalOverlay} onClick={onClose}>
       <div className={classes.modalContainer} onClick={(e) => e.stopPropagation()}>
         <div className={classes.modalHeader}>
-          <h2>Add Student to Class</h2>
-          <button className={classes.closeButton} onClick={onClose}>
-            ×
-          </button>
+          <h2>Inscribir alumno</h2>
         </div>
 
         <div className="modal-body">
           <form onSubmit={handleSubmit}>
             <div className={classes.formGroup}>
-              <label htmlFor="studentId">Student ID:</label>
+              <label htmlFor="studentId">ID estudiante:</label>
               <input
                 type="number"
                 id="studentId"

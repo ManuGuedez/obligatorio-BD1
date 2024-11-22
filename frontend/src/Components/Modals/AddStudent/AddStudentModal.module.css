@@ -19,6 +19,10 @@
     max-width: 500px;
 }
 
+.modalContent h2 {
+    text-align: center;
+}
+
 .formGroup {
     margin-bottom: 1rem;
 }

@@ -82,9 +82,6 @@ const AddClassModal = ({ onClose }) => {
       >
         <div className={classes.modalHeader}>
           <h2>Agregar Nueva Clase</h2>
-          <button className={classes.closeButton} onClick={onClose}>
-            ×
-          </button>
         </div>
         <div className="modal-body">
           <form onSubmit={handleSubmit}>

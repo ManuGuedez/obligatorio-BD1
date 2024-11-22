@@ -50,7 +50,6 @@ const AddTurnModal = ({ onClose }) => {
             <div className={classes.modalContainer} onClick={(e) => e.stopPropagation()}>
                 <div className={classes.modalHeader}>
                     <h2>Agregar Nuevo Turno</h2>
-                    <button className={classes.closeButton} onClick={onClose}>×</button>
                 </div>
                 <div className="modal-body">
                     <form onSubmit={handleSubmit}>
