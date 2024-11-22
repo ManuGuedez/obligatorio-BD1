@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AddNewInstructor from "../Components/Modals/AddNewInstructor/AddNewInstructor";
 import AddStudentToClassModal from "../Components/Modals/AddStudentToClassModal/AddStudentToClassModal";
 import ModifyActivityModal from "../Components/Modals/ModifyActivityModal/ModifyActivityModal";
@@ -10,8 +10,11 @@ import AddStudentModal from "./../Components/Modals/AddStudent/AddStudentModal";
 import AddTurnModal from "./../Components/Modals/AddTurnModal/AddTurnModal";
 import "./Admin.css";
 import ModifyTurnModal from "./Modals/ModifyTurnModal";
+import { useNavigate } from "react-router-dom";
+import NavBar from "../Components/NavBar";
 
 const Admin = () => {
+  const navigate = useNavigate();
   const [reports, setReports] = useState({});
   const [addInstructorIsOpen, setAddInstructorIsOpen] = useState(false);
   const [addActivityIsOpen, setAddActivityIsOpen] = useState(false);
@@ -35,19 +38,17 @@ const Admin = () => {
     setShowModifyTurn(true);
   };
 
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      navigate("/Login");
+    }
+  }, []);
+
   // Modal para mostrar actividades
   const [showActivities, setShowActivities] = useState(false);
 
   // Modal para modificar una clase
   const [showModifyClass, setShowModifyClass] = useState(false);
-
-  // Modal para agregar un estudiante a una clase
-  const [showAddStudentToClass, setShowAddStudentToClass] = useState(false);
-  const handleCloseAddStudentToClassModal = () =>
-    setShowAddStudentToClass(false);
-  const handleAddStudentToClass = () => {
-    setShowAddStudentToClass(true);
-  };
 
   const handleRemoveStudent = () => {
     /* Lógica para eliminar alumno */
@@ -61,6 +62,7 @@ const Admin = () => {
 
   return (
     <div className="admin-dashboard">
+    <NavBar />
       <h1>Panel de Administración</h1>
       <div className="admin-card-container">
         {/* Gestión de Instructores */}

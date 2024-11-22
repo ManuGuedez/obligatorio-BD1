@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Actividad from '../Components/Actividad';
 import './Alumno.css';
+import NavBar from '../Components/NavBar';
 
 const activities = [
     {
@@ -55,6 +56,7 @@ const Alumno = () => {
 
     return (
         <div className="alumno-container">
+            <NavBar />
             <div className="actividades-header">
                 <h2 className="actividades-title">Actividades</h2>
             </div>

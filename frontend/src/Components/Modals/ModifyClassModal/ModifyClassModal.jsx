@@ -207,7 +207,7 @@ const ClassItem = ({ classItem, handleEdit }) => {
           <strong>ID:</strong> {classItem.class_id}
         </div>
         <div className="categorias">
-          <strong>Clase:</strong> {classItem.description}
+          <strong>Actividad:</strong> {classItem.description}
         </div>
         <div className="categorias">
           <strong>Instructor:</strong>{" "}

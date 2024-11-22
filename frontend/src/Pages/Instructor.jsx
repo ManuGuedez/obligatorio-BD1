@@ -2,8 +2,11 @@ import React, { useEffect, useState } from 'react';
 import './Instructor.css';
 import Clases from "../Components/Clases";
 import CalendarioClases from '../Components/CalendarioClases';
+import NavBar from '../Components/NavBar';
+import { useNavigate } from 'react-router-dom';
 
 const Instructor = () => {
+    const navigate = useNavigate();
     const [classes, setClasses] = useState([]);
     const [instructorName, setInstructorName] = useState("");
 
@@ -19,6 +22,12 @@ const Instructor = () => {
         // Agrega más clases con diferentes fechas
     ];
 
+    useEffect(() => {
+        if (!localStorage.getItem("token")) {
+          navigate("/Login");
+        }
+      }, []);
+      
     useEffect(() => {
         // Simulación de datos de ejemplo
         const storedUser = localStorage.getItem("user");
@@ -80,6 +89,7 @@ const Instructor = () => {
 
     return (
         <div className="instructor-dashboard">
+            <NavBar />  
             <div className='instructor-dashboard2'>
                 <div className='instructor'>
                     <div className="encabezadoInstructor">
