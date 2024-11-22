@@ -1,96 +1,86 @@
-/* Fondo del modal */
-.modal-overlay {
+.modalOverlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
 }
 
-/* Contenedor principal del modal */
-.modal-container {
+.modalContainer {
     background-color: white;
     border-radius: 8px;
     width: 90%;
-    max-width: 600px;
-    height: 80vh;
+    max-width: 500px;
+    padding: 20px;
+}
+
+.modalHeader {
     display: flex;
-    flex-direction: column;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
 }
 
-/* Encabezado del modal */
-.modal-header {
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-}
-
-.modal-header h2 {
+.modalHeader h2 {
     margin: 0;
     color: black;
     font-size: 1.5rem;
 }
 
-/* Contenido del modal */
-.modal-content {
-    flex: 1;
-    height: 100%;
-    overflow-y: auto;
-    padding: 20px;
+.modalContent {
+    margin-bottom: 20px;
+    align-content: center;
 }
 
-
-.main-content {
-    height: 100%;
+.mainContent {
+    max-height: 70vh;
+    min-width: 450px;
 }
 
-.classes-list {
-    height: 100%;
+.classesList {
+    max-height: 65vh;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 /* Formulario de edición */
-.edit-form {
+.editForm {
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
-.edit-form h3 {
+.editForm h3 {
     color: black;
     margin-bottom: 12px;
 }
 
-.edit-form div {
+.editForm > div {
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 
-.edit-form label {
+.editForm label {
     font-weight: bold;
     color: black;
 }
 
-.edit-form input {
+.editForm input {
     padding: 6px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 0.9rem;
 }
 
-/* Lista de clases */
-.classes-list {
-    display: grid;
-    gap: 12px;
-}
-
-.class-item {
+.classItem {
     padding: 12px;
     border: 1px solid #ddd;
     border-radius: 6px;
@@ -100,53 +90,72 @@
     align-items: center; /* Centrar verticalmente */
 }
 
-.class-item div {
+.classItem div {
     margin: 0; /* Reducido para evitar demasiados espacios */
 }
 
 /* Pie del modal */
-.modal-footer {
+.modalFooter {
     padding: 12px 15px;
     border-top: 1px solid #eee;
     display: flex;
     justify-content: flex-end;
 }
 
-/* Botones generales */
-button {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    font-size: 0.9rem;
-}
-
-.edit-button {
-    padding: 2px 6px;
-    font-size: 0.7rem;
+.editButton {
+    padding: 5px 10px 5px 10px;
     background-color: #4CAF50;
     color: white;
     border: none;
-    border-radius: 3px;
+    border-radius: 4px;
     cursor: pointer;
-    white-space: nowrap;
-    text-align: center;
+    width:fit-content;
 }
 
 
-.edit-button:hover {
+.editButton:hover {
     background-color: #45a049; /* Verde más oscuro */
 }
 
-/* Botón de cancelar */
-.cancel-button {
-    background-color: #757575;
-    color: white;
+select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
 }
 
-button:hover {
-    opacity: 0.9;
+.modalFooter {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.submitButton,
+.cancelButton {
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.submitButton {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+}
+
+.cancelButton {
+    background-color: #f44336;
+    color: white;
+    border: none;
+}
+
+.submitButton:hover {
+    background-color: #0ea10b;
+}
+
+.cancelButton:hover {
+    background-color: #ff3700;
 }
 
 .categorias {

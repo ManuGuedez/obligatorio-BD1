@@ -11,16 +11,13 @@ const AddStudentToClassModal = ({ onClose }) => {
   useEffect(() => {
     const fetchClasses = async () => {
       const classesResponse = await ApiService.get("classes", token);
-      console.log("ACA!! ", classesResponse);
       if (classesResponse.code === 200) {
         const classesDict = classesResponse.data;
         let fetchedClasses = [];
         for (const id in classesDict) {
           const currentClass = { ...classesDict[id], class_id: id };
-          console.log("current-class:", currentClass);
           fetchedClasses.push(currentClass);
         }
-        console.log("classes: ", fetchClasses);
         setAllClasses(fetchedClasses);
       }
     };

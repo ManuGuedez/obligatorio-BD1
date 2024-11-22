@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import AddNewInstructor from "../Components/Modals/AddNewInstructor/AddNewInstructor";
 import AddStudentToClassModal from "../Components/Modals/AddStudentToClassModal/AddStudentToClassModal";
 import ModifyActivityModal from "../Components/Modals/ModifyActivityModal/ModifyActivityModal";
+import ModifyClassModal from "../Components/Modals/ModifyClassModal/ModifyClassModal";
 import ShowActivitiesModal from "../Components/Modals/ShowActivitiesModal/ShowActivitiesModal";
 import AddActivityModal from "./../Components/Modals/AddActivityModal/AddActivityModal";
 import AddClassModal from "./../Components/Modals/AddClassModal/AddClassModal";
 import AddStudentModal from "./../Components/Modals/AddStudent/AddStudentModal";
 import AddTurnModal from "./../Components/Modals/AddTurnModal/AddTurnModal";
 import "./Admin.css";
-import ModifyClassModal from "./Modals/ModifyClassModal";
 import ModifyTurnModal from "./Modals/ModifyTurnModal";
 
 const Admin = () => {
@@ -40,10 +40,6 @@ const Admin = () => {
 
   // Modal para modificar una clase
   const [showModifyClass, setShowModifyClass] = useState(false);
-  const handleCloseModifyClassModal = () => setShowModifyClass(false);
-  const handleModifyClass = () => {
-    setShowModifyClass(true);
-  };
 
   // Modal para agregar un estudiante a una clase
   const [showAddStudentToClass, setShowAddStudentToClass] = useState(false);
@@ -90,7 +86,9 @@ const Admin = () => {
           <button onClick={() => setAddActivityIsOpen(true)}>
             Agregar Actividad
           </button>
-          <button onClick={() => setShowActivities(true)}>Ver Actividades</button>
+          <button onClick={() => setShowActivities(true)}>
+            Ver Actividades
+          </button>
           <button onClick={() => setShowModifyActivity(true)}>
             Modificar Actividad
           </button>
@@ -109,7 +107,9 @@ const Admin = () => {
           {/* MODIFICAR LOS HANDLERS */}
           <h2>Gestión de Clases</h2>
           <button onClick={() => setAddClassIsOpen(true)}>Crear Clase</button>
-          <button onClick={handleModifyClass}>Modificar Clase</button>
+          <button onClick={() => setShowModifyClass(true)}>
+            Modificar Clase
+          </button>
           <button onClick={() => setAddStudentToClass(true)}>
             Inscribir alumno
           </button>
@@ -162,20 +162,16 @@ const Admin = () => {
       )}
 
       {showActivities && (
-        <ShowActivitiesModal
-          onClose={() => setShowActivities(false)}
-        />
+        <ShowActivitiesModal onClose={() => setShowActivities(false)} />
       )}
 
       {showModifyActivity && (
         <ModifyActivityModal onClose={() => setShowModifyActivity(false)} />
       )}
 
-      
-      <ModifyClassModal
-        isOpen={showModifyClass}
-        onClose={() => handleCloseModifyClassModal(false)}
-      />
+      {showModifyClass && (
+        <ModifyClassModal onClose={() => setShowModifyClass(false)} />
+      )}
 
       {addStudentToClass && (
         <AddStudentToClassModal onClose={() => setAddStudentToClass(false)} />
