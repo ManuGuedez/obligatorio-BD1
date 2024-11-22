@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import AddNewInstructor from "../Components/Modals/AddNewInstructor/AddNewInstructor";
 import AddStudentToClassModal from "../Components/Modals/AddStudentToClassModal/AddStudentToClassModal";
 import ModifyActivityModal from "../Components/Modals/ModifyActivityModal/ModifyActivityModal";
+import ShowActivitiesModal from "../Components/Modals/ShowActivitiesModal/ShowActivitiesModal";
 import AddActivityModal from "./../Components/Modals/AddActivityModal/AddActivityModal";
 import AddClassModal from "./../Components/Modals/AddClassModal/AddClassModal";
 import AddStudentModal from "./../Components/Modals/AddStudent/AddStudentModal";
@@ -9,7 +10,6 @@ import AddTurnModal from "./../Components/Modals/AddTurnModal/AddTurnModal";
 import "./Admin.css";
 import ModifyClassModal from "./Modals/ModifyClassModal";
 import ModifyTurnModal from "./Modals/ModifyTurnModal";
-import ShowActivitiesModal from "./Modals/ShowActivitiesModal";
 
 const Admin = () => {
   const [reports, setReports] = useState({});
@@ -36,11 +36,7 @@ const Admin = () => {
   };
 
   // Modal para mostrar actividades
-  const [showShowActivities, setShowShowActivities] = useState(false);
-  const handleCloseShowActivitiesModal = () => setShowShowActivities(false);
-  const handleShowActivities = () => {
-    setShowShowActivities(true);
-  };
+  const [showActivities, setShowActivities] = useState(false);
 
   // Modal para modificar una clase
   const [showModifyClass, setShowModifyClass] = useState(false);
@@ -94,8 +90,10 @@ const Admin = () => {
           <button onClick={() => setAddActivityIsOpen(true)}>
             Agregar Actividad
           </button>
-          <button onClick={handleShowActivities}>Ver Actividades</button>
-          <button onClick={() => setShowModifyActivity(true)}>Modificar Actividad</button>
+          <button onClick={() => setShowActivities(true)}>Ver Actividades</button>
+          <button onClick={() => setShowModifyActivity(true)}>
+            Modificar Actividad
+          </button>
         </div>
 
         {/* Gestión de Alumnos */}
@@ -163,16 +161,17 @@ const Admin = () => {
         <AddActivityModal onClose={() => setAddActivityIsOpen(false)} />
       )}
 
-      <ShowActivitiesModal
-        isOpen={showShowActivities}
-        onClose={() => handleCloseShowActivitiesModal(false)}
-      />
-
-      {showModifyActivity && (
-        <ModifyActivityModal
-          onClose={() => setShowModifyActivity(false)}
+      {showActivities && (
+        <ShowActivitiesModal
+          onClose={() => setShowActivities(false)}
         />
       )}
+
+      {showModifyActivity && (
+        <ModifyActivityModal onClose={() => setShowModifyActivity(false)} />
+      )}
+
+      
       <ModifyClassModal
         isOpen={showModifyClass}
         onClose={() => handleCloseModifyClassModal(false)}

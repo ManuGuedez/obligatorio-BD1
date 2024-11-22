@@ -1,4 +1,4 @@
-.modal-overlay {
+.modalOverlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -11,7 +11,7 @@
     z-index: 1000;
 }
 
-.modal-content {
+.modalContent {
     background-color: white;
     padding: 20px;
     border-radius: 8px;
@@ -20,32 +20,31 @@
     overflow-y: auto;
 }
 
-.modal-header {
+.modalHeader {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
-.close-button {
-    color: black;
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-}
-
-.activity-card {
-    border: 1px solid #ddd;
+.activityCard {
     border-radius: 4px;
     padding: 15px;
     margin-bottom: 15px;
+    gap: 5px;
+    width: 250px;
+    background-color: #a9e2f3cc;
 }
 
-.activity-header {
-    margin-bottom: 10px;
+.activityCard p {
+    text-align: center;
 }
 
-.activity-details {
-    color: #666;
+.activitiesContainer {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    flex-wrap: wrap;
+    max-width: 800px;
+    min-width: 250px;
 }
