@@ -427,16 +427,22 @@ def get_equipment_rental(id):
 @jwt_required()
 def get_class_information(id):
     '''
+    devuelve la información detallada de la clase con el id especificado
+    
     este endpoint no requiere un body
     '''
     claims = get_jwt()
     role = services.get_role(claims.get("role_id"))
     user_ci = int(get_jwt_identity() )   
-    class_information = services.get_extended_class_info(id)
+    result, data = services.get_extended_class_info(id)
     
     match role:
         case 'admin':
-            return jsonify(class_information), 200
+            if result > 0:
+                return jsonify(data), 200
+            else:
+                return jsonify({'error': data})
+                
         case 'instructor':
             if not services.is_instructor_responsible(id, user_ci):
                 return jsonify({'error': 'Debe ser instructor responsable de la clase para acceder a la información'}), 400   
@@ -447,7 +453,10 @@ def get_class_information(id):
         case _:
             return jsonify({'error': 'Rol no identificado'}), 400
             
-    return jsonify(class_information), 200
+    if result > 0:
+        return jsonify(data), 200
+    else:
+        return jsonify({'error': data})
     
     
 @app.route('/classes/<int:id>/enrolled-students', methods=['GET']) 

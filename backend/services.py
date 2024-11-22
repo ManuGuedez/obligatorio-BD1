@@ -718,7 +718,7 @@ def get_extended_class_info(class_id):
     data = cursor.fetchall()
     
     if len(data) <= 0:
-        return data
+        return -1, "No hay una clase activa con el id especificado."
     
     current_class = data[0]
     current_class['start_time'] = cast_time(current_class['start_time'])
@@ -728,7 +728,7 @@ def get_extended_class_info(class_id):
     current_class["end_date"] = cast_date(current_class["end_date"])
     current_class['is_group'] = current_class['is_group'] == 1
     
-    return data
+    return 1, data
 
 def is_instructor_responsible(class_id, instructor_ci):
     query = """
