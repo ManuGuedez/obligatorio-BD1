@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import Actividad from '../Components/Actividad';
+import ClasesAlumno from '../Components/ClasesAlumno'; // Importamos el nuevo componente
 import alumnoService from '../Services/alumnoService';
 import './Alumno.css';
 
 const Alumno = () => {
     const [activities, setActivities] = useState([]); // Estado para actividades
+    const [studentClasses, setStudentClasses] = useState([]); // Estado para clases del estudiante
     const [isLoading, setIsLoading] = useState(true); // Estado para la carga
     const [error, setError] = useState(null); // Estado para errores
 
@@ -13,27 +15,38 @@ const Alumno = () => {
     const [enrolledActivities, setEnrolledActivities] = useState([]); // Inscripciones
 
     useEffect(() => {
-        const fetchActivities = async () => {
+        const fetchData = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await alumnoService.getAlumnos(token);
 
-                if (response && response.code === 200 && Array.isArray(response.data)) {
-                    console.log("Actividades recibidas:", response.data);
-                    setActivities(response.data);
+                // Cargar actividades disponibles
+                const activitiesResponse = await alumnoService.getAlumnos(token);
+                if (activitiesResponse && activitiesResponse.code === 200 && Array.isArray(activitiesResponse.data)) {
+                    console.log("Actividades recibidas:", activitiesResponse.data);
+                    setActivities(activitiesResponse.data);
                 } else {
-                    console.error("Error: estructura inesperada en los datos", response);
-                    setError('El formato de datos no es válido.');
+                    console.error("Error: estructura inesperada en los datos de actividades", activitiesResponse);
+                    setError('El formato de datos de actividades no es válido.');
+                }
+
+                // Cargar clases del estudiante
+                const studentClassesResponse = await alumnoService.getStudentClasses(token);
+                if (studentClassesResponse && studentClassesResponse.code === 200 && Array.isArray(studentClassesResponse.data)) {
+                    console.log("Clases del estudiante recibidas:", studentClassesResponse.data);
+                    setStudentClasses(studentClassesResponse.data);
+                } else {
+                    console.error("Error: estructura inesperada en los datos de clases", studentClassesResponse);
+                    setError('El formato de datos de clases no es válido.');
                 }
             } catch (err) {
-                console.error("Error al cargar actividades:", err);
-                setError('Error al cargar actividades.');
+                console.error("Error al cargar datos:", err);
+                setError('Error al cargar datos.');
             } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchActivities();
+        fetchData();
     }, []);
 
     const openModal = (activity) => {
@@ -60,13 +73,13 @@ const Alumno = () => {
         }
     };
 
-    if (isLoading) return <p>Cargando actividades...</p>;
+    if (isLoading) return <p>Cargando actividades y clases...</p>;
     if (error) return <p>{error}</p>;
 
     return (
         <div className="alumno-container">
             <div className="actividades-header">
-                <h2 className="actividades-title">Actividades</h2>
+                <h2 className="actividades-title">Actividades disponibles</h2>
             </div>
             <div className="activities-container">
                 {Array.isArray(activities) && activities.map((activity) => (
@@ -77,7 +90,7 @@ const Alumno = () => {
                             name: activity.activity_title || activity.activity_description || "Sin descripción", // Mostrar título o descripción
                             shortDescription: activity.activity_description, // Descripción breve
                             schedule: `${activity.start_time} - ${activity.end_time}`, // Horario
-                            price: activity.equipment_price || 0 // Precio del equipamiento
+                            price: activity.cost || 0 // Precio del equipamiento
                         }}
                         openModal={openModal}
                         toggleEnrollment={toggleEnrollment}
@@ -85,6 +98,11 @@ const Alumno = () => {
                     />
                 ))}
             </div>
+
+            <div className="clases-header">
+                <h2 className="clases-title">Mis Clases:</h2>
+            </div>
+            <ClasesAlumno clases={studentClasses} /> {/* Agregar las clases del estudiante */}
 
             {/* Modal de Detalles */}
             {showModal && selectedActivity && (
@@ -94,7 +112,6 @@ const Alumno = () => {
                         <h3>{selectedActivity.name}</h3>
                         <p><strong>Descripción:</strong> {selectedActivity.shortDescription}</p>
                         <p><strong>Horario:</strong> {selectedActivity.schedule}</p>
-                        <p><strong>Precio del equipamiento:</strong> ${selectedActivity.price}</p>
                     </div>
                 </div>
             )}
