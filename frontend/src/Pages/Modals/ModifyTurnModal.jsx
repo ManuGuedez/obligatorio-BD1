@@ -41,16 +41,16 @@ const ModifyTurnModal = ({ isOpen, onClose }) => {
             if (newEndTime !== editingTurn.end_time) {
                 updatedFields.end_time = newEndTime;
             }
-    
+
             const response = await ApiService.patch(
                 `turns/${editingTurn.turn_id}/modify-turn`,
                 updatedFields,
                 token
             );
-    
+
             if (response.code === 200) {
-                const updatedTurns = turns.map(turn => 
-                    turn.turn_id === editingTurn.turn_id 
+                const updatedTurns = turns.map(turn =>
+                    turn.turn_id === editingTurn.turn_id
                         ? { ...turn, ...updatedFields }
                         : turn
                 );
@@ -61,8 +61,8 @@ const ModifyTurnModal = ({ isOpen, onClose }) => {
             console.error('Error updating turn:', error);
         }
     };
-    
-    
+
+
 
     if (!isOpen) return null;
 
@@ -78,16 +78,16 @@ const ModifyTurnModal = ({ isOpen, onClose }) => {
                             <h3>Editar Turno {editingTurn.turn_id}</h3>
                             <div>
                                 <label>Hora inicio:</label>
-                                <input 
-                                    type="time" 
+                                <input
+                                    type="time"
                                     value={newStartTime}
                                     onChange={(e) => setNewStartTime(e.target.value)}
                                 />
                             </div>
                             <div>
                                 <label>Hora fin:</label>
-                                <input 
-                                    type="time" 
+                                <input
+                                    type="time"
                                     value={newEndTime}
                                     onChange={(e) => setNewEndTime(e.target.value)}
                                 />
@@ -106,7 +106,7 @@ const ModifyTurnModal = ({ isOpen, onClose }) => {
                                         <div>Hora inicio: {turn.start_time}</div>
                                         <div>Hora fin: {turn.end_time}</div>
                                     </div>
-                                    <button 
+                                    <button
                                         onClick={() => handleEdit(turn.turn_id)}
                                         className="edit-button"
                                         style={{ padding: '5px 10px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}

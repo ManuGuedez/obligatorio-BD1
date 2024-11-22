@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import './Admin.css';
 import AddInstructorModal from './Modals/AddInstructorModal';
 import RemoveInstructorModal from './Modals/RemoveInstructorModal';
@@ -10,6 +10,7 @@ import AddActivityModal from './Modals/AddActivityModal';
 import ShowActivitiesModal from './Modals/ShowActivitiesModal';
 import ModifyActivityModal from './Modals/ModifyActivityModal';
 import ModifyClassModal from './Modals/ModifyClassModal';
+import AddStudentToClassModal from './Modals/AddStudentToClassModal';
 
 const Admin = () => {
     const [instructors, setInstructors] = useState([]);
@@ -81,15 +82,21 @@ const Admin = () => {
         setShowModifyActivity(true);
     };
 
+    // Modal para modificar una clase
     const [showModifyClass, setShowModifyClass] = useState(false);
     const handleCloseModifyClassModal = () => setShowModifyClass(false);
     const handleModifyClass = () => {
         setShowModifyClass(true);
     };
 
+    // Modal para agregar un estudiante a una clase
+    const [showAddStudentToClass, setShowAddStudentToClass] = useState(false);
+    const handleCloseAddStudentToClassModal = () => setShowAddStudentToClass(false);
+    const handleAddStudentToClass = () => {
+        setShowAddStudentToClass(true);
+    };
 
-    const handleAddSchedule = () => { /* Lógica para agregar turno */ };
-    const handleAssignInstructorToSchedule = () => { /* Lógica para asignar instructor a turno */ };
+
     const handleRemoveStudent = () => { /* Lógica para eliminar alumno */ };
     const generateReports = () => { /* Lógica para generar reportes */ };
     const handleEditInstructor = () => { /* Lógica para editar instructor */ };
@@ -133,7 +140,7 @@ const Admin = () => {
                     <h2>Gestión de Clases</h2>
                     <button onClick={handleAddClass}>Crear Clase</button>
                     <button onClick={handleModifyClass}>Modificar Clase</button>
-                    <button onClick={handleModifyTurn}>Añadir alumno</button>
+                    <button onClick={handleAddStudentToClass}>Añadir alumno</button>
                     <button onClick={handleRemoveStudent}>Eliminar Alumno</button>
                 </div>
 
@@ -192,6 +199,11 @@ const Admin = () => {
             <ModifyClassModal
                 isOpen={showModifyClass}
                 onClose={() => handleCloseModifyClassModal(false)}
+            />
+
+            <AddStudentToClassModal
+            isOpen={showAddStudentToClass}
+            onClose={() => handleCloseAddStudentToClassModal(false)}
             />
 
 
