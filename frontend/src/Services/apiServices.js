@@ -43,8 +43,8 @@ const ApiService = {
         return response;
     },
     
-
     delete: async (resource, token) => {
+        console.log(resource);
         const request = {
             method: "DELETE",
             headers: {
@@ -54,10 +54,14 @@ const ApiService = {
 
         const api_response = await fetch(`${default_url}/${resource}`, request);
 
-
         console.log(`DELETE: ${api_response.status}, ${api_response.statusText}`);
 
         const response = { code: api_response.status, data: null };
+
+
+
+       
+
 
         if (api_response.ok)
             response.data = await api_response.json();

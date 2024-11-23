@@ -573,6 +573,8 @@ ALTER TABLE classes
 ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE;
 
 
+SELECT person.person_ci FROM person WHERE person_id = 23 AND person.is_deleted = FALSE;
+
 
 SELECT r.role_name
 FROM roles r

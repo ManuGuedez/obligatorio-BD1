@@ -1130,6 +1130,7 @@ def delete_instructor(instructor_ci):
     return 1, "Instructor eliminado correctamente."
 
 def delete_person(person_ci):
+    print("CI", person_ci) #LLEGA -1
     update = 'UPDATE person SET is_deleted = TRUE WHERE person_ci = %s'
     cursor.execute(update, (person_ci, ))
     cnx.commit()
@@ -1140,8 +1141,9 @@ def delete_person(person_ci):
     delete_login(person_ci)
     rol = get_rol_by_ci(person_ci)
     
+    
     match rol:
         case 'instructor':
-            delete_instructor(person_ci)
+            return delete_instructor(person_ci)
         case 'student':
-            delete_student(person_ci)
+           return delete_student(person_ci)

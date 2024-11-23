@@ -797,26 +797,29 @@ def delete_turn(id):
         return jsonify({'error': message}), 400 
     
 
-@app.route('/person/<int:id>/delete-person', methods=['DELETE']) 
+@app.route('/person/<int:id>/delete-person', methods=['DELETE'])
 @jwt_required()
 def delete_person(id):
+    print("ID",id)  
     claims = get_jwt()
     role = services.get_role(claims.get("role_id"))
     
     if(role != "admin"):
         return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
     
-    
     person_ci = services.get_person_ci_with_id(id)
-    if person_ci == int(get_jwt_identity()):   
+    print("CI ENDPOINT",person_ci)
+    
+    if person_ci == int(get_jwt_identity()):  
         return jsonify({'error': 'No es posible borrar el usuario admin.'}), 400
     
     result, message = services.delete_person(person_ci)
     
-    if result > 0: 
-        return jsonify({'msg': message}), 200
+    if result:
+        return jsonify({'message': 'Person deleted successfully'}), 200
     else:
-        return jsonify({'error': message}), 400 
+        return jsonify({'error': message}), 400
+
     
 
 @app.route('/classes/<int:id>/delete-class', methods=['DELETE']) 
