@@ -52,7 +52,7 @@ const Instructor = () => {
     //para cargar las clases de hoy del instructor
     useEffect(() => {
         const fetchTodayClassesInfo = async () => {
-            const actualDate = '2024-11-22' //new Date().toISOString().split('T')[0]; // Fecha actual en formato 'YYYY-MM-DD'
+            const actualDate = new Date().toISOString().split('T')[0]; // Fecha actual en formato 'YYYY-MM-DD'
             
             const todayClasses = classes.filter(
                 (classData) => classData.class_date === actualDate
