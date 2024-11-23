@@ -806,7 +806,12 @@ def delete_person(id):
     if(role != "admin"):
         return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
     
-    result, message = services.delete_person(id)
+    
+    person_ci = services.get_person_ci_with_id(id)
+    if person_ci == int(get_jwt_identity()):   
+        return jsonify({'error': 'No es posible borrar el usuario admin.'}), 400
+    
+    result, message = services.delete_person(person_ci)
     
     if result > 0: 
         return jsonify({'msg': message}), 200
