@@ -989,8 +989,7 @@ def get_student_classes(student_ci):
     
     for current_class in classes:
         id = current_class['class_id']
-        result.append(get_extended_class_info(id)[0])
-    
+        result.append(get_extended_class_info(id)[1][0])
     return result
 
 def get_class_data():

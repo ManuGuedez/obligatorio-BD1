@@ -697,23 +697,6 @@ def get_student_classes():
     classes = services.get_student_classes(student_ci)
     
     return jsonify(classes), 200
-
-@app.route('/student/<int:id>/class-information', methods=['GET'])
-@jwt_required()
-def get_student_classes_by_id(id):
-    print("ENTR", id)
-    claims = get_jwt()
-    role = services.get_role(claims.get("role_id"))
-    
-    if(role != "admin"):
-        return jsonify({'error': 'Unauthorized access'}), 401
-    
-    student_ci = services.get_person_ci_with_id(id)
-    classes = services.get_student_classes(student_ci)
-    print(student_ci,classes)
-    
-    return jsonify(classes), 200
-
     
 
 @app.route('/instructors', methods=['GET']) 
