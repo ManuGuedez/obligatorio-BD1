@@ -839,5 +839,70 @@ def delete_class(id):
         return jsonify({'error': message}), 400 
 
 
+#REPORTES
+
+#actividades con mas estudiantes, snow, ski, etc
+@app.route('/report/most_students', methods=['GET'])
+@jwt_required()
+def report_most_students():
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "admin"):
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 403 
+    
+    status, results = services.get_activities_with_most_students()
+    if status == 1:
+        return jsonify(results), 200
+    else:
+        return jsonify({"error": results}), 404
+
+
+#Actividades con mas ganancia, contamos el alquiler
+@app.route('/report/income', methods=['GET'])
+@jwt_required()
+def report_income():
+    """
+    Endpoint para obtener las actividades con mayores ingresos generados.
+    Solo accesible para admin
+    """
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if role != "admin":
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 403  # 403 sin permisos:)
+
+    # Obtener el reporte de services
+    status, results = services.get_top_income_activities()
+    if status == 1:
+        return jsonify(results), 200
+    else:
+        return jsonify({"error": results}), 404
+
+#Mas turnos
+@app.route('/report/most_classes', methods=['GET'])
+@jwt_required()
+def report_most_classes():
+    """
+    Endpoint para obtener los turnos con más clases dictadas.
+    Solo accesible para usuarios con el rol 'admin'.
+    """
+    # Recuperar las claims del JWT
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    # Validar si el rol del usuario es 'admin'
+    if role != "admin":
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 403  # Forbidden
+
+    # Obtener el reporte
+    status, results = services.get_turns_with_most_classes()
+    if status == 1:
+        return jsonify(results), 200
+    else:
+        return jsonify({"error": results}), 404
+
+
 if __name__ == '__main__':
     app.run(debug=True)
+    

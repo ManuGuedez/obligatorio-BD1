@@ -1147,3 +1147,69 @@ def delete_person(person_ci):
             return delete_instructor(person_ci)
         case 'student':
            return delete_student(person_ci)
+
+
+#########################################
+#REPORTES#
+
+def get_activities_with_most_students():
+    """
+    Devuelve las actividades con más alumnos inscritos.
+    """
+    query = """
+    SELECT 
+        a.description AS activity,
+        COUNT(sc.student_ci) AS student_count
+    FROM activities a
+    JOIN classes c ON a.activity_id = c.activity_id
+    JOIN student_class sc ON c.class_id = sc.class_id
+    WHERE c.is_deleted = FALSE AND sc.is_deleted = FALSE
+    GROUP BY a.activity_id
+    ORDER BY student_count DESC;
+    """
+    cursor.execute(query)
+    results = cursor.fetchall()
+    return 1, results if results else (-1, "No se encontraron datos.")
+
+def get_top_income_activities():
+    """
+    Devuelve las actividades con mayores ingresos generados.
+    """
+    query = """
+    SELECT
+        a.description AS activity,
+        (a.cost + COALESCE(SUM(e.cost), 0)) AS total_income
+    FROM activities a
+    LEFT JOIN equipment e ON a.activity_id = e.activity_id
+    GROUP BY a.activity_id 
+    ORDER BY total_income DESC;
+    """
+    cursor.execute(query)
+    results = cursor.fetchall()
+    return 1, results if results else (-1, "No se encontraron datos.")
+
+def get_turns_with_most_classes():
+    """
+    Devuelve los turnos con más clases dictadas.
+    """
+    query = """
+    SELECT 
+        t.start_time,
+        t.end_time,
+        COUNT(c.class_id) AS total_classes
+    FROM turns t
+    JOIN classes c ON t.turn_id = c.turn_id
+    WHERE c.is_deleted = FALSE
+    GROUP BY t.turn_id
+    ORDER BY total_classes DESC;
+    """
+    cursor.execute(query)
+    results = cursor.fetchall()
+    if results:
+        for turn in results:
+            #formatea los turnos para que se vean facha, Hora y minutos nomas
+            turn['start_time'] = cast_time(turn['start_time'])
+            turn['end_time'] = cast_time(turn['end_time'])
+        print(results)
+        return 1, results
+    return -1, "No se encontraron datos."
