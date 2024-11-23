@@ -14,6 +14,7 @@ import AddTurnModal from "./../Components/Modals/AddTurnModal/AddTurnModal";
 import DeletePersonModal from "./../Components/Modals/DeletePersonModal/DeletePersonModal";
 import DeleteTurnModal from "./../Components/Modals/DeleteTurnModal/DeleteTurnModal";
 import DeleteClassModal from "./../Components/Modals/DeleteClassModal/DeleteClassModal";
+import RemoveStudentClassModal from "./../Components/Modals/RemoveStudentClassModal/RemoveStudentClassModal";
 
 import "./Admin.css";
 
@@ -31,15 +32,7 @@ const Admin = () => {
     const [deleteStudentIsOpen, setDeleteStudentIsOpen] = useState(false);
     const [deleteTurnIsOpen, setDeleteTurnIsOpen] = useState(false);
     const [deleteClassIsOpen, setDeleteClassIsOpen] = useState(false);
-
-    // // Modal para eliminar un instructor
-    // const [showRemoveModal, setShowRemoveModal] = useState(false);
-    // const handleCloseRemoveModal = () => setShowRemoveModal(false);
-    // const handleRemoveInstructor = () => {
-    //     setShowRemoveModal(true)
-    // };
-
-    // Modal para modificar un turno
+    const [removeStudentClassIsOpen, setRemoveStudentClassIsOpen] = useState(false);
 
 
     const [showModifyTurn, setShowModifyTurn] = useState(false);
@@ -56,9 +49,7 @@ const Admin = () => {
     // Modal para modificar una clase
     const [showModifyClass, setShowModifyClass] = useState(false);
 
-    const handleRemoveStudent = () => {
-        /* Lógica para eliminar alumno */
-    };
+
     const generateReports = () => {
         /* Lógica para generar reportes */
     };
@@ -129,7 +120,7 @@ const Admin = () => {
                     <button onClick={() => setAddStudentToClass(true)}>
                         Inscribir alumno
                     </button>
-                    <button onClick={handleRemoveStudent}>Eliminar Alumno</button>
+                    <button onClick={() => setRemoveStudentClassIsOpen(true)}>Eliminar Alumno</button>
                 </div>
 
                 {/* Reportes */}
@@ -213,6 +204,12 @@ const Admin = () => {
             {deleteClassIsOpen && (
                 <DeleteClassModal onClose={() => setDeleteClassIsOpen(false)} />
             )}
+
+            {removeStudentClassIsOpen && (
+                <RemoveStudentClassModal onClose={() => setRemoveStudentClassIsOpen(false)} />
+            )}
+
+
 
 
         </div>

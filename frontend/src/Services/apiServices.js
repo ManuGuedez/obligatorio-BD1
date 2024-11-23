@@ -14,6 +14,8 @@ const ApiService = {
         const api_response = await fetch(`${default_url}/${resource}`, request);
         const response = { code: api_response.status, data: null };
 
+        console.log(resource)
+
         if (api_response.ok)
             response.data = await api_response.json();
 
@@ -57,11 +59,6 @@ const ApiService = {
         console.log(`DELETE: ${api_response.status}, ${api_response.statusText}`);
 
         const response = { code: api_response.status, data: null };
-
-
-
-       
-
 
         if (api_response.ok)
             response.data = await api_response.json();
