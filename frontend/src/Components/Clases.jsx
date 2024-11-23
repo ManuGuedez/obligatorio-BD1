@@ -1,22 +1,21 @@
-import React, { useState } from "react";
-import "./Clases.css"
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import "./Clases.css";
 
-const Clases = ({ turno, deporte, maxAlumnos, alumnos }) => {
-    const toggleDetails = () => {
-        setShowDetails(!showDetails);
+const Clases = ({ start_time, end_time, description, class_id, studentCount }) => {
+    const navigate = useNavigate();
+
+    const handleDetailsClick = () => {
+        navigate(`/class/${class_id}`);
     };
-
-    const cantAlumnos = alumnos.length
 
     return (
         <div className="class-card">
-            <p>{deporte}</p>
-            <p>Horario: {turno}</p>
-            <p>Alumnos inscriptos: {cantAlumnos} </p>
-            <p>Cantidad máxima de alumnos: {maxAlumnos}</p>
-
+            <h3 className="class-title">{description}</h3>
+            <p>Horario: {start_time} - {end_time}</p>
+            <p>Cantidad de Alumnos: {studentCount}</p> {/* Mostrar cantidad de alumnos */}
             <div className="button-container">
-                <button onClick={toggleDetails}>
+                <button onClick={handleDetailsClick}>
                     Ver Detalles
                 </button>
             </div>

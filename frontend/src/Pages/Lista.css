@@ -1,0 +1,57 @@
+.student-list-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(0, 51, 102, 0.8);
+    border-radius: 10px;
+    color: #fff;
+}
+
+h1 {
+    text-align: center;
+    color: #fff;
+}
+
+.error {
+    color: red;
+    text-align: center;
+}
+
+.student-list-container {
+    width: 80%;
+    margin: 0 auto;
+    text-align: center;
+    background-color: #1e3a8a;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.student-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.student-table th,
+.student-table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+    color: white;
+}
+
+.student-table th {
+    background-color: #4b3fc8;
+    font-weight: bold;
+}
+
+.student-table tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.error-message {
+    color: red;
+    font-size: 1em;
+    margin-top: 10px;
+}
