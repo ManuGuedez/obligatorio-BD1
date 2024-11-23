@@ -293,7 +293,8 @@ def is_instructor_busy(instructor_id, turn_id, days_ids, start_date, end_date):
     return len(classes) > 0
 
 def get_person_ci_with_id(person_id):
-    query = 'SELECT person.person_ci FROM person WHERE person_id = %s AND person.is_deleted = FALSE'
+    print("ACA ",person_id)
+    query = 'SELECT person.person_ci FROM person WHERE person_id = %s' #AND person.is_deleted = FALSE
     cursor.execute(query,(person_id,))
     data = cursor.fetchall()
     
@@ -581,6 +582,7 @@ def add_student_to_class(student_ci, class_id):
     
     
 def remove_student_from_class(class_id, student_ci):
+    
     delete = "DELETE FROM student_class WHERE class_id = %s AND student_ci = %s"
 
     try:

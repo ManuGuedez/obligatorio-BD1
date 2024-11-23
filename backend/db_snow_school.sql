@@ -575,6 +575,11 @@ ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE;
 
 SELECT person.person_ci FROM person WHERE person_id = 23 AND person.is_deleted = FALSE;
 
+DELETE FROM student_class WHERE class_id = 1 AND student_ci = 41256398
+
+SELECT person.person_ci FROM person WHERE person_id = 22
+
+SELECT * FROM classes WHERE is_deleted = FALSE
 
 SELECT r.role_name
 FROM roles r

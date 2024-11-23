@@ -120,7 +120,9 @@ def create_class():
 
     instructor_id = data.get('instructor_id')
     instructor_ci = services.get_person_ci_with_id(instructor_id)
+    
     if instructor_ci == -1:
+        print("entre aqui")
         return jsonify({'error': 'No es posible identificar el id del instructor ingresado'}), 400
     
     start_date = data.get('start_date')
@@ -348,10 +350,12 @@ def enroll_student(id):
 @app.route('/classes/<int:id>/remove-student', methods=['DELETE'])
 @jwt_required()   
 def remove_student_from_class(id):
+    print("ID",id)
     '''
     cuerpo requerido:
         - student_id: id del alumno a inscribir
     '''
+
     data = request.get_json()
     student_id = data.get('student_id')
     
@@ -370,12 +374,15 @@ def remove_student_from_class(id):
     elif role == 'student':
         if user_ci != student_ci:
             return jsonify({"error": "Un alumno no puede eliminar de una clase a otro"}), 400 
-        
+    
+    
     result, message = services.remove_student_from_class(id, student_ci)
+    print(result)
 
     if result > 0:
         return jsonify({'msg': message}), 200
     else:
+        print("CI ",student_ci)
         return jsonify({'error': message}), 400
 
 
@@ -781,6 +788,7 @@ def get__classes():
         return jsonify({'error': 'Debes ser admin para poder acceder a las clases.'}), 400
     
     result, data = services.get_class_data()
+    print("RESULTADO ", result)
     
     if result > 0:
         return jsonify(data), 200
