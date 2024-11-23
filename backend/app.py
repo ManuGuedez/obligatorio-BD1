@@ -675,14 +675,25 @@ def get_turn():
 def get_student_classes(): 
     '''
     dado un estudiante (que inició sesión) se devuelven todas las clases en las que está inscripto
+    el admin puede ver las clases de todos los estudiantes, cuerpo requerido:
+        - student_id
     '''
     claims = get_jwt()
     role = services.get_role(claims.get("role_id"))
     
-    if(role != "student"):
-        return jsonify({'error': 'Debes ser estudiante para poder acceder a las clases.'}), 400
+    if(role != "student" and role != "admin"):
+        return jsonify({'error': 'Debes ser estudiante o administrador para poder acceder a las clases.'}), 400
     
-    student_ci = int(get_jwt_identity())
+    match role:
+        case "student":
+            student_ci = int(get_jwt_identity())
+        case "admin":
+            data = request.get_json()
+            student_id = data.get('student_id')
+            if not student_id:
+                return jsonify({'error': 'Faltan datos requeridos.'}), 400
+            student_ci = services.get_person_ci_with_id(student_id)
+            
     classes = services.get_student_classes(student_ci)
     
     return jsonify(classes), 200
