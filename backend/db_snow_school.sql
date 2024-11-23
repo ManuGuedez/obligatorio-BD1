@@ -612,9 +612,9 @@ SELECT activities.description, turns.start_time, turns.end_time,
  SELECT s.person_id as student_id, s.first_name, s.last_name
     FROM students s
     JOIN student_class sc ON s.student_ci = sc.student_ci
-    WHERE sc.class_id = 1 and sc.is_deleted = false
+    WHERE sc.class_id = 1 and sc.is_deleted = false;
 
- SELECT * FROM turns WHERE is_deleted = FALSE
+ SELECT * FROM turns WHERE is_deleted = FALSE;
 
 
 SELECT r.role_name

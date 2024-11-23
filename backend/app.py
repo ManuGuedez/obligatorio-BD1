@@ -670,9 +670,9 @@ def get_turn():
     return jsonify(turns)
 
 
-@app.route('/student/class-information', methods=['GET']) 
+@app.route('/student/<int:id>/class-information', methods=['GET']) 
 @jwt_required()
-def get_student_classes(): 
+def get_student_classes(id): 
     '''
     dado un estudiante (que inició sesión) se devuelven todas las clases en las que está inscripto
     el admin puede ver las clases de todos los estudiantes, cuerpo requerido:
@@ -687,12 +687,11 @@ def get_student_classes():
     match role:
         case "student":
             student_ci = int(get_jwt_identity())
+            another_student_ci = services.get_person_ci_with_id(id)
+            if student_ci != another_student_ci:
+                return jsonify({'error': 'No tienes permiso para ver las clases de este estudiante.'}), 400 
         case "admin":
-            data = request.get_json()
-            student_id = data.get('student_id')
-            if not student_id:
-                return jsonify({'error': 'Faltan datos requeridos.'}), 400
-            student_ci = services.get_person_ci_with_id(student_id)
+            student_ci = services.get_person_ci_with_id(id)
             
     classes = services.get_student_classes(student_ci)
     
