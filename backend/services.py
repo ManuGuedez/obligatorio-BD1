@@ -18,8 +18,8 @@ def validate_student(student):
     except KeyError:
         raise ValueError("Asegurate de haber ingrsado las key correspondientes.")
 
-    query = f"SELECT students.student_ci FROM students WHERE students.student_ci = {ci} AND students.first_name = \'{name}\' AND students.last_name = \'{last_name}\' AND students.birth_date = \'{birth_date}\'"
-    cursor.execute(query)
+    query = "SELECT students.student_ci FROM students WHERE students.student_ci = %s AND students.first_name = %s AND students.last_name = %s AND students.birth_date = %s"
+    cursor.execute(query, (ci, name, last_name, birth_date))
     data = cursor.fetchall()
 
     if len(data) <= 0:
@@ -72,8 +72,8 @@ def validate_user(email, password):
     """
         Valdia la existencia del usuario en la base de datos.
     """
-    query =  query = f"SELECT login.person_ci, login.role_id FROM login WHERE login.email = \'{email}\' AND login.password = \'{password}\'"
-    cursor.execute(query)
+    query =  query = "SELECT login.person_ci, login.role_id FROM login WHERE login.email = %s AND login.password = %s AND login.is_deleted = FALSE"
+    cursor.execute(query, (email, password))
     data = cursor.fetchall()
     
     if len(data) > 0:
@@ -91,8 +91,8 @@ def validate_instructor(instructor):
     except KeyError:
         raise ValueError("Asegurate de haber ingrsado las key correspondientes.")
 
-    query = f"SELECT instructors.instructor_ci FROM instructors WHERE instructors.instructor_ci = {ci} AND instructors.first_name = \'{name}\' AND instructors.last_name = \'{last_name}\'"
-    cursor.execute(query)
+    query = "SELECT instructors.instructor_ci FROM instructors WHERE instructors.instructor_ci = %s AND instructors.first_name = %s AND instructors.last_name = %s AND instructors.is_deleted = FALSE"
+    cursor.execute(query, (ci, name, last_name))
     data = cursor.fetchall()
 
     if len(data) <= 0:
@@ -112,7 +112,7 @@ def create_instructor_account(instructor, email, password):
     if response == -1:
         return -1, "No hay un instructor que cumpla con las especificaciones en la bd, primero debe ser ingresado al sistema por el adminsitrador"
     
-    query = "SELECT login.email FROM login WHERE login.person_ci = %s"
+    query = "SELECT login.email FROM login WHERE login.person_ci = %s AND login.is_deleted = FALSE"
     cursor.execute(query, (response,))
     data = cursor.fetchall()
     if len(data) > 0 :
@@ -142,6 +142,7 @@ def get_person_data(person_id):
     query = """
     SELECT person_id, name AS first_name, last_name
     FROM person WHERE person_ci = %s
+    AND is_deleted = FALSE
     """
     cursor.execute(query, (person_id,))
     data = cursor.fetchall()
@@ -168,14 +169,14 @@ def get_role_id(role):
 def cast_date(date: datetime.date):
     return date.strftime("%Y-%m-%d")
 
-def cast_time(current_time):   
+def cast_time(current_time):
     hours, remainder = divmod(current_time.seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
     new_time = time(hours, minutes, seconds)
     return new_time.strftime('%H:%M:%S')
 
 def get_class_turn(class_id):
-    query = 'SELECT turn_id FROM classes WHERE class_id = %s'
+    query = 'SELECT turn_id FROM classes WHERE class_id = %s AND classes.is_deleted = FALSE'
     cursor.execute(query, (class_id,))
     data = cursor.fetchall()
     
@@ -191,6 +192,7 @@ def get_class_information_for_instructor(class_id):
         JOIN turns ON (classes.turn_id = turns.turn_id) 
         JOIN login ON (classes.instructor_ci = login.person_ci) 
     WHERE classes.class_id = %s
+          AND classes.is_deleted = FALSE 
     """
     
     cursor.execute(query, (class_id,))
@@ -202,10 +204,10 @@ def get_class_information_for_instructor(class_id):
     
 def modify_class_turn(class_id, new_turn_id):
 
-    query = f"UPDATE classes SET turn_id = {new_turn_id} WHERE class_id = {class_id}"
+    query = "UPDATE classes SET turn_id = %s  WHERE class_id = %s AND classes.is_deleted = FALSE"
     
     try:
-        cursor.execute(query)
+        cursor.execute(query, (new_turn_id, class_id))
         cnx.commit()  
         if cursor.rowcount > 0:
             return 1, "Turno de la clase modificado exitosamente."
@@ -215,10 +217,10 @@ def modify_class_turn(class_id, new_turn_id):
         return -1, f"Error al modificar la clase: {err}"
 
 def modify_class_instructor(class_id, instructor_ci):
-    query = f"UPDATE classes SET instructor_ci = {instructor_ci} WHERE class_id = {class_id}"
+    update = "UPDATE classes SET instructor_ci = %s WHERE class_id = %s AND classes.is_deleted = FALSE"
     
     try:
-        cursor.execute(query)
+        cursor.execute(update, (instructor_ci, class_id))
         cnx.commit()  
         if cursor.rowcount > 0:
             # mandar mail al instructor avisando que fue asignado para dar esta clase
@@ -229,7 +231,7 @@ def modify_class_instructor(class_id, instructor_ci):
         return -1, f"Error al modificar la clase: {err}"
     
 def get_person_id_with_ci(person_ci):
-    query = 'SELECT person.person_id FROM person WHERE person_ci = %s'
+    query = 'SELECT person.person_id FROM person WHERE person_ci = %s AND person.is_deleted = FALSE'
     cursor.execute(query,(person_ci,))
     data = cursor.fetchall()
     
@@ -274,7 +276,7 @@ def retrieve_instructor_classes_by_turn_and_days(instructor_id, turn_id, days_id
     # '''
     select = 'SELECT c.class_id, c.activity_id, c.turn_id, cd.day_id FROM classes c '
     joins = 'JOIN instructors i ON i.instructor_ci = c.instructor_ci JOIN class_day cd ON cd.class_id = c.class_id '
-    where = 'WHERE i.person_id = %s AND c.turn_id = %s AND (c.start_date <= %s and %s <= c.end_date) AND cd.day_id IN '
+    where = 'WHERE i.person_id = %s AND c.turn_id = %s AND (c.start_date <= %s and %s <= c.end_date) AND c.is_deleted = FALSE AND cd.day_id IN '
     
     days = '('+ str(days_id)[1:-1] + ')'
     
@@ -291,7 +293,7 @@ def is_instructor_busy(instructor_id, turn_id, days_ids, start_date, end_date):
     return len(classes) > 0
 
 def get_person_ci_with_id(person_id):
-    query = 'SELECT person.person_ci FROM person WHERE person_id = %s'
+    query = 'SELECT person.person_ci FROM person WHERE person_id = %s AND person.is_deleted = FALSE'
     cursor.execute(query,(person_id,))
     data = cursor.fetchall()
     
@@ -324,6 +326,7 @@ def add_class(instructor_ci, activity_id, turn_id, start_date, end_date, days_id
         insert = 'INSERT INTO classes (instructor_ci, activity_id, turn_id, start_date, end_date, is_group) VALUE (%s, %s, %s, %s, %s, %s)'
         cursor.execute(insert, (instructor_ci, activity_id, turn_id, start_date, end_date, is_group))
         cnx.commit()  
+        class_id = -1
         
         # en caso de haber podido agregar la clase a la tabla classes
         if cursor.rowcount > 0:
@@ -372,6 +375,7 @@ def add_class(instructor_ci, activity_id, turn_id, start_date, end_date, days_id
         rollback_added_class(class_id)
         return -1, f"Error al crear la clase: {err}"
 
+# para cuando sale mal la inserción que se despliegue la cadena
 def rollback_added_class(class_id):
     delete = "DELETE FROM class_day WHERE class_id = " + str(class_id)
     cursor.execute(delete)
@@ -387,7 +391,7 @@ def get_basic_class_info(class_id):
     FROM classes c
     JOIN class_day cd ON c.class_id = cd.class_id
     JOIN instructors i ON c.instructor_ci = i.instructor_ci
-        WHERE c.class_id = %s
+        WHERE c.class_id = %s AND c.is_deleted = FALSE
     """
     cursor.execute(query, (class_id,))
     data = cursor.fetchall()
@@ -403,6 +407,7 @@ def get_instructor_schedule(instructor_id, turn_id, days_ids):
     JOIN class_day cd ON c.class_id = cd.class_id
     WHERE i.person_id = %s
         AND c.turn_id = %s
+        AND c.is_deleted = FALSE
         AND cd.day_id IN
     """
     
@@ -433,7 +438,7 @@ def can_modify(start_time, end_time, days):
         return True
     
 def get_turn_time(turn_id):
-    query = 'SELECT t.start_time, t.end_time FROM turns as t WHERE t.turn_id = %s'
+    query = 'SELECT t.start_time, t.end_time FROM turns as t WHERE t.turn_id = %s AND t.is_deleted = FALSE'
     cursor.execute(query,(turn_id,))
     data = cursor.fetchall()
     
@@ -442,13 +447,17 @@ def get_turn_time(turn_id):
     return -1
 
 def add_person(person_ci, name, last_name):
-    query = 'SELECT person.person_id FROM person WHERE person_ci = %s'
+    query = 'SELECT person.person_id, person.is_deleted FROM person WHERE person_ci = %s'
     cursor.execute(query, (person_ci,))
     data = cursor.fetchall()
     
     if len(data) > 0:
+        if data[0]['is_deleted'] == 1: # si la persona está eliminada lógicamente
+            update = "UPDATE person SET is_deleted = FALSE WHERE person_ci = %s"
+            cursor.execute(update, (person_ci,))
+            
         return data[0]['person_id']
-    
+            
     insert = 'INSERT INTO person (person_ci, name, last_name) VALUE (%s, %s, %s)'
     cursor.execute(insert, (person_ci, name, last_name))
     result = cursor.rowcount
@@ -458,16 +467,22 @@ def add_person(person_ci, name, last_name):
     return -1
 
 def add_instructor(person_id, instructor_ci, first_name, last_name):
-    query = 'SELECT i.instructor_ci FROM instructors i WHERE i.instructor_ci = %s'
+    query = 'SELECT i.instructor_ci, i.is_deleted FROM instructors i WHERE i.instructor_ci = %s'
     cursor.execute(query, (instructor_ci,))
     data = cursor.fetchall()
     
     if len(data) > 0:
+        if data[0]['is_deleted'] == 1: # si la persona está eliminada lógicamente
+            update = "UPDATE instructors SET is_deleted = FALSE WHERE instructor_ci = %s"
+            cursor.execute(update, (instructor_ci,))
+            cnx.commit()
+            return data[0]['instructor_ci'] 
         return -1, "Ya hay un instructor ingresado con la ci ingresada."
-    
-    insert = "INSERT INTO instructors (person_id, instructor_ci, first_name, last_name) VALUE (%s, %s, %s, %s)"
-    cursor.execute(insert, (person_id, instructor_ci, first_name, last_name))
-    cnx.commit()
+    else:
+        insert = "INSERT INTO instructors (person_id, instructor_ci, first_name, last_name) VALUE (%s, %s, %s, %s)"
+        cursor.execute(insert, (person_id, instructor_ci, first_name, last_name))
+        cnx.commit()
+        
     result = cursor.rowcount
     
     if result > 0:
@@ -475,16 +490,21 @@ def add_instructor(person_id, instructor_ci, first_name, last_name):
     return -1, "Hubo un error al ingresar el instrucor al sistema."
 
 def add_student(person_id, student_ci, first_name, last_name, birth_date):
-    query = 'SELECT s.student_ci FROM students s WHERE s.student_ci = %s'
+    query = 'SELECT s.student_ci, s.is_deleted FROM students s WHERE s.student_ci = %s'
     cursor.execute(query, (student_ci,))
     data = cursor.fetchall()
     
     if len(data) > 0:
-        return -1, "Ya hay un estudiante ingresado con la ci especificada."
-    
-    insert = "INSERT INTO students (person_id, student_ci, first_name, last_name, birth_date) VALUE (%s, %s, %s, %s, %s)"
-    cursor.execute(insert, (person_id, student_ci, first_name, last_name, birth_date))
-    cnx.commit()
+        if data[0]['is_deleted'] == 1: # si la persona está eliminada lógicamente
+            update = "UPDATE students SET is_deleted = FALSE WHERE student_ci = %s"
+            cursor.execute(update, (student_ci,))
+            cnx.commit()
+            return data[0]['student_ci'] 
+        return -1, "Ya hay un estudiante ingresado con la ci ingresada."
+    else:
+        insert = "INSERT INTO students (person_id, student_ci, first_name, last_name, birth_date) VALUE (%s, %s, %s, %s, %s)"
+        cursor.execute(insert, (person_id, student_ci, first_name, last_name, birth_date))
+        cnx.commit()
     result = cursor.rowcount
     
     if result > 0:
@@ -513,6 +533,7 @@ def retrieve_student_classes_by_turn_and_days(student_id, turn_id, days_id, star
             s.person_id = %s
             AND c.turn_id = %s
             AND (c.start_date <= %s and %s <= c.end_date)
+            AND c.is_deleted = FALSE
             AND cd.day_id IN 
     """
     
@@ -530,7 +551,7 @@ def is_student_busy(student_id, turn_id, days_ids, start_date, end_date):
 
 
 def enrolled_students_count(class_id):
-    query = 'SELECT COUNT(*) AS enrolled_students FROM student_class WHERE class_id = %s'
+    query = 'SELECT COUNT(*) AS enrolled_students FROM student_class WHERE class_id = %s AND is_deleted = FALSE'
     cursor.execute(query, (class_id,))
     data = cursor.fetchall()
     
@@ -590,6 +611,7 @@ def get_available_classes(student_ci):
             AND (SELECT COUNT(*) FROM student_class WHERE class_id = c.class_id) < 10)
             OR (c.is_group = FALSE 
             AND (SELECT COUNT(*) FROM student_class WHERE class_id = c.class_id) < 1))
+            AND c.is_deleted = FALSE
             AND c.class_id NOT IN (
                 SELECT class_id 
                 FROM student_class 
@@ -639,11 +661,8 @@ def get_rentable_equipment(class_id):
     SELECT DISTINCT e.description, e.cost, e.equipment_id
     FROM classes c
     JOIN equipment e ON c.activity_id = e.activity_id
-    WHERE c.activity_id = (
-        select c2.activity_id
-        FROM classes c2
-        WHERE c2.class_id = %s
-        );
+    WHERE c.class_id = %s
+    AND c.is_deleted = FALSE
     """
     cursor.execute(query, (class_id, ))
     data = cursor.fetchall()
@@ -679,7 +698,7 @@ def is_student_enrolled(student_ci, class_id):
     query = """
     SELECT sc.student_ci
     FROM student_class sc
-    WHERE sc.student_ci = %s AND sc.class_id = %s
+    WHERE sc.student_ci = %s AND sc.class_id = %s AND sc.is_deleted = FALSE
     """
     cursor.execute(query, (student_ci, class_id))
     data = cursor.fetchall()
@@ -695,13 +714,13 @@ def get_extended_class_info(class_id):
         JOIN activities ON (c.activity_id = activities.activity_id)
         JOIN turns ON (c.turn_id = turns.turn_id)
         JOIN instructors i on (c.instructor_ci = i.instructor_ci)
-    WHERE c.class_id = %s
+    WHERE c.class_id = %s AND c.is_deleted = FALSE
     """
     cursor.execute(query, (class_id, ))
     data = cursor.fetchall()
     
     if len(data) <= 0:
-        return data
+        return -1, "No hay una clase activa con el id especificado."
     
     current_class = data[0]
     current_class['start_time'] = cast_time(current_class['start_time'])
@@ -711,7 +730,7 @@ def get_extended_class_info(class_id):
     current_class["end_date"] = cast_date(current_class["end_date"])
     current_class['is_group'] = current_class['is_group'] == 1
     
-    return data
+    return 1, data
 
 def is_instructor_responsible(class_id, instructor_ci):
     query = """
@@ -719,6 +738,7 @@ def is_instructor_responsible(class_id, instructor_ci):
     FROM classes
     WHERE class_id = %s
     AND instructor_ci = %s
+    AND classes.is_deleted = FALSE
     """
     cursor.execute(query, (class_id, instructor_ci))
     data = cursor.fetchall()
@@ -731,6 +751,7 @@ def get_enrolled_students(class_id):
     FROM students s
     JOIN student_class sc ON s.student_ci = sc.student_ci
     WHERE sc.class_id = %s
+    AND sc.is_deleted = FALSE
     """
     cursor.execute(query, (class_id, ))
     data = cursor.fetchall()
@@ -742,6 +763,7 @@ def get_id_class_session(class_id, date):
     FROM class_session cs
     WHERE cs.class_id = %s
     AND cs.class_date = %s
+    AND cs.is_deleted = FALSE
     """
     cursor.execute(query, (class_id, date))
     data = cursor.fetchall()
@@ -750,7 +772,7 @@ def get_id_class_session(class_id, date):
     return data[0]['id_class_session']
     
 def clase_dictada(id_class_session):
-    update = 'UPDATE class_session SET dictated = %s WHERE id_class_session = %s'
+    update = 'UPDATE class_session SET dictated = %s WHERE id_class_session = %s AND cs.is_deleted = FALSE'
     cursor.execute(update, (True, id_class_session, ))
     cnx.commit() 
     return cursor.rowcount >= 0
@@ -803,7 +825,7 @@ def get_class_calendar(instructor_ci):
     JOIN activities a on a.activity_id = c.activity_id
     JOIN instructors i on i.instructor_ci = c.instructor_ci
     JOIN class_session cs on c.class_id = cs.class_id
-    WHERE i.instructor_ci = %s
+    WHERE i.instructor_ci = %s AND c.is_deleted = FALSE
     """
     cursor.execute(query, (instructor_ci, ))
     data = cursor.fetchall()
@@ -821,7 +843,7 @@ def get_days_from_class(class_info):
     return days
 
 def get_class_data_from_an_instructor(instructor_ci):
-    query = 'SELECT class_id FROM classes WHERE instructor_ci = %s'
+    query = 'SELECT class_id FROM classes WHERE instructor_ci = %s AND is_deleted = FALSE'
     cursor.execute(query, (instructor_ci,))
     data = cursor.fetchall()  
     print(data)
@@ -873,15 +895,15 @@ def add_turn(start_time, end_time):
     
     insert = 'INSERT INTO turns (start_time, end_time) VALUES (%s, %s)'
     cursor.execute(insert, (start_time, end_time))
-    
-    cnx.commit()  
+    cnx.commit()
+
     if cursor.rowcount > 0:
         return 1, "Nuevo turno agregado exitosamente."
     else:
         return -1, "No Fue posible agregar el nuevo turno."
     
 def get_all_turns():
-    query = 'SELECT * FROM turns'
+    query = 'SELECT * FROM turns WHERE is_deleted = FALSE'
     cursor.execute(query)
     turns = cursor.fetchall()
     for turn in turns:
@@ -984,3 +1006,142 @@ def get_class_data():
             id = current_data['class_id']
             classes[id] = get_extended_class_info(id)[0]
         return 1, classes
+
+def delete_student_class_by_class(class_id):
+    update = 'UPDATE student_class SET is_deleted = TRUE WHERE class_id = %s'
+    cursor.execute(update, (class_id,))
+    cnx.commit()
+
+    if cursor.rowcount < 1:
+        return -1, "Hubo un error al eliminar las inscripciones de estudiantes."
+
+def delete_class_session(class_id):
+    update = 'UPDATE class_session SET is_deleted = TRUE WHERE class_id = %s AND dictated = FALSE'
+    cursor.execute(update, (class_id,))
+    cnx.commit()
+
+    if cursor.rowcount < 1:
+        return -1, "Hubo un error al eliminar las sesiones de clase."
+   
+def delete_class(class_id):
+    delete_student_class_by_class(class_id)
+    
+    delete_class_session(class_id)
+    
+    update = 'UPDATE classes SET is_deleted = TRUE WHERE class_id = %s'
+    cursor.execute(update, (class_id,))
+    cnx.commit()
+
+    if cursor.rowcount < 1:
+        return -1, "Hubo un error al eliminar la clase."
+
+    return 1, "Clase eliminada exitosamente."
+
+def delete_class_by_turn(turn_id):
+    select = 'SELECT class_id FROM classes WHERE turn_id = %s AND is_deleted = FALSE'
+    cursor.execute(select, (turn_id,))
+    classes = cursor.fetchall()
+
+    for cls in classes:
+        delete_class(cls['class_id'])
+
+def delete_turn(turn_id):
+    delete_class_by_turn(turn_id)
+    
+    update = 'UPDATE turns SET is_deleted = TRUE WHERE turn_id = %s'
+    cursor.execute(update, (turn_id,))
+    cnx.commit()
+
+    if cursor.rowcount < 1:
+        return -1, "Hubo un error al eliminar el turno."
+
+    return 1, "Turno eliminado exitosamente."
+
+def delete_login(person_ci):
+    update = 'UPDATE login SET is_deleted = TRUE WHERE person_ci = %s'
+    cursor.execute(update, (person_ci, ))
+    cnx.commit()
+    
+    if cursor.rowcount < 0:
+        return -1, "Hubo un error al eliminar la persona."
+    
+def get_rol_by_ci(person_ci):
+    query = """
+    SELECT r.role_name
+    FROM roles r
+    JOIN login l on r.role_id = l.role_id
+    where person_ci = %s AND l.is_deleted = FALSE
+    """
+    cursor.execute(query, (person_ci, ))
+    data = cursor.fetchall()
+    
+    if len(data) > 0:
+        return data[0]
+    return -1    
+    
+####################################################################################################
+
+def delete_student_classes(student_ci):
+    update = 'UPDATE student_class SET is_deleted = TRUE WHERE student_ci = %s'
+    cursor.execute(update, (student_ci,))
+    cnx.commit()
+    
+    if cursor.rowcount < 0:
+        return -1, "Hubo un error al eliminar las inscripciones del estudiante."
+    
+    return 1, "Inscripciones del estudiante eliminadas correctamente."
+
+def delete_student(student_ci):
+    delete_student_classes(student_ci)
+    
+    delete_login(student_ci)
+    
+    update = 'UPDATE students SET is_deleted = TRUE WHERE student_ci = %s'
+    cursor.execute(update, (student_ci,))
+    cnx.commit()
+
+    if cursor.rowcount < 0:
+        return -1, "Hubo un error al eliminar el estudiante."
+    
+    return 1, "Estudiante eliminado correctamente."
+
+def delete_classes_by_instructor(instructor_ci):
+    update = 'UPDATE classes SET is_deleted = TRUE WHERE instructor_ci = %s'
+    cursor.execute(update, (instructor_ci,))
+    cnx.commit()
+    
+    if cursor.rowcount < 0:
+        return -1, "Hubo un error al eliminar las clases asociadas al instructor."
+    
+    return 1, "Clases del instructor eliminadas correctamente."
+
+def delete_instructor(instructor_ci):
+    delete_classes_by_instructor(instructor_ci)
+    
+    delete_login(instructor_ci)
+    
+    update = 'UPDATE instructors SET is_deleted = TRUE WHERE instructor_ci = %s'
+    cursor.execute(update, (instructor_ci,))
+    cnx.commit()
+
+    if cursor.rowcount < 0:
+        return -1, "Hubo un error al eliminar el instructor."
+    
+    return 1, "Instructor eliminado correctamente."
+
+def delete_person(person_ci):
+    update = 'UPDATE person SET is_deleted = TRUE WHERE person_ci = %s'
+    cursor.execute(update, (person_ci, ))
+    cnx.commit()
+    
+    if cursor.rowcount < 0:
+        return -1, "Hubo un error al eliminar la persona."
+    
+    delete_login(person_ci)
+    rol = get_rol_by_ci(person_ci)
+    
+    match rol:
+        case 'instructor':
+            delete_instructor(person_ci)
+        case 'student':
+            delete_student(person_ci)

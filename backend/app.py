@@ -252,17 +252,13 @@ def modify_class(id):
 @app.route('/add_user', methods=['POST']) 
 @jwt_required()
 def add_user():
-    data = request.get_json()
-
     '''
     Cuerpo requerido:
-    {
         ci
         first_name
         last_name
         user_type (instructor / estudiante)
         fecha de nacimiento (si es estudiante)
-    }
     '''
     # primero se verifica que quien intenta crear una clase es el administrador 
     claims = get_jwt()
@@ -279,7 +275,6 @@ def add_user():
     
     if not ci or not first_name or not last_name or not user_type:
         return jsonify({'error': 'Faltan datos obligatorios'}), 400
-
     
     person_id = services.add_person(ci, first_name, last_name) 
     
@@ -326,8 +321,7 @@ def enroll_student(id):
     if role == 'instructor':
         if not services.is_instructor_responsible(id, user_ci):
             return jsonify({"error": "Debes ser el instructor de la clase para agregar alumnos."}), 400   
-    elif role == 'student':
-        if user_ci != student_ci:
+    elif role == 'student' and user_ci != student_ci:
             return jsonify({"error": "Un alumno no puede inscribir a otro"}), 400   
             
     class_info = services.get_basic_class_info(id) 
@@ -439,16 +433,22 @@ def get_equipment_rental(id):
 @jwt_required()
 def get_class_information(id):
     '''
+    devuelve la información detallada de la clase con el id especificado
+    
     este endpoint no requiere un body
     '''
     claims = get_jwt()
     role = services.get_role(claims.get("role_id"))
     user_ci = int(get_jwt_identity() )   
-    class_information = services.get_extended_class_info(id)
+    result, data = services.get_extended_class_info(id)
     
     match role:
         case 'admin':
-            return jsonify(class_information), 200
+            if result > 0:
+                return jsonify(data), 200
+            else:
+                return jsonify({'error': data})
+                
         case 'instructor':
             if not services.is_instructor_responsible(id, user_ci):
                 return jsonify({'error': 'Debe ser instructor responsable de la clase para acceder a la información'}), 400   
@@ -459,7 +459,10 @@ def get_class_information(id):
         case _:
             return jsonify({'error': 'Rol no identificado'}), 400
             
-    return jsonify(class_information), 200
+    if result > 0:
+        return jsonify(data), 200
+    else:
+        return jsonify({'error': data})
     
     
 @app.route('/classes/<int:id>/enrolled-students', methods=['GET']) 
@@ -775,7 +778,58 @@ def get__classes():
         return  jsonify({'msg': data}), 200
     else:
         return jsonify({'error': data}), 400
+
+
+@app.route('/turns/<int:id>/delete-turn', methods=['DELETE']) 
+@jwt_required()
+def delete_turn(id):
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
     
+    if(role != "admin"):
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
+    
+    result, message = services.delete_turn(id)
+    
+    if result > 0: 
+        return jsonify({'msg': message}), 200
+    else:
+        return jsonify({'error': message}), 400 
+    
+
+@app.route('/person/<int:id>/delete-person', methods=['DELETE']) 
+@jwt_required()
+def delete_person(id):
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "admin"):
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
+    
+    result, message = services.delete_person(id)
+    
+    if result > 0: 
+        return jsonify({'msg': message}), 200
+    else:
+        return jsonify({'error': message}), 400 
+    
+
+@app.route('/classes/<int:id>/delete-class', methods=['DELETE']) 
+@jwt_required()
+def delete_class(id):
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "admin"):
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
+    
+    result, message = services.delete_class(id)
+    
+    if result > 0: 
+        return jsonify({'msg': message}), 200
+    else:
+        return jsonify({'error': message}), 400 
+
+
 if __name__ == '__main__':
     app.run(debug=True)
-

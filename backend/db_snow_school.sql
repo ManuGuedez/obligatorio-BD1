@@ -432,6 +432,7 @@ JOIN turns t ON c.turn_id = t.turn_id
 LEFT JOIN student_class sc ON c.class_id = sc.class_id
 WHERE c.is_group = TRUE
     AND (SELECT COUNT(*) FROM student_class WHERE class_id = c.class_id) < 10
+    AND c.is_deleted = FALSE
     AND c.class_id NOT IN (
         SELECT class_id
         FROM student_class
@@ -540,12 +541,81 @@ FROM person WHERE person_ci = 500000005;
 use snowSchool;
 SELECT person_id AS student_id, first_name, last_name FROM students;
 
-SELECT c.start_date, c.end_date, i.first_name as instructor_name, i.last_name as instructor_surname,
-        t.start_time, t.end_time, a.description
-FROM classes c
-JOIN instructors i ON c.instructor_ci = i.instructor_ci
-JOIN turns t ON c.turn_id = t.turn_id
-JOIN activities a ON c.activity_id = a.activity_id
-JOIN student_class sc ON c.class_id = sc.class_id
-WHERE sc.student_ci = 41657890;
+-- tablas con datos eliminables directamente
 
+ALTER TABLE person
+ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE instructors
+ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE students
+ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE turns
+ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE;
+
+-- tablas que por cascade deberían eliminar datos
+
+ALTER TABLE class_day
+ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE class_session
+ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE login
+ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE student_class
+ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE classes
+ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE;
+
+
+
+SELECT r.role_name
+FROM roles r
+JOIN login l on r.role_id = l.role_id
+where person_ci = 35478956
+
+SELECT i.instructor_ci, i.is_deleted FROM instructors i WHERE i.instructor_ci = 36752147
+
+ SELECT DISTINCT e.description, e.cost, e.equipment_id
+    FROM classes c
+    JOIN equipment e ON c.activity_id = e.activity_id
+    WHERE c.activity_id = (
+        select c2.activity_id
+        FROM classes c2
+        WHERE c2.class_id = 1
+
+        );
+
+ SELECT DISTINCT e.description, e.cost, e.equipment_id
+    FROM classes c
+    JOIN equipment e ON c.activity_id = e.activity_id
+    WHERE c.class_id = 1
+        AND c.is_deleted = FALSE
+
+
+SELECT activities.description, turns.start_time, turns.end_time,
+            c.start_date, c.end_date, c.is_group, i.first_name as instructor_first_name,
+            i.last_name as instructor_last_name
+    FROM classes c
+        JOIN activities ON (c.activity_id = activities.activity_id)
+        JOIN turns ON (c.turn_id = turns.turn_id)
+        JOIN instructors i on (c.instructor_ci = i.instructor_ci)
+    WHERE c.class_id = 1 AND c.is_deleted = FALSE
+
+ SELECT s.person_id as student_id, s.first_name, s.last_name
+    FROM students s
+    JOIN student_class sc ON s.student_ci = sc.student_ci
+    WHERE sc.class_id = 1 and sc.is_deleted = false
+
+ SELECT * FROM turns WHERE is_deleted = FALSE
+
+
+SELECT r.role_name
+FROM roles r
+JOIN login l on r.role_id = l.role_id
+where person_ci = 500000005 AND l.is_deleted = FALSE

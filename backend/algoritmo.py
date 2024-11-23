@@ -40,21 +40,3 @@ def generar_calendario(start_date, end_date, dias_clase): #start_date, end_date,
 
         
     return dias_marcados
-
-days = {
-    'lunes': 1,
-    'martes': 2,
-    'miercoles': 3
-}
-
-# fechas = generar_calendario("2024-11-11" ,  "2024-12-11", [1, 3])
-# session_values = ""
-# class_id = 1
-# for fecha in fechas:
-#         id_dia = days.get(fecha[1])
-#         session_values += f"({str(class_id)}, \'{fecha[0]}\', {str(id_dia)}),"
-# session_values = session_values[:-1]
-
-# print(session_values)
-
-print('('+ str([1, 2, 3, 4])[1:-1] + ')')
