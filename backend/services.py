@@ -994,7 +994,7 @@ def get_student_classes(student_ci):
     return result
 
 def get_class_data():
-    query = 'SELECT * FROM classes'
+    query = 'SELECT * FROM classes WHERE is_deleted = FALSE'
     cursor.execute(query)
     data = cursor.fetchall()  
     

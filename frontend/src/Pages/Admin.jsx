@@ -12,6 +12,9 @@ import AddClassModal from "./../Components/Modals/AddClassModal/AddClassModal";
 import AddStudentModal from "./../Components/Modals/AddStudent/AddStudentModal";
 import AddTurnModal from "./../Components/Modals/AddTurnModal/AddTurnModal";
 import DeletePersonModal from "./../Components/Modals/DeletePersonModal/DeletePersonModal";
+import DeleteTurnModal from "./../Components/Modals/DeleteTurnModal/DeleteTurnModal";
+import DeleteClassModal from "./../Components/Modals/DeleteClassModal/DeleteClassModal";
+
 import "./Admin.css";
 
 const Admin = () => {
@@ -26,6 +29,8 @@ const Admin = () => {
     const [showModifyActivity, setShowModifyActivity] = useState(false);
     const [deletePersonIsOpen, setDeletePersonIsOpen] = useState(false);
     const [deleteStudentIsOpen, setDeleteStudentIsOpen] = useState(false);
+    const [deleteTurnIsOpen, setDeleteTurnIsOpen] = useState(false);
+    const [deleteClassIsOpen, setDeleteClassIsOpen] = useState(false);
 
     // // Modal para eliminar un instructor
     // const [showRemoveModal, setShowRemoveModal] = useState(false);
@@ -35,6 +40,8 @@ const Admin = () => {
     // };
 
     // Modal para modificar un turno
+
+
     const [showModifyTurn, setShowModifyTurn] = useState(false);
 
     useEffect(() => {
@@ -79,6 +86,8 @@ const Admin = () => {
                 <div className="admin-card">
                     <h2>Gestión de Turnos y Horarios</h2>
                     <button onClick={() => setAddTurnIsOpen(true)}>Crear Turno</button>
+                    <button onClick={() => setDeleteTurnIsOpen(true)}>Eliminar Turno</button>
+
                     <button onClick={() => setShowModifyTurn(true)}>
                         Modificar Turno
                     </button>
@@ -113,6 +122,7 @@ const Admin = () => {
                     {/* MODIFICAR LOS HANDLERS */}
                     <h2>Gestión de Clases</h2>
                     <button onClick={() => setAddClassIsOpen(true)}>Crear Clase</button>
+                    <button onClick={() => setDeleteClassIsOpen(true)}>Eliminar Clase</button>
                     <button onClick={() => setShowModifyClass(true)}>
                         Modificar Clase
                     </button>
@@ -194,6 +204,14 @@ const Admin = () => {
                     onClose={() => setDeleteStudentIsOpen(false)}
                     personType="student"
                 />
+            )}
+
+            {deleteTurnIsOpen && (
+                <DeleteTurnModal onClose={() => setDeleteTurnIsOpen(false)} />
+            )}
+
+            {deleteClassIsOpen && (
+                <DeleteClassModal onClose={() => setDeleteClassIsOpen(false)} />
             )}
 
 
