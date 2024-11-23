@@ -201,12 +201,12 @@ body {
 /* Ajustes para el texto en el modal */
 .modal-content h3 {
     font-size: 1.5rem;
-    color: #7ba7e4; /* Título con el color principal */
+    color: #f6f8fb; /* Título con el color principal */
     margin-bottom: 0.5rem;
 }
 
 .modal-content p {
-    color: #cbd5e0; /* Color claro para el texto */
+    color: #d8dee5; /* Color claro para el texto */
     margin: 0.5rem 0;
 }
 

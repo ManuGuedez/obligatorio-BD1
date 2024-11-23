@@ -15,7 +15,7 @@ const CalendarioClases = ({ classes }) => {
     // Filtrar clases según la fecha seleccionada
     const classesForSelectedDate = classes.filter(
         (classData) =>
-            new Date(classData.fecha).toDateString() === selectedDate.toDateString()
+            classData.class_date === selectedDate.toISOString().split('T')[0] // Compara solo la parte 'YYYY-MM-DD'
     );
 
     return (
@@ -27,8 +27,9 @@ const CalendarioClases = ({ classes }) => {
                     <ul>
                         {classesForSelectedDate.map((classData, index) => (
                             <li key={index}>
-                                <strong>Deporte:</strong> {classData.deporte} <br />
-                                <strong>Horario:</strong> {classData.horario}
+                                <strong>Deporte:</strong> {classData.description} <br />
+                                <strong>Desde:</strong> {classData.start_time}<br />
+                                <strong>Hasta:</strong> {classData.end_time}
                             </li>
                         ))}
                     </ul>

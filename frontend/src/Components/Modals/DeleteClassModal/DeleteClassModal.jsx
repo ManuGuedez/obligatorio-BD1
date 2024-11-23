@@ -12,6 +12,7 @@ const DeleteClassModal = ({ onClose }) => {
             try {
                 const classesResponse = await ApiService.get("classes", token);
                 console.log("Response from API:", classesResponse);
+                
                 if (classesResponse.code === 200) {
                     const classesDict = classesResponse.data;
                     let fetchedClasses = [];

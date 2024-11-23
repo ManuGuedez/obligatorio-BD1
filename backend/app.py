@@ -76,7 +76,7 @@ def register_user():
     last_name = data.get('last_name')
     email = data.get('email')
     password = data.get('password')
-    
+
     match (rol):
         case 'instructor':
             instructor = {'ci': ci, 'first_name': first_name, 'last_name': last_name}
@@ -122,7 +122,6 @@ def create_class():
     instructor_ci = services.get_person_ci_with_id(instructor_id)
     
     if instructor_ci == -1:
-        print("entre aqui")
         return jsonify({'error': 'No es posible identificar el id del instructor ingresado'}), 400
     
     start_date = data.get('start_date')
@@ -350,7 +349,6 @@ def enroll_student(id):
 @app.route('/classes/<int:id>/remove-student', methods=['DELETE'])
 @jwt_required()   
 def remove_student_from_class(id):
-    print("ID",id)
     '''
     cuerpo requerido:
         - student_id: id del alumno a inscribir
@@ -377,12 +375,10 @@ def remove_student_from_class(id):
     
     
     result, message = services.remove_student_from_class(id, student_ci)
-    print(result)
 
     if result > 0:
         return jsonify({'msg': message}), 200
     else:
-        print("CI ",student_ci)
         return jsonify({'error': message}), 400
 
 
@@ -534,7 +530,26 @@ def get_class_calendar():
     
     return jsonify(instructor_calendar), 200
     
+@app.route('/instructor/class-information', methods=['GET']) 
+@jwt_required()
+def get_instructor_classes():
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
     
+    if(role != "instructor"):
+        return jsonify({'error': 'Debes ser instructor para poder acceder a las clases.'}), 400
+    
+    user_ci = get_jwt_identity()
+    result, data = services.get_class_data_from_an_instructor(user_ci)
+    
+    if result > 0:
+        return jsonify(data), 200
+    elif result == 0:
+        return  jsonify({'msg': data}), 200
+    else:
+        return jsonify({'error': data}), 400
+    
+"""
 @app.route('/instructor/class-information', methods=['GET']) 
 @jwt_required()
 def get_instructor_classes():
@@ -557,7 +572,7 @@ def get_instructor_classes():
     else:
         return jsonify({'error': data}), 400
     
-
+"""
 @app.route('/activities/add-activity', methods=['POST']) 
 @jwt_required()
 def add_activity():
@@ -788,7 +803,6 @@ def get__classes():
         return jsonify({'error': 'Debes ser admin para poder acceder a las clases.'}), 400
     
     result, data = services.get_class_data()
-    print("RESULTADO ", result)
     
     if result > 0:
         return jsonify(data), 200
@@ -818,7 +832,6 @@ def delete_turn(id):
 @app.route('/person/<int:id>/delete-person', methods=['DELETE'])
 @jwt_required()
 def delete_person(id):
-    print("ID",id)  
     claims = get_jwt()
     role = services.get_role(claims.get("role_id"))
     
@@ -826,7 +839,6 @@ def delete_person(id):
         return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
     
     person_ci = services.get_person_ci_with_id(id)
-    print("CI ENDPOINT",person_ci)
     
     if person_ci == int(get_jwt_identity()):  
         return jsonify({'error': 'No es posible borrar el usuario admin.'}), 400
