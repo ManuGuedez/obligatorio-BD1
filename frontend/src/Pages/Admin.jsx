@@ -14,12 +14,14 @@ import AddTurnModal from "./../Components/Modals/AddTurnModal/AddTurnModal";
 import DeletePersonModal from "./../Components/Modals/DeletePersonModal/DeletePersonModal";
 import DeleteTurnModal from "./../Components/Modals/DeleteTurnModal/DeleteTurnModal";
 import DeleteClassModal from "./../Components/Modals/DeleteClassModal/DeleteClassModal";
+import MostStudentsModal from "../Components/Modals/ReportMostStudents/reportMostStudents";
+import MostClassesModal from "../Components/Modals/ReportMostClasses/reportMosTClasses";
+import ReportIncome from "../Components/Modals/ReportIncome/reportIncome";
 
 import "./Admin.css";
 
 const Admin = () => {
     const navigate = useNavigate();
-    const [reports, setReports] = useState({});
     const [addInstructorIsOpen, setAddInstructorIsOpen] = useState(false);
     const [addActivityIsOpen, setAddActivityIsOpen] = useState(false);
     const [addTrunIsOpen, setAddTurnIsOpen] = useState(false);
@@ -31,6 +33,9 @@ const Admin = () => {
     const [deleteStudentIsOpen, setDeleteStudentIsOpen] = useState(false);
     const [deleteTurnIsOpen, setDeleteTurnIsOpen] = useState(false);
     const [deleteClassIsOpen, setDeleteClassIsOpen] = useState(false);
+    const [showMostStudentsModal, setShowMostStudentsModal] = useState(false);
+    const [showMostClassesModal, setShowMostClassesModal] = useState(false);
+    const [showReportIncomeModal, setShowReportIncomeModal] = useState(false);
 
     // // Modal para eliminar un instructor
     // const [showRemoveModal, setShowRemoveModal] = useState(false);
@@ -59,9 +64,7 @@ const Admin = () => {
     const handleRemoveStudent = () => {
         /* Lógica para eliminar alumno */
     };
-    const generateReports = () => {
-        /* Lógica para generar reportes */
-    };
+
     const handleEditInstructor = () => {
         /* Lógica para editar instructor */
     };
@@ -135,22 +138,33 @@ const Admin = () => {
                 {/* Reportes */}
                 <div className="admin-card">
                     <h2>Reportes</h2>
-                    <button onClick={generateReports}>Generar Reportes</button>
-                    <div className="report-content">
-                        {reports.mostPopularActivity && (
-                            <p>Actividad más popular: {reports.mostPopularActivity}</p>
-                        )}
-                        {reports.highestIncomeActivity && (
-                            <p>Actividad con más ingresos: {reports.highestIncomeActivity}</p>
-                        )}
-                        {reports.mostClassesSchedule && (
-                            <p>
-                                Turno con más clases dictadas: {reports.mostClassesSchedule}
-                            </p>
-                        )}
-                    </div>
+                    {/* Botón para generar el reporte de actividad más popular */}
+                    <button onClick={() => setShowMostStudentsModal(true)}>
+                        Actividades con más estudiantes
+                    </button>
+                    {/* Botón para generar el reporte de actividad con más ingresos */}
+                    <button onClick={() => setShowMostClassesModal(true)}>
+                        Turno con más clases dictadas
+                    </button>
+
+                    {/* Botón para generar el reporte del turno con más clases */}
+                    <button onClick={() => setShowReportIncomeModal(true)}>
+                        Actividad con más ingresos
+                    </button>
                 </div>
             </div>
+
+            {showReportIncomeModal && (
+                <ReportIncome onClose={() => setShowReportIncomeModal(false)} />
+            )}
+
+            {showMostClassesModal && (
+                <MostClassesModal onClose={() => setShowMostClassesModal(false)} />
+            )}
+
+            {showMostStudentsModal && (
+                <MostStudentsModal onClose={() => setShowMostStudentsModal(false)} />
+            )}
 
             {addInstructorIsOpen && (
                 <AddNewInstructor onClose={() => setAddInstructorIsOpen(false)} />
