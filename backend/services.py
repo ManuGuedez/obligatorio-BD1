@@ -709,7 +709,7 @@ def get_extended_class_info(class_id):
     query = """
     SELECT activities.description, turns.start_time, turns.end_time,
             c.start_date, c.end_date, c.is_group, i.first_name as instructor_first_name, 
-            i.last_name as instructor_last_name
+            i.last_name as instructor_last_name, c.class_id
     FROM classes c
         JOIN activities ON (c.activity_id = activities.activity_id)
         JOIN turns ON (c.turn_id = turns.turn_id)
