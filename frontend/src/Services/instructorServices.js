@@ -34,6 +34,26 @@ const ServiceInstructor = {
             console.error("Error obteniendo la lista de la clase:", error);
             return { error: "No se pudo obtener la lista de la clase" };
         }
+    },
+    
+    passAttendanceList: async (token, classId, studentsPresent) => {
+        try {
+            if (!classId || !studentsPresent) {
+                throw new Error("El ID de la clase o la lista de asistencia no están definidos.");
+            }
+
+            const response = await ApiService.post(
+                `/classes/${classId}/roll-call`, // Endpoint del backend
+                { students_present: studentsPresent }, // Formato requerido por el backend
+                "application/json",
+                token
+            );
+
+            return response; // Devuelve la respuesta del servidor
+        } catch (error) {
+            console.error("Error pasando la lista de asistencia:", error);
+            return { error: "No se pudo pasar la lista de asistencia" };
+        }
     }
     
 };
