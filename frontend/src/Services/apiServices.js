@@ -12,9 +12,6 @@ const ApiService = {
         };
 
         const api_response = await fetch(`${default_url}/${resource}`, request);
-
-        console.log(`POST: ${api_response.status}, ${api_response.statusText}`);
-
         const response = { code: api_response.status, data: null };
 
         if (api_response.ok)
@@ -24,6 +21,7 @@ const ApiService = {
     },
 
     post: async (resource, data, content_type, token) => {
+    
         const request = {
             method: "POST",
             body: JSON.stringify(data),
@@ -32,18 +30,17 @@ const ApiService = {
                 "Content-Type": `${content_type}`,
             },
         };
-    
+        
+        console.log("HOLA",request);
         const api_response = await fetch(`${default_url}/${resource}`, request);
-        console.log('Request:', request);
-        console.log('Request body:', data);
+        
     
         const response = { code: api_response.status, data: null };
         
-        // Get the response body regardless of status
         const responseBody = await api_response.json();
-        console.log('Response body:', responseBody);
         
         response.data = responseBody;
+        
         return response;
     },
     
@@ -86,6 +83,28 @@ const ApiService = {
         const api_response = await fetch(`${default_url}/${resource}`, request);
 
         console.log(`PUT: ${api_response.status}, ${api_response.statusText}`);
+
+        const response = { code: api_response.status, data: null };
+
+        if (api_response.ok)
+            response.data = await api_response.json();
+
+        return response;
+    },
+
+    patch: async (resource, data, token) => {
+        const request = {
+            method: "PATCH",
+            body: JSON.stringify(data),
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        };
+
+        const api_response = await fetch(`${default_url}/${resource}`, request);
+
+        console.log(`PATCH: ${api_response.status}, ${api_response.statusText}`);
 
         const response = { code: api_response.status, data: null };
 
