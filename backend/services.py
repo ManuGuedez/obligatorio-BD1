@@ -598,12 +598,13 @@ def remove_student_from_class(class_id, student_ci):
 
 def get_available_classes(student_ci):
     query = """
-        SELECT DISTINCT c.class_id, d.day_name, t.start_time, t.end_time
+        SELECT DISTINCT c.class_id, d.day_name, t.start_time, t.end_time, a.description, a.cost
         FROM classes c
         JOIN class_day cd ON c.class_id = cd.class_id
         JOIN days d ON cd.day_id = d.day_id
         JOIN turns t ON c.turn_id = t.turn_id
         LEFT JOIN student_class sc ON c.class_id = sc.class_id
+        JOIN activities a ON c.activity_id = a.activity_id
         WHERE ((c.is_group = TRUE
             AND (SELECT COUNT(*) FROM student_class WHERE class_id = c.class_id) < 10)
             OR (c.is_group = FALSE 
@@ -642,7 +643,7 @@ def get_available_classes(student_ci):
         if not classes.get(class_id):
             end_time = current_class['end_time']
             start_time = current_class['start_time']
-            classes[class_id] = {'class_id': class_id, 'days': [day_name], 'start_time': start_time, 'end_time': end_time}
+            classes[class_id] = {'class_id': class_id, 'days': [day_name], 'start_time': start_time, 'end_time': end_time, 'description': current_class['description'], 'cost': current_class['cost']}
         else:
             c = classes.get(class_id)
             days = c.get("days")
