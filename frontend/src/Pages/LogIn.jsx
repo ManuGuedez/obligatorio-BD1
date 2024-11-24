@@ -48,11 +48,12 @@ const LogIn = () => {
                 localStorage.setItem("token", user.data.access_token); // Guardar el token
                 localStorage.setItem("user", JSON.stringify(user.data.user_data)); // Guardar datos del usuario
                 console.log("Respuesta del servidor:", user);
+                console.log("datos guardados", user.data.user_data)
                 // Redirigir según el rol
                 if (user.data.user.role_id === 1) {
-                    navigate("/instructor");
-                } else if (user.data.user.role_id === 2) {
                     navigate("/alumno");
+                } else if (user.data.user.role_id === 2) {
+                    navigate("/instructor");
                 } else if (user.data.user.role_id === 3) {
                     navigate("/Admin");
                 } else {

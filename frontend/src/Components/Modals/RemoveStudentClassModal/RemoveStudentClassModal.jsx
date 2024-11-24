@@ -22,6 +22,26 @@ const StudentClassesModal = ({ onClose, studentId }) => {
         }
     }, [studentId]);
 
+    const handleDeleteClass = (classId) => {
+        const requestBody = {
+            student_id: studentId
+        };
+        
+        ApiService.delete(`classes/${classId}/remove-student`, token, requestBody)
+            .then(() => {
+                setClasses(classes.filter(c => c.id !== classId));
+                alert('Clase eliminada con éxito');
+                onClose(); // Cierra el modal después del borrado exitoso
+            })
+            .catch(error => {
+                console.log('Error deleting class:', error);
+                alert('Error al eliminar la clase');
+            });
+    };
+    
+
+
+
 
     return (
         <div className={styles.modalOverlay}>
@@ -33,7 +53,13 @@ const StudentClassesModal = ({ onClose, studentId }) => {
                 <div className={styles.modalBody}>
                     <div className={styles.gridContainer}>
                         {classes.map(classItem => (
-                            <div key={classItem.id} className={styles.gridItem}>
+                            <div key={classItem.class_id} className={styles.gridItem}>
+                                <span
+                                    className={styles.deleteButton}
+                                    onClick={() => handleDeleteClass(classItem.class_id)}
+                                >
+                                    ✕
+                                </span>
                                 <h3>{classItem.name}</h3>
                                 <p>{classItem.description}</p>
                             </div>

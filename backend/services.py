@@ -58,10 +58,8 @@ def create_student_account(student, email, password):
     # verificación de que la isnerción fue exitosa
     if result > 0:
         message = 'Usuario creado exitosamente'
-        print(message)
     else:
         message = 'No se pudo crear el usuario'
-        print(message)
 
     # confirma los cambios en la base de datos
     cnx.commit()
@@ -128,10 +126,8 @@ def create_instructor_account(instructor, email, password):
     # verificación de que la isnerción fue exitosa
     if result > 0:
         message = 'Usuario creado exitosamente'
-        print(message)
     else:
         message = 'No se pudo crear el usuario'
-        print(message)
 
     # confirma los cambios en la base de datos
     cnx.commit()
@@ -293,7 +289,7 @@ def is_instructor_busy(instructor_id, turn_id, days_ids, start_date, end_date):
     return len(classes) > 0
 
 def get_person_ci_with_id(person_id):
-    query = 'SELECT person.person_ci FROM person WHERE person_id = %s AND person.is_deleted = FALSE'
+    query = 'SELECT person.person_ci FROM person WHERE person_id = %s' #AND person.is_deleted = FALSE
     cursor.execute(query,(person_id,))
     data = cursor.fetchall()
     
@@ -581,6 +577,7 @@ def add_student_to_class(student_ci, class_id):
     
     
 def remove_student_from_class(class_id, student_ci):
+    
     delete = "DELETE FROM student_class WHERE class_id = %s AND student_ci = %s"
 
     try:
@@ -846,8 +843,7 @@ def get_class_data_from_an_instructor(instructor_ci):
     query = 'SELECT class_id FROM classes WHERE instructor_ci = %s AND is_deleted = FALSE'
     cursor.execute(query, (instructor_ci,))
     data = cursor.fetchall()  
-    print(data)
-    
+        
     if len(data) < 0:
         return -1, "Hubo un error al obtener las clases del instructor."
     elif len(data) == 0:
@@ -1129,7 +1125,6 @@ def delete_instructor(instructor_ci):
     return 1, "Instructor eliminado correctamente."
 
 def delete_person(person_ci):
-    print("CI", person_ci) #LLEGA -1
     update = 'UPDATE person SET is_deleted = TRUE WHERE person_ci = %s'
     cursor.execute(update, (person_ci, ))
     cnx.commit()

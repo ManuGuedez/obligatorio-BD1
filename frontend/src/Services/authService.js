@@ -1,11 +1,16 @@
 import ApiService from "./apiServices";
 
 const AuthService = {
-    register: async (username, email, passwd) => {
+    register: async (formData) => {
         const creds = {
-            username: username,
-            email: email,
-            password: passwd,
+            rol: formData.rol, // Convertir el rol a minúsculas para coincidir con el backend
+            ci: formData.ci,
+            first_name: formData.name,
+            last_name: formData.lastname,
+            email: formData.email,
+            password: formData.password,
+            birth_date: formData.birthday // Solo requerido para estudiantes
+
         };
 
         const registeredUser = await ApiService.post( // Cambiado a 'registeredUser'
@@ -25,7 +30,7 @@ const AuthService = {
 
         const loggedInUser = await ApiService.post( // Cambiado a 'loggedInUser'
             "/login",
-            creds, 
+            creds,
             "application/json"
         );
         return loggedInUser;

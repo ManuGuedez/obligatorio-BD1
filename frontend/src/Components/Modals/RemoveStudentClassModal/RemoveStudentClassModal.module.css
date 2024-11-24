@@ -61,3 +61,16 @@
     background-color: #45a049;
   }
   
+
+  .deleteButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    color: red;
+}
+
+.gridItem {
+    position: relative;
+}

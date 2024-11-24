@@ -1,3 +1,4 @@
+// Admin.js
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AddNewInstructor from "../Components/Modals/AddNewInstructor/AddNewInstructor";
@@ -141,6 +142,72 @@ const Admin = () => {
                         )}
                     </div>
                 </div>
+
+                {addInstructorIsOpen && (
+                    <AddNewInstructor onClose={() => setAddInstructorIsOpen(false)} />
+                )}
+
+                {addClassIsOpen && (
+                    <AddClassModal onClose={() => setAddClassIsOpen(false)} />
+                )}
+
+                {addTrunIsOpen && (
+                    <AddTurnModal onClose={() => setAddTurnIsOpen(false)} />
+                )}
+
+                {showModifyTurn && (
+                    <ModifyTurnModal onClose={() => setShowModifyTurn(false)} />
+                )}
+
+                {addStudentIsOpen && (
+                    <AddStudentModal onClose={() => setAddStudentIsOpen(false)} />
+                )}
+
+                {addActivityIsOpen && (
+                    <AddActivityModal onClose={() => setAddActivityIsOpen(false)} />
+                )}
+
+                {showActivities && (
+                    <ShowActivitiesModal onClose={() => setShowActivities(false)} />
+                )}
+
+                {showModifyActivity && (
+                    <ModifyActivityModal onClose={() => setShowModifyActivity(false)} />
+                )}
+
+                {showModifyClass && (
+                    <ModifyClassModal onClose={() => setShowModifyClass(false)} />
+                )}
+
+                {addStudentToClass && (
+                    <AddStudentToClassModal onClose={() => setAddStudentToClass(false)} />
+                )}
+
+                {deletePersonIsOpen && (
+                    <DeletePersonModal
+                        onClose={() => setDeletePersonIsOpen(false)}
+                        personType="instructor"
+                    />
+                )}
+
+                {deleteStudentIsOpen && (
+                    <DeletePersonModal
+                        onClose={() => setDeleteStudentIsOpen(false)}
+                        personType="student"
+                    />
+                )}
+
+                {deleteTurnIsOpen && (
+                    <DeleteTurnModal onClose={() => setDeleteTurnIsOpen(false)} />
+                )}
+
+                {deleteClassIsOpen && (
+                    <DeleteClassModal onClose={() => setDeleteClassIsOpen(false)} />
+                )}
+
+                {removeStudentClassIsOpen && (
+                    <RemoveStudentClassModal onClose={() => setRemoveStudentClassIsOpen(false)} />
+                )}
             </div>
 
             {addInstructorIsOpen && (
