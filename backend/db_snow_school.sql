@@ -145,18 +145,6 @@ INSERT INTO turns (start_time, end_time) VALUES
 ('12:00:00', '14:00:00'),
 ('16:00:00', '18:00:00');
 
--- INSERT INTO students (student_ci, first_name, last_name, birth_date) VALUES
--- (20000001, 'Lucas', 'Gray', '2005-05-15'),
--- (20000002, 'Olivia', 'Blue', '2003-08-22'),
--- (20000003, 'Noah', 'Black', '2006-01-12'),
--- (20000004, 'Emma', 'Red', '2004-12-30');
-
--- INSERT INTO classes (instructor_ci, activity_id, turn_id) VALUES
--- (10000001, 1, 1),
--- (10000002, 2, 2),
--- (10000003, 3, 3),
--- (10000004, 2, 3);
-
 -- inserción de personas
 INSERT INTO person (person_ci, name, last_name) VALUES
 (43158769, 'Lucas', 'González'), -- id 1
@@ -215,13 +203,6 @@ INSERT INTO classes (instructor_ci, activity_id, turn_id) VALUES
 (37865421, 1, 2), -- Gabriela Díaz, Snowboarding, turno de 12:00 a 14:00
 (43258790, 2, 1); -- Julia Méndez, Skiing, turno de 09:00 a 11:00
 
-
--- INSERT INTO student_class (class_id, student_ci) VALUES
--- (1, 20000001, 1),  -- Lucas Gray takes snowboarding class and rents a snowboard
--- (2, 20000002, 2),  -- Olivia Blue takes skiing class and rents ski set
--- (3, 20000003, 4),  -- Noah Black takes snowmobile class and rents helmet
--- (2, 20000004, 3);  -- Emma Red takes skiing class and rents ski set
-
 INSERT INTO student_class (class_id, student_ci) VALUES
 (1, 43158769), -- Lucas en la clase de Andrés Gutiérrez (Snowboarding, 09:00-11:00)
 (1, 41256398), -- Mariana en la clase de Andrés Gutiérrez (Snowboarding, 09:00-11:00)
@@ -263,25 +244,6 @@ insert into person (person_ci, name, last_name) value
 
 insert into login (email, password, person_ci, role_id) value
 ('ucusnowschool@gmail.com', '@dminSnowSchool', 111111111, 3);
-
-
--- en desuso ---------------------------------------------------------------------------------------------
--- INSERT INTO login (email, password, person_ci) VALUES
--- ('persona1@example.com', 'persona1', 20000001),
--- ('persona2@example.com', 'persona2', 20000002),
--- ('persona3@example.com', 'persona3', 20000003),
--- ('persona4@example.com', 'persona4', 20000004);
-
-SELECT login.person_ci FROM login WHERE login.email = 'manuela@example.com' AND login.password = 'manu1234';
-
-SELECT login.email, activities.description, turns.start_time, turns.end_time
-FROM classes
-    JOIN activities ON (classes.activity_id = activities.activity_id)
-    JOIN turns ON (classes.turn_id = turns.turn_id)
-    JOIN login ON (classes.instructor_ci = login.person_ci)
-WHERE classes.class_id = 1;
--- -------------------------------------------------------------------------------------------------------
-
 
 ALTER TABLE classes
 ADD COLUMN start_date DATE;
@@ -498,13 +460,6 @@ AND cs.class_date = '2024-11-15';
 
 update classes set classes.end_date = '2024-11-14' WHERE class_id = 5;
 
--- insert into student_class (class_id, student_ci) values
--- (13, 44751236), -- Rodrigo en la clase de Julia Méndez (Skiing, 09:00-11:00)
--- (13, 41657890); -- Paula en la clase de Julia Méndez (Skiing, 09:00-11:00)
-
--- INSERT INTO class_attendance (id_class_session, student_id, attended) VALUES
--- (13, 12, TRUE);
-
 SELECT c.class_id, c.start_date, c.end_date, a.description, t.start_time, t.end_time, cs.class_date
 FROM classes c
 JOIN turns t on c.turn_id = t.turn_id
@@ -535,11 +490,6 @@ WHERE
     AND (c.start_date <= '2024-12-20' AND '2024-12-02' <= c.end_date );
     --                  fecha inicio                fecha fin
 
-SELECT person_id, name AS first_name, last_name
-FROM person WHERE person_ci = 500000005;
-
-use snowSchool;
-SELECT person_id AS student_id, first_name, last_name FROM students;
 
 -- tablas con datos eliminables directamente
 
@@ -572,52 +522,11 @@ ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE;
 ALTER TABLE classes
 ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE;
 
+-- Creación de usuario para realizar unicamente operaciones de CRUD desde la app
+CREATE USER 'app_user'@'%' IDENTIFIED BY 'obligatorio_bd1';
 
-SELECT person.person_ci FROM person WHERE person_id = 23 AND person.is_deleted = FALSE;
+-- Se otorgan permisos de CRUD sobre todas las tablas de la bd del proyecto
+GRANT SELECT, INSERT, UPDATE, DELETE ON snowSchool.* TO 'app_user'@'%';
+FLUSH PRIVILEGES;
 
-
-SELECT r.role_name
-FROM roles r
-JOIN login l on r.role_id = l.role_id
-where person_ci = 35478956
-
-SELECT i.instructor_ci, i.is_deleted FROM instructors i WHERE i.instructor_ci = 36752147
-
- SELECT DISTINCT e.description, e.cost, e.equipment_id
-    FROM classes c
-    JOIN equipment e ON c.activity_id = e.activity_id
-    WHERE c.activity_id = (
-        select c2.activity_id
-        FROM classes c2
-        WHERE c2.class_id = 1
-
-        );
-
- SELECT DISTINCT e.description, e.cost, e.equipment_id
-    FROM classes c
-    JOIN equipment e ON c.activity_id = e.activity_id
-    WHERE c.class_id = 1
-        AND c.is_deleted = FALSE
-
-
-SELECT activities.description, turns.start_time, turns.end_time,
-            c.start_date, c.end_date, c.is_group, i.first_name as instructor_first_name,
-            i.last_name as instructor_last_name
-    FROM classes c
-        JOIN activities ON (c.activity_id = activities.activity_id)
-        JOIN turns ON (c.turn_id = turns.turn_id)
-        JOIN instructors i on (c.instructor_ci = i.instructor_ci)
-    WHERE c.class_id = 1 AND c.is_deleted = FALSE
-
- SELECT s.person_id as student_id, s.first_name, s.last_name
-    FROM students s
-    JOIN student_class sc ON s.student_ci = sc.student_ci
-    WHERE sc.class_id = 1 and sc.is_deleted = false;
-
- SELECT * FROM turns WHERE is_deleted = FALSE;
-
-
-SELECT r.role_name
-FROM roles r
-JOIN login l on r.role_id = l.role_id
-where person_ci = 500000005 AND l.is_deleted = FALSE
+SHOW GRANTS FOR 'app_user'@'%';

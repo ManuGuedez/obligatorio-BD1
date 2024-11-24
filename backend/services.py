@@ -1,6 +1,6 @@
 import mysql.connector as mysql
 
-cnx = mysql.connect(user='root', password='rootpassword', host='127.0.0.1', database='snowSchool') #host.docker.internal #mysql
+cnx = mysql.connect(user='app_user', password='obligatorio_bd1', host='127.0.0.1', database='snowSchool') 
 cursor = cnx.cursor(dictionary=True) # devuelve la info en formato key-value
 from mysql.connector.errors import IntegrityError
 import algoritmo
@@ -856,7 +856,7 @@ def get_class_data_from_an_instructor(instructor_ci):
         classes = dict()
         for current_data in data:
             id = current_data['class_id']
-            classes[id] = get_extended_class_info(id)[0]
+            classes[id] = get_extended_class_info(id)[1][0]
         return 1, classes
     
 def add_activity(description, cost):
@@ -1003,7 +1003,7 @@ def get_class_data():
         classes = dict()
         for current_data in data:
             id = current_data['class_id']
-            classes[id] = get_extended_class_info(id)[0]
+            classes[id] = get_extended_class_info(id)[1][0]
         return 1, classes
 
 def delete_student_class_by_class(class_id):
