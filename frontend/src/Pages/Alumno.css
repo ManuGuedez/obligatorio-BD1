@@ -11,6 +11,7 @@
 
 /* Estilos generales */
 .alumno-container {
+    margin-top: 2rem; /* Ajusta este valor para mayor separación */
     padding: 1rem;
     display: flex;
     flex-direction: column;
@@ -22,9 +23,17 @@
 
 /* Título */
 .actividades-title {
-    font-size: 2rem;
+    font-size: 2.5rem; /* Aumenta el tamaño del título */
     color: #edeff3;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem; /* Mayor separación debajo del título */
+    text-align: center;
+}
+
+/* Título "Mis clases" */
+.mis-clases-title {
+    font-size: 2.5rem; /* Mismo tamaño que "Actividades disponibles" */
+    color: #edeff3;
+    margin-bottom: 1.5rem; /* Ajuste de separación */
     text-align: center;
 }
 
@@ -58,7 +67,6 @@
     max-width: 1200px;
     padding: 0 1rem;
 }
-
 
 /* Tarjeta de actividad */
 .activity-card {
@@ -164,16 +172,18 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: #2c5282;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    background-color: #b91a74;
+
 }
 
 .modal-content {
-    background-color: #2d3748; /* Fondo oscuro */
-    color: #e4e6e8; /* Texto claro */
+    background-color: #7675c0; /* Fondo celeste igual al de las tarjetas */
+    color: #b91a74; /* Texto en negro */
     padding: 1.5rem;
     border-radius: 8px;
     max-width: 500px;
@@ -189,43 +199,34 @@ body {
     right: 10px;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #e4e6e8; /* Color claro para que sea visible en el fondo oscuro */
+    color: black; /* Ícono de cerrar en negro */
     background-color: transparent;
     border: none;
 }
 
 .close-btn:hover {
-    color: #7ba7e4; /* Cambia el color al pasar el mouse */
+    color: #4a4e8c; /* Cambia el color al pasar el mouse */
 }
 
 /* Ajustes para el texto en el modal */
 .modal-content h3 {
     font-size: 1.5rem;
-    color: #f6f8fb; /* Título con el color principal */
+    color:#2c5282; /* Títulos en negro */
     margin-bottom: 0.5rem;
 }
 
 .modal-content p {
-    color: #d8dee5; /* Color claro para el texto */
+    color: #2c5282; /* Texto descriptivo en negro */
     margin: 0.5rem 0;
 }
 
 
-.close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #333;
-}
-
-/* Resto de estilos (actividades, botones, contenedores) */
 .activities-container {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
     justify-content: center;
+    margin-bottom: 50px;
 }
 
 .activity-card {
@@ -261,3 +262,11 @@ body {
     background-color: #1a365d;
 }
 
+/* Ajuste para separar "Mis Clases:" de las tarjetas */
+.mis-clases-title {
+    font-size: 2.5rem; /* Mantener el tamaño */
+    color: #edeff3;
+    margin-top: 3rem; /* Aumentar espacio superior */
+    margin-bottom: 1.5rem; /* Mantener espacio inferior */
+    text-align: center;
+}

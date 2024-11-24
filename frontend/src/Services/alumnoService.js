@@ -20,6 +20,16 @@ const alumnoService = {
             throw err;
         }
     },
+    enrollStudent: async (classId, studentId, token) => {
+        try {
+            const body = { student_id: studentId };
+            const response = await ApiService.post(`classes/${classId}/enroll-student`, body, "application/json", token);
+            return response;
+        } catch (err) {
+            console.error("Error al inscribir al estudiante:", err);
+            throw err;
+        }
+    },    
 };
 
 export default alumnoService;

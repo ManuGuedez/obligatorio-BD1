@@ -3,7 +3,6 @@ import './Actividad.css';
 
 const Actividad = ({ activity, openModal, toggleEnrollment, enrolledActivities }) => {
     const [hasEquipment, setHasEquipment] = useState(false);
-
     const handleEquipmentToggle = () => {
         setHasEquipment(!hasEquipment);
     };
@@ -17,11 +16,12 @@ const Actividad = ({ activity, openModal, toggleEnrollment, enrolledActivities }
             <button
                 className={`enroll-btn ${enrolledActivities.includes(activity.id) ? 'enrolled' : ''}`}
                 onClick={() => toggleEnrollment(activity.id)}
+                disabled={enrolledActivities.includes(activity.id)} // deshabilitar si ya está inscrito
             >
                 {enrolledActivities.includes(activity.id) ? 'Darme de baja' : 'Inscribirme'}
             </button>
 
-            {/* Switch con texto a la izquierda */}
+
             <div className="equipment-switch">
                 <span className="equipment-label">Necesito equipamiento</span>
                 <label className="switch">
@@ -34,7 +34,6 @@ const Actividad = ({ activity, openModal, toggleEnrollment, enrolledActivities }
                 </label>
             </div>
 
-            {/* Mostrar mensaje de alquiler de equipamiento si el switch está activado */}
             {hasEquipment && (
                 <p className="equipment-rental-text">
                     Alquiler del equipamiento: ${activity.price}

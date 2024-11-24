@@ -3,11 +3,12 @@
 }
 
 .clase-card {
-    border: 1px solid #ddd;
     padding: 15px;
     margin-bottom: 10px;
     border-radius: 5px;
-    background-color: #f9f9f9;
+    box-shadow: 45px;
+    background-color: #7675c0;
+    color: rgb(43, 43, 100);
 }
 
 .clase-card h4 {

@@ -1,25 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import Actividad from '../Components/Actividad';
-import ClasesAlumno from '../Components/ClasesAlumno'; // Importamos el nuevo componente
+import ClasesAlumno from '../Components/ClasesAlumno'; 
 import alumnoService from '../Services/alumnoService';
 import './Alumno.css';
 
 const Alumno = () => {
-    const [activities, setActivities] = useState([]); // Estado para actividades
-    const [studentClasses, setStudentClasses] = useState([]); // Estado para clases del estudiante
-    const [isLoading, setIsLoading] = useState(true); // Estado para la carga
-    const [error, setError] = useState(null); // Estado para errores
+    const [activities, setActivities] = useState([]); 
+    const [studentClasses, setStudentClasses] = useState([]); 
+    const [isLoading, setIsLoading] = useState(true); 
+    const [error, setError] = useState(null); 
 
     const [showModal, setShowModal] = useState(false);
     const [selectedActivity, setSelectedActivity] = useState(null);
-    const [enrolledActivities, setEnrolledActivities] = useState([]); // Inscripciones
+    const [enrolledActivities, setEnrolledActivities] = useState([]); 
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const token = localStorage.getItem('token');
 
-                // Cargar actividades disponibles
+                // lo uso para cargar actividades disponibles
                 const activitiesResponse = await alumnoService.getAlumnos(token);
                 if (activitiesResponse && activitiesResponse.code === 200 && Array.isArray(activitiesResponse.data)) {
                     console.log("Actividades recibidas:", activitiesResponse.data);
@@ -65,13 +65,31 @@ const Alumno = () => {
         }
     };
 
-    const toggleEnrollment = (activityId) => {
+    const toggleEnrollment = async (activityId) => {
+        
+        const token = localStorage.getItem('token');
+        const studentId = JSON.parse(atob(token.split('.')[1])).sub;
+    
         if (enrolledActivities.includes(activityId)) {
             setEnrolledActivities(enrolledActivities.filter(id => id !== activityId));
         } else {
-            setEnrolledActivities([...enrolledActivities, activityId]);
+            try {
+                console.log({activityId, studentId,    token});
+                const response = await alumnoService.enrollStudent(activityId, studentId, token);
+                if (response && response.code === 200) {
+                    console.log('Inscripción exitosa:', response.msg);
+                    setEnrolledActivities([...enrolledActivities, activityId]);
+                } else {
+                    console.error('Error al inscribir:', response.error);
+                    setError('No se pudo inscribir en la clase. Intente de nuevo.');
+                }
+            } catch (err) {
+                console.error('Error al inscribir:', err);
+                setError('Error en la inscripción.');
+            }
         }
     };
+    
 
     if (isLoading) return <p>Cargando actividades y clases...</p>;
     if (error) return <p>{error}</p>;
@@ -84,13 +102,13 @@ const Alumno = () => {
             <div className="activities-container">
                 {Array.isArray(activities) && activities.map((activity) => (
                     <Actividad
-                        key={activity.class_id} // Usar class_id como key
+                        key={activity.class_id} // uso class_id como key
                         activity={{
                             id: activity.class_id,
-                            name: activity.activity_title || activity.activity_description || "Sin descripción", // Mostrar título o descripción
-                            shortDescription: activity.activity_description, // Descripción breve
-                            schedule: `${activity.start_time} - ${activity.end_time}`, // Horario
-                            price: activity.cost || 0 // Precio del equipamiento
+                            name: activity.description || "Sin descripción", 
+                            shortDescription: activity.description, 
+                            schedule: `${activity.days.join(", ")}: ${activity.start_time} - ${activity.end_time}`, 
+                            price: activity.cost || 0 
                         }}
                         openModal={openModal}
                         toggleEnrollment={toggleEnrollment}
@@ -102,9 +120,8 @@ const Alumno = () => {
             <div className="clases-header">
                 <h2 className="clases-title">Mis Clases:</h2>
             </div>
-            <ClasesAlumno clases={studentClasses} /> {/* Agregar las clases del estudiante */}
+            <ClasesAlumno clases={studentClasses} /> {/* agregar las clases del estudiante */}
 
-            {/* Modal de Detalles */}
             {showModal && selectedActivity && (
                 <div className="modal-overlay" onClick={handleOverlayClick}>
                     <div className="modal-content">
