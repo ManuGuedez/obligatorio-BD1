@@ -56,7 +56,7 @@
 
 .modalFooter {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 10px;
     margin-top: 20px;
 }
@@ -78,4 +78,31 @@
     background-color: #f44336;
     color: white;
     border: none;
+}
+
+.checkboxContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    /* Espacio entre los checkboxes */
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    /* Tamaño de texto pequeño */
+    margin: 0;
+    padding: 2px 5px;
+    /* Reduce el espacio interno */
+    cursor: pointer;
+    /* Cambia el cursor para indicar que es interactivo */
+}
+
+.checkboxLabel input[type="checkbox"] {
+    margin-right: 5px;
+    /* Espacio entre el checkbox y el texto */
+    width: 14px;
+    /* Tamaño del checkbox */
+    height: 14px;
 }
