@@ -20,6 +20,7 @@ import RemoveStudentClassModal from "./../Components/Modals/RemoveStudentClassMo
 import MostStudentsModal from "../Components/Modals/ReportMostStudents/reportMostStudents";
 import MostClassesModal from "../Components/Modals/ReportMostClasses/reportMosTClasses";
 import ReportIncome from "../Components/Modals/ReportIncome/reportIncome";
+import ModifyInstructorModal from "../Components/Modals/ModifyInstructor/ModifyInstructor";
 
 import "./Admin.css";
 
@@ -41,7 +42,7 @@ const Admin = () => {
   const [showMostStudentsModal, setShowMostStudentsModal] = useState(false);
   const [showMostClassesModal, setShowMostClassesModal] = useState(false);
   const [showReportIncomeModal, setShowReportIncomeModal] = useState(false);
-
+  const [showModifyInstructor, setShowModifyInstructor] = useState(false);
   // // Modal para eliminar un instructor
   // const [showRemoveModal, setShowRemoveModal] = useState(false);
   // const handleCloseRemoveModal = () => setShowRemoveModal(false);
@@ -88,7 +89,7 @@ const Admin = () => {
             <button onClick={() => setAddInstructorIsOpen(true)}>
               Agregar Instructor
             </button>
-            <button onClick={handleEditInstructor}>Modificar Instructor</button>{" "}
+            <button onClick={() => setShowModifyInstructor(true)}>Modificar Instructor</button>{" "}
             <button onClick={() => setDeletePersonIsOpen(true)}>
               Eliminar Instructor
             </button>
@@ -341,6 +342,10 @@ const Admin = () => {
         <RemoveStudentClassModal
           onClose={() => setRemoveStudentClassIsOpen(false)}
         />
+      )}
+
+      {showModifyInstructor && (
+        <ModifyInstructorModal onClose={() => setShowModifyInstructor(false)} />
       )}
     </div>
   );

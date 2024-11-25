@@ -924,6 +924,72 @@ def report_most_classes():
     else:
         return jsonify({"error": results}), 404
 
+@app.route('/instructor/<int:id>/modify-instructor', methods=['PATCH'])
+@jwt_required()
+def modify_instructor(id): 
+    '''
+    cuerpo requerido: (al menos uno de los siguientes)
+        - name
+        - last_name
+    '''
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+
+    if(role != "admin"):
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
+    
+    data = request.get_json()
+    name = data.get('name')
+    last_name = data.get('last_name')
+    if not name and not last_name:
+        return jsonify({'error': 'Debe proporcionar al menos un campo a modificar.'}), 400
+    instructor_ci = services.get_person_ci_with_id(id)
+    print("name", name)
+    print("last_name", last_name)
+    if name:
+        result, message = services.modify_instructor_name(instructor_ci, name)
+        if result < 0:
+                return jsonify({'error': message}), 400
+            
+    if last_name:
+        result, message = services.modify_instructor_last_name(instructor_ci, last_name)
+        if result < 0:
+                return jsonify({'error': message}), 400
+    
+    return jsonify({'msj': 'Instructor modificado exitosamente'}), 200
+
+
+@app.route('/student/<int:id>/modify-student', methods=['PATCH'])
+@jwt_required()
+def modify_student(id):
+    '''
+    cuerpo requerido: (al menos uno de los siguientes)
+        - name
+        - last_name
+    '''
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    if(role != "admin"):
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
+
+    data = request.get_json()
+    name = data.get('name')
+    last_name = data.get('last_name')
+    if not name and not last_name:
+        return jsonify({'error': 'Debe proporcionar al menos un campo a modificar.'}), 400
+    student_ci = services.get_person_ci_with_id(id)
+
+    if name:
+        result, message = services.modify_student_name(student_ci, name)
+        if result < 0:
+                return jsonify({'error': message}), 400
+
+    if last_name:
+        result, message = services.modify_student_last_name(student_ci, last_name)
+        if result < 0:
+                return jsonify({'error': message}), 400
+
+    return jsonify({'msj': 'Estudiante modificado exitosamente'}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
