@@ -44,4 +44,48 @@ El servidor del frontend se levantará, y estará disponible en el puerto config
 
 ## Descripción de la Aplicación
 
-La aplicación está penada para tres vistas dependiendo del rol del usuario logueado (continuar). 
+La aplicación está pensada para tres vistas dependiendo del rol del usuario logueado.
+
+### Administrador de la Plataforma:
+
+El Administrador tiene acceso completo a la gestión de la plataforma y puede realizar las siguientes acciones:
+
+1. **Gestión de Instructores y Alumnos**: Alta, baja y modificación (ABM).
+2. **Asignación de Alumnos a Clases**: Agregar o eliminar alumnos en clases específicas.
+3. **Gestión de Turnos**: ABM de turnos disponibles.
+4. **Creación y Eliminación de Clases.**
+5. **Visualización de Actividades**: Listar todas las actividades con información detallada.
+6. **Generación de Reportes**: Estadísticas de inscripciones y clases dictadas.
+
+#### Baja de Instructores y Alumnos:
+
+El proceso de baja de instructores y alumnos se realiza mediante borrado lógico.
+En el sistema, se asigna un valor a una variable:
+  1: Indica que el instructor o alumno ha sido dado de baja.
+  0: Indica que el instructor o alumno está activo.
+
+### Instructor
+Un instructor puede realizar las siguientes tareas:
+
+1. **Ver Clases Asignadas**: Información detallada de clases del día (actividad, horario, días).
+2. **Marcar Asistencia**: Registrar asistencia de alumnos y marcar la clase como dictada.
+3. **Acceder a su Calendario**: Visualizar clases asignadas según la fecha.
+
+### Alumno
+Un alumno tiene acceso a las siguientes funcionalidades:
+
+1. **Visualizar Clases Disponibles**: Según los horarios disponibles.
+2. **Inscribirse en Cursos Recomendados**.
+3. **Consultar Cursos Inscritos**: Con información detallada.
+4. **Darse de Baja de Cursos**.
+5. **Alquiler de Equipamiento**: Basado en las clases inscritas.
+
+
+#### Creación de cuentas y roles
+
+Para ingresar al sistema como usuario, es necesario que primero el administrador registre a la persona en el sistema, asignándole un rol específico.
+
+Una vez registrada, la persona puede crear su cuenta y establecer sus credenciales de acceso.
+
+Esta lógica se implementa porque consideramos que corresponde al administrador del sistema habilitar a los usuarios. Sin embargo, permitir que el administrador cree las cuentas iniciales implicaría asignar contraseñas, las cuales deberían ser cambiadas posteriormente por los usuarios. Por ello, y dado el alcance del proyecto, decidimos implementar un sistema donde los propios usuarios puedan crear sus cuentas, restringiendo esta funcionalidad únicamente a quienes ya hayan sido previamente registrados por el administrador.
+
