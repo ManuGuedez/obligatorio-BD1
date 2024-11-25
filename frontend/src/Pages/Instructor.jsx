@@ -3,8 +3,11 @@ import './Instructor.css';
 import Clases from "../Components/Clases";
 import CalendarioClases from '../Components/CalendarioClases';
 import ServiceInstructor from '../Services/instructorServices';
+import NavBar from '../Components/NavBar';
+import { useNavigate } from 'react-router-dom';
 
 const Instructor = () => {
+    const navigate = useNavigate();
     const [classes, setClasses] = useState([]);
     const [infoTodayClasses, setInfoTodayClasses] = useState([]);
     const [error, setError] = useState("");
@@ -90,6 +93,7 @@ const Instructor = () => {
 
     return (
         <div className="instructor-dashboard">
+            <NavBar />  
             <div className='instructor-dashboard2'>
                 <div className='instructor'>
                     <div className="encabezadoInstructor">

@@ -31,10 +31,8 @@ const ApiService = {
             },
         };
         
-        console.log("HOLA",request,resource);
         const api_response = await fetch(`${default_url}/${resource}`, request);
         
-        console.log("HOLA",api_response);
     
         const response = { code: api_response.status, data: null };
         
@@ -45,25 +43,25 @@ const ApiService = {
         return response;
     },
     
-
     delete: async (resource, token) => {
+        console.log(resource);
         const request = {
             method: "DELETE",
             headers: {
                 "Authorization": `Bearer ${token}`,
             },
         };
-        console.log('Request payload:', JSON.stringify(newInstructor, null, 2));
 
         const api_response = await fetch(`${default_url}/${resource}`, request);
-
-        const errorBody = await api_response.json();
-        console.log('Error details:', errorBody);
-
 
         console.log(`DELETE: ${api_response.status}, ${api_response.statusText}`);
 
         const response = { code: api_response.status, data: null };
+
+
+
+       
+
 
         if (api_response.ok)
             response.data = await api_response.json();
@@ -85,8 +83,6 @@ const ApiService = {
 
         console.log(`PUT: ${api_response.status}, ${api_response.statusText}`);
 
-        const response = { code: api_response.status, data: null };
-
         if (api_response.ok)
             response.data = await api_response.json();
 
@@ -104,7 +100,6 @@ const ApiService = {
         };
 
         const api_response = await fetch(`${default_url}/${resource}`, request);
-
         console.log(`PATCH: ${api_response.status}, ${api_response.statusText}`);
 
         const response = { code: api_response.status, data: null };

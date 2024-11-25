@@ -117,7 +117,7 @@ def create_class():
     
     # en caso de que sea el adminsitrador
     data = request.get_json()
-    print(data)
+
     instructor_id = data.get('instructor_id')
     instructor_ci = services.get_person_ci_with_id(instructor_id)
     if instructor_ci == -1:
@@ -204,6 +204,8 @@ def modify_class(id):
         return jsonify({'error': 'Es necesario ingresar turno a modificar o instructor'}), 400  
         
     current_class_instructor = class_info[0]['instructor_id']
+    result = -1
+    message = "Hubo un error."
     
     # si lo que se intenta modificar es el turno de la clase
     if turn_id and instructor_id == int(current_class_instructor):
@@ -228,18 +230,20 @@ def modify_class(id):
     if result > 0: 
         if is_instructor_modified:
             class_information = services.get_class_information_for_instructor(id)
-            description = class_information["description"]
-            start_time = class_information["start_time"]
-            end_time = class_information["end_time"]
             
-            # estoy sacando el email del login, deberíamos tenerlo guardado en instructor o persona
-            email = class_information["instructor_email"] 
-            
-            subject = "Nueva clase para dictar como instructor"
-            content = f"Has sido asingado para dictar {description} desde {start_time} hasta {end_time}" # agergar info de los días
-            
-            smtp.send_email("manuelaguedez18@gmail.com", subject, email + ": " + content) # para testear que el mensaje llega correctamente
-            smtp.send_email(email, subject, content)
+            if class_information != -1:          
+                description = class_information["description"]
+                start_time = class_information["start_time"]
+                end_time = class_information["end_time"]
+                
+                # estoy sacando el email del login, deberíamos tenerlo guardado en instructor o persona
+                email = class_information["instructor_email"] 
+                
+                subject = "Nueva clase para dictar como instructor"
+                content = f"Has sido asingado para dictar {description} desde {start_time} hasta {end_time}" # agergar info de los días
+                
+                smtp.send_email("manuelaguedez18@gmail.com", subject, email + ": " + content) # para testear que el mensaje llega correctamente
+                smtp.send_email(email, subject, content)
         return jsonify({'msg': message}), 200
     else:
         return jsonify({'error': message}), 400
@@ -248,17 +252,13 @@ def modify_class(id):
 @app.route('/add_user', methods=['POST']) 
 @jwt_required()
 def add_user():
-    data = request.get_json()
-
     '''
     Cuerpo requerido:
-    {
         ci
         first_name
         last_name
         user_type (instructor / estudiante)
         fecha de nacimiento (si es estudiante)
-    }
     '''
     # primero se verifica que quien intenta crear una clase es el administrador 
     claims = get_jwt()
@@ -275,7 +275,6 @@ def add_user():
     
     if not ci or not first_name or not last_name or not user_type:
         return jsonify({'error': 'Faltan datos obligatorios'}), 400
-
     
     person_id = services.add_person(ci, first_name, last_name) 
     
@@ -322,8 +321,7 @@ def enroll_student(id):
     if role == 'instructor':
         if not services.is_instructor_responsible(id, user_ci):
             return jsonify({"error": "Debes ser el instructor de la clase para agregar alumnos."}), 400   
-    elif role == 'student':
-        if user_ci != student_ci:
+    elif role == 'student' and user_ci != student_ci:
             return jsonify({"error": "Un alumno no puede inscribir a otro"}), 400   
             
     class_info = services.get_basic_class_info(id) 
@@ -435,16 +433,22 @@ def get_equipment_rental(id):
 @jwt_required()
 def get_class_information(id):
     '''
+    devuelve la información detallada de la clase con el id especificado
+    
     este endpoint no requiere un body
     '''
     claims = get_jwt()
     role = services.get_role(claims.get("role_id"))
     user_ci = int(get_jwt_identity() )   
-    class_information = services.get_extended_class_info(id)
+    result, data = services.get_extended_class_info(id)
     
     match role:
         case 'admin':
-            return jsonify(class_information), 200
+            if result > 0:
+                return jsonify(data), 200
+            else:
+                return jsonify({'error': data})
+                
         case 'instructor':
             if not services.is_instructor_responsible(id, user_ci):
                 return jsonify({'error': 'Debe ser instructor responsable de la clase para acceder a la información'}), 400   
@@ -455,7 +459,10 @@ def get_class_information(id):
         case _:
             return jsonify({'error': 'Rol no identificado'}), 400
             
-    return jsonify(class_information), 200
+    if result > 0:
+        return jsonify(data), 200
+    else:
+        return jsonify({'error': data})
     
     
 @app.route('/classes/<int:id>/enrolled-students', methods=['GET']) 
@@ -768,6 +775,153 @@ def modify_turn(id):
     else:
         return jsonify({'error': message}), 400  
     
+    
+@app.route('/classes', methods=['GET']) 
+@jwt_required()
+def get__classes():
+    '''
+    devuelve información detallada de todas las clases ingresadas en el sistema
+    '''
+
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "admin"):
+        return jsonify({'error': 'Debes ser admin para poder acceder a las clases.'}), 400
+    
+    result, data = services.get_class_data()
+    
+    if result > 0:
+        return jsonify(data), 200
+    elif result == 0:
+        return  jsonify({'msg': data}), 200
+    else:
+        return jsonify({'error': data}), 400
+
+
+@app.route('/turns/<int:id>/delete-turn', methods=['DELETE']) 
+@jwt_required()
+def delete_turn(id):
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "admin"):
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
+    
+    result, message = services.delete_turn(id)
+    
+    if result > 0: 
+        return jsonify({'msg': message}), 200
+    else:
+        return jsonify({'error': message}), 400 
+    
+
+@app.route('/person/<int:id>/delete-person', methods=['DELETE'])
+@jwt_required()
+def delete_person(id):
+    print("ID",id)  
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "admin"):
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
+    
+    person_ci = services.get_person_ci_with_id(id)
+    print("CI ENDPOINT",person_ci)
+    
+    if person_ci == int(get_jwt_identity()):  
+        return jsonify({'error': 'No es posible borrar el usuario admin.'}), 400
+    
+    result, message = services.delete_person(person_ci)
+    
+    if result:
+        return jsonify({'message': 'Person deleted successfully'}), 200
+    else:
+        return jsonify({'error': message}), 400
+
+    
+
+@app.route('/classes/<int:id>/delete-class', methods=['DELETE']) 
+@jwt_required()
+def delete_class(id):
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "admin"):
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 400
+    
+    result, message = services.delete_class(id)
+    
+    if result > 0: 
+        return jsonify({'msg': message}), 200
+    else:
+        return jsonify({'error': message}), 400 
+
+
+#REPORTES
+
+#actividades con mas estudiantes, snow, ski, etc
+@app.route('/report/most_students', methods=['GET'])
+@jwt_required()
+def report_most_students():
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "admin"):
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 403 
+    
+    status, results = services.get_activities_with_most_students()
+    if status == 1:
+        return jsonify(results), 200
+    else:
+        return jsonify({"error": results}), 404
+
+
+#Actividades con mas ganancia, contamos el alquiler
+@app.route('/report/income', methods=['GET'])
+@jwt_required()
+def report_income():
+    """
+    Endpoint para obtener las actividades con mayores ingresos generados.
+    Solo accesible para admin
+    """
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if role != "admin":
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 403  # 403 sin permisos:)
+
+    # Obtener el reporte de services
+    status, results = services.get_top_income_activities()
+    if status == 1:
+        return jsonify(results), 200
+    else:
+        return jsonify({"error": results}), 404
+
+#Mas turnos
+@app.route('/report/most_classes', methods=['GET'])
+@jwt_required()
+def report_most_classes():
+    """
+    Endpoint para obtener los turnos con más clases dictadas.
+    Solo accesible para usuarios con el rol 'admin'.
+    """
+    # Recuperar las claims del JWT
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    # Validar si el rol del usuario es 'admin'
+    if role != "admin":
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 403  # Forbidden
+
+    # Obtener el reporte
+    status, results = services.get_turns_with_most_classes()
+    if status == 1:
+        return jsonify(results), 200
+    else:
+        return jsonify({"error": results}), 404
+
+
 if __name__ == '__main__':
     app.run(debug=True)
-
+    
