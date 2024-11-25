@@ -3,6 +3,7 @@ import Actividad from '../Components/Actividad';
 import ClasesAlumno from '../Components/ClasesAlumno'; 
 import alumnoService from '../Services/alumnoService';
 import './Alumno.css';
+import NavBar from '../Components/NavBar';
 
 const Alumno = () => {
     const [activities, setActivities] = useState([]); 
@@ -96,6 +97,7 @@ const Alumno = () => {
 
     return (
         <div className="alumno-container">
+            <NavBar />
             <div className="actividades-header">
                 <h2 className="actividades-title">Actividades disponibles</h2>
             </div>

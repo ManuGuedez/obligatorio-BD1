@@ -1,46 +1,57 @@
-/*.class-card{
-    border: solid 1px;
-    margin: 5px;
-    border-radius: 5px;
-    padding: 7.5px;
-    width: max-content;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}*/
-.class-card{
-    background-color:rgba(0, 51, 102, 0.8); /* Fondo blanco semitransparente */
+.class-card {
+    background-color: rgba(0, 51, 102, 0.8); /* Fondo azul oscuro */
     padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para destacarlo */
-    margin: 2px;
-    color: #333; /* Color del texto */
+    border-radius: 15px; /* Bordes más redondeados */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Sombra más prominente */
+    margin: 10px auto; /* Espaciado */
+    color: #fff; /* Texto blanco */
     max-width: 300px; /* Ancho máximo para las tarjetas */
-    border: 1px solid rgba(0, 0, 0, 0.1); /* Borde sutil */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Borde blanco tenue */
+    text-align: center; /* Centramos el contenido */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transición en hover */
+}
+
+.class-card:hover {
+    transform: translateY(-5px); /* Levanta ligeramente la tarjeta */
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3); /* Sombra más grande */
 }
 
 .class-card h3 {
     margin-top: 0;
-    font-size: 1.2em;
-    color: #333;
+    font-size: 1.5em; /* Tamaño un poco más pequeño */
+    font-weight: 600; /* Negrita ligera */
+    color: #00bcd4; /* Azul claro para un estilo moderno */
+    text-shadow: none; /* Sin sombras, más minimalista */
+    text-align: center; /* Centrado */
+    text-transform: capitalize; /* Sólo la primera letra en mayúscula */
+    font-family: 'Roboto', sans-serif; /* Fuente minimalista */
 }
 
 .class-card p {
-    margin: 5px 0;
-    color: #fff;
+    margin: 10px 0;
+    font-size: 1.1em; /* Tamaño de texto más grande */
+    color: #ffffff; /* Texto blanco */
+}
+
+.class-card .button-container {
+    display: flex;
+    justify-content: center; /* Centrar el botón */
+    margin-top: 15px;
 }
 
 .class-card button {
     background-color: #4b3fc8;
     color: #fff;
-    padding: 8px 16px;
+    padding: 10px 20px;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
-    transition: background-color 0.3s ease;
+    font-size: 1em; /* Tamaño del texto del botón */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Transiciones */
 }
 
 .class-card button:hover {
-    background-color: #555;
+    background-color: #372a9c; /* Azul más oscuro al pasar el mouse */
+    transform: scale(1.05); /* Botón ligeramente más grande */
 }

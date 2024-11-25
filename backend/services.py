@@ -1,5 +1,6 @@
 import mysql.connector as mysql
-cnx = mysql.connect(user='root', password='rootpassword', host='127.0.0.1', database='snowSchool')
+
+cnx = mysql.connect(user='app_user', password='obligatorio_bd1', host='127.0.0.1', database='snowSchool') # host='mysql'
 cursor = cnx.cursor(dictionary=True) # devuelve la info en formato key-value
 from mysql.connector.errors import IntegrityError
 import algoritmo
@@ -57,10 +58,8 @@ def create_student_account(student, email, password):
     # verificación de que la isnerción fue exitosa
     if result > 0:
         message = 'Usuario creado exitosamente'
-        print(message)
     else:
         message = 'No se pudo crear el usuario'
-        print(message)
 
     # confirma los cambios en la base de datos
     cnx.commit()
@@ -127,10 +126,8 @@ def create_instructor_account(instructor, email, password):
     # verificación de que la isnerción fue exitosa
     if result > 0:
         message = 'Usuario creado exitosamente'
-        print(message)
     else:
         message = 'No se pudo crear el usuario'
-        print(message)
 
     # confirma los cambios en la base de datos
     cnx.commit()
@@ -193,6 +190,7 @@ def get_class_information_for_instructor(class_id):
     WHERE classes.class_id = %s
           AND classes.is_deleted = FALSE 
     """
+    
     cursor.execute(query, (class_id,))
     data = cursor.fetchall()
     
@@ -291,7 +289,7 @@ def is_instructor_busy(instructor_id, turn_id, days_ids, start_date, end_date):
     return len(classes) > 0
 
 def get_person_ci_with_id(person_id):
-    query = 'SELECT person.person_ci FROM person WHERE person_id = %s AND person.is_deleted = FALSE'
+    query = 'SELECT person.person_ci FROM person WHERE person_id = %s' #AND person.is_deleted = FALSE
     cursor.execute(query,(person_id,))
     data = cursor.fetchall()
     
@@ -314,6 +312,7 @@ def get_activities():
     return result
 
 def add_class(instructor_ci, activity_id, turn_id, start_date, end_date, days_ids, type):
+    
     try:
         if type:
             is_group = False
@@ -578,6 +577,7 @@ def add_student_to_class(student_ci, class_id):
     
     
 def remove_student_from_class(class_id, student_ci):
+    
     delete = "DELETE FROM student_class WHERE class_id = %s AND student_ci = %s"
 
     try:
@@ -707,7 +707,7 @@ def get_extended_class_info(class_id):
     query = """
     SELECT activities.description, turns.start_time, turns.end_time,
             c.start_date, c.end_date, c.is_group, i.first_name as instructor_first_name, 
-            i.last_name as instructor_last_name
+            i.last_name as instructor_last_name, c.class_id
     FROM classes c
         JOIN activities ON (c.activity_id = activities.activity_id)
         JOIN turns ON (c.turn_id = turns.turn_id)
@@ -844,8 +844,7 @@ def get_class_data_from_an_instructor(instructor_ci):
     query = 'SELECT class_id FROM classes WHERE instructor_ci = %s AND is_deleted = FALSE'
     cursor.execute(query, (instructor_ci,))
     data = cursor.fetchall()  
-    print(data)
-    
+        
     if len(data) < 0:
         return -1, "Hubo un error al obtener las clases del instructor."
     elif len(data) == 0:
@@ -854,7 +853,7 @@ def get_class_data_from_an_instructor(instructor_ci):
         classes = dict()
         for current_data in data:
             id = current_data['class_id']
-            classes[id] = get_extended_class_info(id)[0]
+            classes[id] = get_extended_class_info(id)[1][0]
         return 1, classes
     
 def add_activity(description, cost):
@@ -987,9 +986,23 @@ def get_student_classes(student_ci):
     
     for current_class in classes:
         id = current_class['class_id']
-        result.append(get_extended_class_info(id)[0])
-    
+        result.append(get_extended_class_info(id)[1][0])
     return result
+
+def get_class_data():
+    query = 'SELECT * FROM classes WHERE is_deleted = FALSE'
+    cursor.execute(query)
+    data = cursor.fetchall()  
+    
+    if len(data) <= 0:
+        return -1, "Hubo un error al obtener las clases."
+    else:
+        classes = dict()
+        for current_data in data:
+            id = current_data['class_id']
+            classes[id] = get_extended_class_info(id)[1][0]
+        return 1, classes
+
 def delete_student_class_by_class(class_id):
     update = 'UPDATE student_class SET is_deleted = TRUE WHERE class_id = %s'
     cursor.execute(update, (class_id,))
@@ -1123,8 +1136,9 @@ def delete_person(person_ci):
     delete_login(person_ci)
     rol = get_rol_by_ci(person_ci)
     
+    
     match rol:
         case 'instructor':
-            delete_instructor(person_ci)
+            return delete_instructor(person_ci)
         case 'student':
-            delete_student(person_ci)
+           return delete_student(person_ci)

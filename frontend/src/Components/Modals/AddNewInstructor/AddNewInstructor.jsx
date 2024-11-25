@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import ApiService from '../../Services/apiServices';
-import './AddInstructorModal.css';
+import ApiService from './../../../Services/apiServices';
+import classes from './AddNewInstructor.module.css'
 
-
-const AddInstructorModal = ({ show, handleClose }) => {
+const AddNewInstructor = ({ onClose }) => {
     const [formData, setFormData] = useState({
         ci: '',
         first_name: '',
@@ -20,7 +19,6 @@ const AddInstructorModal = ({ show, handleClose }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         try {
 
             const newInstructor = {
@@ -39,7 +37,7 @@ const AddInstructorModal = ({ show, handleClose }) => {
     
             if (response.code === 201) {
                 
-                handleClose();
+                onClose();
                 setFormData({
                     ci: '',
                     first_name: '',
@@ -52,15 +50,14 @@ const AddInstructorModal = ({ show, handleClose }) => {
     };
     
     return (
-        show && ( 
-        <div className="modal-overlay">
-            <div className="modal-container">
-                <div className="modal-header">
+        <div className={classes.modaOverlay} onClick={onClose}>
+            <div className={classes.modalContainer} onClick={(e) => e.stopPropagation()}>
+                <div className={classes.modalHeader}>
                     <h2>Agregar Nuevo Instructor</h2>
                 </div>
                 <div className="modal-body">
                     <form onSubmit={handleSubmit}>
-                        <div className="form-group">
+                        <div className={classes.formGroup}>
                             <label htmlFor="ci">CI</label>
                             <input
                                 type="number"
@@ -71,7 +68,7 @@ const AddInstructorModal = ({ show, handleClose }) => {
                                 required
                             />
                         </div>
-                        <div className="form-group">
+                        <div className={classes.formGroup}>
                             <label htmlFor="first_name">Nombre</label>
                             <input
                                 type="text"
@@ -82,7 +79,7 @@ const AddInstructorModal = ({ show, handleClose }) => {
                                 required
                             />
                         </div>
-                        <div className="form-group">
+                        <div className={classes.formGroup}>
                             <label htmlFor="last_name">Apellido</label>
                             <input
                                 type="text"
@@ -93,11 +90,11 @@ const AddInstructorModal = ({ show, handleClose }) => {
                                 required
                             />
                         </div>
-                        <div className="button-group">
-                            <button type="button" className="cancel-button" onClick={handleClose}>
+                        <div className={classes.buttonGroup}>
+                            <button type="button" className={classes.cancelButton} onClick={onClose}>
                                 Cancelar
                             </button>
-                            <button type="submit" className="submit-button">
+                            <button type="submit" className={classes.submitButton}>
                                 Guardar
                             </button>
                         </div>
@@ -105,8 +102,7 @@ const AddInstructorModal = ({ show, handleClose }) => {
                 </div>
             </div>
         </div>
-        )
     );
 };
 
-export default AddInstructorModal;
+export default AddNewInstructor;

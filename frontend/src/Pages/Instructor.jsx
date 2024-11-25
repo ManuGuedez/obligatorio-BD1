@@ -2,28 +2,33 @@ import React, { useEffect, useState } from 'react';
 import './Instructor.css';
 import Clases from "../Components/Clases";
 import CalendarioClases from '../Components/CalendarioClases';
+import NavBar from '../Components/NavBar';
+import { useNavigate } from 'react-router-dom';
 import ServiceInstructor from '../Services/instructorServices';
 
 const Instructor = () => {
+    const navigate = useNavigate();
     const [classes, setClasses] = useState([]);
-    const [instructorName, setInstructorName] = useState("");
+    const [infoTodayClasses, setInfoTodayClasses] = useState([]);
+    const [error, setError] = useState("");
+    /*Traemos datos usuario localStorage*/
     const token = localStorage.getItem("token"); // Recuperar token del localStorage
-    const [error, setError] = useState("")
     const user = JSON.parse(localStorage.getItem("user")); // Recuperar datos del usuario del localStorage
+    const [instructorName, setInstructorName] = useState("");
 
-    const calendario = [
-        { fecha: '2024-11-05', deporte: 'Snow Ski', horario: '10:00 - 12:00' },
-        { fecha: '2024-11-06', deporte: 'Snowboard', horario: '14:00 - 16:00' },
-        // Agrega más clases con diferentes fechas
-    ];
-
-    const actualDate = new Date();
-    const todayClasses = classes.filter(
-        (classData) =>
-            classData.fecha === actualDate.toISOString().split('T')[0]
-    );
-
+    /*Para actualizar el nombre del instructor*/
     useEffect(() => {
+        if (user?.[0]?.first_name) {
+            setInstructorName(user[0].first_name);
+        } else {
+            console.error("No se pudo encontrar el nombre del instructor en los datos del usuario.");
+            setInstructorName("Instructor");
+        }
+    }, [user]);
+
+    //Para cargar las clases del instructor
+    useEffect(() => {
+
         const fetchInstructorData = async () => {
             if (!token || !user) {
                 console.error("No token or user found. User must be logged in.");
@@ -31,12 +36,8 @@ const Instructor = () => {
                 return;
             }
 
-            // Establece el nombre del instructor usando los datos del usuario
-            setInstructorName(user.first_name);
-
             try {
                 const response = await ServiceInstructor.getInstructorClasses(token);
-                console.log(response)
                 if (response.code === 200) {
                     setClasses(response.data); // Asigna las clases obtenidas al estado
                 } else {
@@ -51,37 +52,79 @@ const Instructor = () => {
         fetchInstructorData();
     }, []);
 
+    //para cargar las clases de hoy del instructor
+    useEffect(() => {
+        const fetchTodayClassesInfo = async () => {
+            const actualDate = new Date().toISOString().split('T')[0]; // Fecha actual en formato 'YYYY-MM-DD'
+            
+            const todayClasses = classes.filter(
+                (classData) => classData.class_date === actualDate
+            );
+
+            const detailedClasses = [];
+            for (const classData of todayClasses) {
+                try {
+                    const classInfoResponse = await ServiceInstructor.getInfoClasses(token, classData.class_id);
+                    const studentsResponse = await ServiceInstructor.getClassesStudents(token, classData.class_id);
+
+                    if (classInfoResponse.code === 200) {
+                        const studentCount = studentsResponse?.data?.length || 0; // Contar estudiantes
+                        detailedClasses.push({
+                            ...classData,
+                            ...classInfoResponse.data,
+                            students: studentsResponse?.data || [], // Agregar lista de estudiantes
+                            studentCount, // Agregar la cantidad de estudiantes
+                        });
+                    }
+                } catch (error) {
+                    console.error(`Error fetching details for class ${classData.class_id}:`, error);
+                }
+            }
+
+            setInfoTodayClasses(detailedClasses);
+            console.log(detailedClasses);
+        };
+
+        if (classes.length > 0) {
+            fetchTodayClassesInfo();
+        }
+    }, [classes, token]);
+
+
     return (
         <div className="instructor-dashboard">
+            <NavBar />  
             <div className='instructor-dashboard2'>
                 <div className='instructor'>
                     <div className="encabezadoInstructor">
                         <p id="inspecciona">Inspecciona tus clases</p>
-                        <h1>Bienvenido,  {instructorName}</h1>
+                        <h1>Bienvenido, {instructorName}</h1>
                     </div>
                     <section className="schedule">
                         <h2>Clases de Hoy</h2>
                         <div className="classes">
-                            {todayClasses.length > 0 ? (
+                            {infoTodayClasses.length > 0 ? (
                                 <ul>
-                                    {todayClasses.map((classData, key) => (
+                                    {infoTodayClasses.map((classData, key) => (
                                         <Clases
                                             key={key}
-                                            turno={classData.turno}
-                                            dictada={classData.dictada}
-                                            deporte={classData.deporte}
-                                            maxAlumnos={classData.maxAlumnos}
-                                            alumnos={classData.cantAlumnos}
-                                            fecha={classData.fecha}
+                                            description={classData.description}
+                                            start_time={classData.start_time}
+                                            end_time={classData.end_time}
+                                            class_id={classData.class_id}
+                                            studentCount={classData.studentCount} // Pasar la cantidad de estudiantes
                                         />
                                     ))}
                                 </ul>
-                            ) : (<p id="noClasses">No hay clases agendadas</p>)}
+                            ) : (
+                                <p id="noClasses">No hay clases agendadas</p>
+                            )}
                         </div>
+
                     </section>
                 </div>
 
-                <CalendarioClases classes={calendario} />
+                <CalendarioClases classes={classes} />
             </div>
         </div>
     );

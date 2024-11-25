@@ -21,7 +21,7 @@ const ApiService = {
     },
 
     post: async (resource, data, content_type, token) => {
-    
+
         const request = {
             method: "POST",
             body: JSON.stringify(data),
@@ -30,45 +30,42 @@ const ApiService = {
                 "Content-Type": `${content_type}`,
             },
         };
-        
-        console.log("HOLA",request);
+
         const api_response = await fetch(`${default_url}/${resource}`, request);
-        
-    
+
         const response = { code: api_response.status, data: null };
-        
+
         const responseBody = await api_response.json();
-        
+
         response.data = responseBody;
-        
+
         return response;
     },
-    
 
-    delete: async (resource, token) => {
+    delete: async (resource, token, data = null) => {
         const request = {
             method: "DELETE",
             headers: {
-                "Authorization": `Bearer ${token}`,
-            },
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
         };
-        console.log('Request payload:', JSON.stringify(newInstructor, null, 2));
-
+    
+        if (data) {
+            request.body = JSON.stringify(data);
+        }
+    
         const api_response = await fetch(`${default_url}/${resource}`, request);
-
-        const errorBody = await api_response.json();
-        console.log('Error details:', errorBody);
-
-
-        console.log(`DELETE: ${api_response.status}, ${api_response.statusText}`);
-
+        console.log(`DELETE: ${api_response}, ${api_response.statusText}`);
+    
         const response = { code: api_response.status, data: null };
-
+    
         if (api_response.ok)
             response.data = await api_response.json();
-
+    
         return response;
     },
+    
 
     put: async (resource, data, token) => {
         const request = {
@@ -83,8 +80,6 @@ const ApiService = {
         const api_response = await fetch(`${default_url}/${resource}`, request);
 
         console.log(`PUT: ${api_response.status}, ${api_response.statusText}`);
-
-        const response = { code: api_response.status, data: null };
 
         if (api_response.ok)
             response.data = await api_response.json();
@@ -103,7 +98,6 @@ const ApiService = {
         };
 
         const api_response = await fetch(`${default_url}/${resource}`, request);
-
         console.log(`PATCH: ${api_response.status}, ${api_response.statusText}`);
 
         const response = { code: api_response.status, data: null };

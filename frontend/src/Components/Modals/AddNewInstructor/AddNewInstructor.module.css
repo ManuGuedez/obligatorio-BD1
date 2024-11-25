@@ -1,4 +1,4 @@
-.modal-overlay {
+.modaOverlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -10,52 +10,76 @@
     align-items: center;
 }
 
-.modal-container {
+.modalContainer {
     background-color: white;
-    padding: 20px;
     border-radius: 8px;
-    width: 400px;
+    width: 90%;
+    max-width: 500px;
+    padding: 20px;
 }
 
-.modal-header {
+.modalHeader {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     margin-bottom: 20px;
 }
 
-.close-button {
+.closeButton {
     background: none;
     border: none;
     font-size: 24px;
     cursor: pointer;
 }
 
-.form-group {
+.formGroup {
     margin-bottom: 15px;
 }
 
-.form-group label {
+.formGroup label {
     display: block;
     margin-bottom: 5px;
+    font-weight: bold;
+    color: #5a6268;
 }
 
-.form-group input {
+.formGroup input {
     width: 100%;
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
 }
 
-.modal-footer {
-    margin-top: 20px;
+.buttonGroup {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+    margin-top: 20px;
 }
 
-.modal-footer button {
+.submitButton,
+.cancelButton {
     padding: 8px 16px;
     border-radius: 4px;
     cursor: pointer;
+}
+
+.submitButton {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+}
+
+.cancelButton {
+    background-color: #f44336;
+    color: white;
+    border: none;
+}
+
+.submitButton:hover {
+    background-color: #0ea10b;
+}
+
+.cancelButton:hover {
+    background-color: #ff3700;
 }

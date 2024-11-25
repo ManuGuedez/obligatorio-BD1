@@ -13,6 +13,7 @@ const NavBar = () => {
     const handleLogout = () => {
         console.log("Cerrando sesión...");
         setMenuOpen(false);
+        localStorage.removeItem('token');
         navigate('/LogIn'); // Redirige a la página de inicio de sesión
     };
 

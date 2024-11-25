@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import ApiService from '../../Services/apiServices';
-import './AddTurnModal.css';
+import ApiService from './../../../Services/apiServices';
+import classes from './AddTurnModal.module.css';
 
-const AddTurnModal = ({ isOpen, onClose }) => {
+const AddTurnModal = ({ onClose }) => {
     const [turnData, setTurnData] = useState({
         start_time: '',
         end_time: ''
@@ -45,20 +45,16 @@ const AddTurnModal = ({ isOpen, onClose }) => {
         }
     };
     
-
-    if (!isOpen) return null;
-
     return (
-        <div className="modal-overlay">
-            <div className="modal-container">
-                <div className="modal-header">
-                    <h2>Add New Turn</h2>
-                    <button className="close-button" onClick={onClose}>×</button>
+        <div className={classes.modalOverlay} onClick={onClose}>
+            <div className={classes.modalContainer} onClick={(e) => e.stopPropagation()}>
+                <div className={classes.modalHeader}>
+                    <h2>Agregar Nuevo Turno</h2>
                 </div>
                 <div className="modal-body">
                     <form onSubmit={handleSubmit}>
-                        <div className="form-group">
-                            <label htmlFor="start_time">Start Time:</label>
+                        <div className={classes.formGroup}>
+                            <label htmlFor="start_time">Hora inicio:</label>
                             <input
                                 type="time"
                                 id="start_time"
@@ -68,8 +64,8 @@ const AddTurnModal = ({ isOpen, onClose }) => {
                                 required
                             />
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="end_time">End Time:</label>
+                        <div className={classes.formGroup}>
+                            <label htmlFor="end_time">Hora fin:</label>
                             <input
                                 type="time"
                                 id="end_time"
@@ -79,9 +75,9 @@ const AddTurnModal = ({ isOpen, onClose }) => {
                                 required
                             />
                         </div>
-                        <div className="modal-footer">
-                            <button type="button" onClick={onClose}>Cancel</button>
-                            <button type="submit">Add Turn</button>
+                        <div className={classes.modalFooter}>
+                            <button type="button" className={classes.cancelButton} onClick={onClose}>Cancelar</button>
+                            <button type="submit" className={classes.submitButton}>Agregar Truno</button>
                         </div>
                     </form>
                 </div>
