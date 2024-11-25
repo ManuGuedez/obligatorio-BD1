@@ -1,12 +1,24 @@
 .clase-alumno-container {
     margin-top: 20px;
+    gap: 10;
+    flex-wrap: wrap;
+
 }
 
 .clase-card {
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    box-shadow: 45px;
+    max-width: 300px;
+    /* Tamaño uniforme para todas las tarjetas */
+    flex: 1 1 auto;
+    /* Fondo celeste */
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     background-color: #7675c0;
     color: rgb(43, 43, 100);
 }
@@ -17,4 +29,43 @@
 
 .clase-card p {
     margin: 5px 0;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    color:black;
+    max-width: 500px;
+    gap: 20;
+}
+
+.info {
+    margin: 10px;
+}
+
+.button-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding-top: 30px;
+    padding-bottom: 10px
+}
+.modal-button {
+    background-color: #f44336;
+    color: white;
 }

@@ -712,6 +712,7 @@ def get_extended_class_info(class_id):
         JOIN activities ON (c.activity_id = activities.activity_id)
         JOIN turns ON (c.turn_id = turns.turn_id)
         JOIN instructors i on (c.instructor_ci = i.instructor_ci)
+        JOIN class_day cd ON (c.class_id = cd.class_id)
     WHERE c.class_id = %s AND c.is_deleted = FALSE
     """
     cursor.execute(query, (class_id, ))

@@ -58,3 +58,23 @@ input:checked + .slider {
 input:checked + .slider:before {
     transform: translateX(18px);
 }
+
+.activity-card {
+    max-width: 300px;
+    /* Tamaño uniforme para todas las tarjetas */
+    flex: 1 1 auto;
+    /* Se adapta al espacio disponible */
+    background-color: #1a365d;
+    /* Fondo celeste */
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    color: #ffffff;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+

@@ -1,9 +1,6 @@
 {
   "dependencies": {
-<<<<<<< HEAD
-    "cors": "^2.8.5"
-=======
-    "react-spinners": "^0.14.1"
->>>>>>> admin-back
+    "@rneui/base": "^4.0.0-rc.7",
+    "@rneui/themed": "^4.0.0-rc.8"
   }
 }
