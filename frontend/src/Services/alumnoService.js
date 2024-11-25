@@ -13,6 +13,7 @@ const alumnoService = {
       throw err;
     }
   },
+
   getStudentClasses: async (token) => {
     try {
       let student_info = localStorage.getItem("user");
@@ -29,6 +30,7 @@ const alumnoService = {
       throw err;
     }
   },
+
   enrollStudent: async (classId, studentId, token) => {
     try {
       const body = { student_id: studentId };
@@ -44,6 +46,7 @@ const alumnoService = {
       throw err;
     }
   },
+
   removeStudentFromClass: async (classId) => {
     try {
       let student_info = localStorage.getItem("user");
@@ -59,6 +62,20 @@ const alumnoService = {
       return response;
     } catch (err) {
       console.error("Error al inscribir al estudiante:", err);
+      throw err;
+    }
+  },
+
+  getAvailableEquipment: async (classId, token) => {
+    try {
+      const response = await ApiService.get(
+        `classes/${classId}/equipment-available`,
+        token
+      );
+      console.log("equipamiento d:", response);
+      return response;
+    } catch (err) {
+      console.error("Error al obtener el equipamiento disponible:", err);
       throw err;
     }
   },
