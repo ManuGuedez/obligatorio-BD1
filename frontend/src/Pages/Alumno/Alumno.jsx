@@ -10,65 +10,49 @@ const Alumno = () => {
   const [studentClasses, setStudentClasses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [onDeletedClass, setOnDeletedClass] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [enrolledActivities, setEnrolledActivities] = useState([]);
 
-  useEffect(() => {
-    setOnDeletedClass(false);
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-
-        const activitiesResponse = await alumnoService.getAlumnos(token);
-        if (
-          activitiesResponse &&
-          activitiesResponse.code === 200 &&
-          Array.isArray(activitiesResponse.data)
-        ) {
-          console.log("Actividades recibidas:", activitiesResponse.data);
-          setActivities(activitiesResponse.data);
-        } else {
-          console.error(
-            "Error: estructura inesperada en los datos de actividades",
-            activitiesResponse
-          );
-          setError("El formato de datos de actividades no es válido.");
-        }
-
-        const studentClassesResponse = await alumnoService.getStudentClasses(
-          token
-        );
-        if (
-          studentClassesResponse &&
-          studentClassesResponse.code === 200 &&
-          Array.isArray(studentClassesResponse.data)
-        ) {
-          console.log(
-            "Clases del estudiante recibidas:",
-            studentClassesResponse.data
-          );
-          setStudentClasses(studentClassesResponse.data);
-        } else {
-          console.error(
-            "Error: estructura inesperada en los datos de clases",
-            studentClassesResponse
-          );
-          setError("El formato de datos de clases no es válido.");
-        }
-      } catch (err) {
-        console.error("Error al cargar datos:", err);
-        setError("Error al cargar datos.");
-      } finally {
-        setIsLoading(false);
+  const fetchActivities = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await alumnoService.getAlumnos(token);
+      if (response && response.code === 200 && Array.isArray(response.data)) {
+        setActivities(response.data);
+      } else {
+        setError("El formato de datos de actividades no es válido.");
       }
+    } catch (err) {
+      console.error("Error al cargar actividades:", err);
+      setError("Error al cargar actividades.");
+    }
+  };
+
+  const fetchStudentClasses = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await alumnoService.getStudentClasses(token);
+      if (response && response.code === 200 && Array.isArray(response.data)) {
+        setStudentClasses(response.data);
+      } else {
+        setError("No se pudo actualizar las clases del estudiante.");
+      }
+    } catch (err) {
+      console.error("Error al actualizar las clases:", err);
+      setError("Error al actualizar las clases.");
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      await Promise.all([fetchActivities(), fetchStudentClasses()]);
+      setIsLoading(false);
     };
 
     fetchData();
   }, []);
-
-  useEffect(() => {console.log(onDeletedClass)}, [onDeletedClass]);
 
   const openModal = (activity) => {
     setSelectedActivity(activity);
@@ -96,7 +80,6 @@ const Alumno = () => {
       );
     } else {
       try {
-        console.log({ activityId, studentId, token });
         const response = await alumnoService.enrollStudent(
           activityId,
           studentId,
@@ -105,6 +88,12 @@ const Alumno = () => {
         if (response && response.code === 200) {
           console.log("Inscripción exitosa:", response.msg);
           setEnrolledActivities([...enrolledActivities, activityId]);
+
+          setActivities((prevActivities) =>
+            prevActivities.filter((activity) => activity.class_id !== activityId)
+          );
+
+          await fetchStudentClasses();
         } else {
           console.error("Error al inscribir:", response.error);
           setError("No se pudo inscribir en la clase. Intente de nuevo.");
@@ -134,9 +123,7 @@ const Alumno = () => {
                 id: activity.class_id,
                 name: activity.description || "Sin descripción",
                 shortDescription: activity.description,
-                schedule: `${activity.days.join(", ")}: ${
-                  activity.start_time
-                } - ${activity.end_time}`,
+                schedule: `${activity.days.join(", ")}: ${activity.start_time} - ${activity.end_time}`,
                 price: activity.cost || 0,
               }}
               openModal={openModal}
@@ -148,7 +135,7 @@ const Alumno = () => {
       <div className={classes.clasesHeader}>
         <h2 className={classes.clasesTitle}>Mis Clases:</h2>
       </div>
-      <ClasesAlumno clases={studentClasses} />
+      <ClasesAlumno clases={studentClasses} setClases={setStudentClasses} />
       {showModal && selectedActivity && (
         <div className={classes.modalOverlay} onClick={handleOverlayClick}>
           <div className={classes.modalContent}>

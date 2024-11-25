@@ -20,7 +20,6 @@
 
 .app-container{
     display: flex;
-    align-items:flex-start;
 }
 
 .instructor-dashboard h1 {
