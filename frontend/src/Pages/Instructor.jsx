@@ -60,6 +60,7 @@ const Instructor = () => {
             const todayClasses = classes.filter(
                 (classData) => classData.class_date === actualDate
             );
+            console.log("todayClasses:", todayClasses);
 
             const detailedClasses = [];
             for (const classData of todayClasses) {
@@ -101,7 +102,7 @@ const Instructor = () => {
                         <h1>Bienvenido, {instructorName}</h1>
                     </div>
                     <section className="schedule">
-                        <h2>Clases de Hoy</h2>
+                        <h2 style={{color: "white"}}>Clases de Hoy</h2>
                         <div className="classes">
                             {infoTodayClasses.length > 0 ? (
                                 <ul>
@@ -117,7 +118,7 @@ const Instructor = () => {
                                     ))}
                                 </ul>
                             ) : (
-                                <p id="noClasses">No hay clases agendadas</p>
+                                <p id="noClasses" style={{color: "white"}}>No hay clases agendadas</p>
                             )}
                         </div>
 

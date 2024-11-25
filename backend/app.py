@@ -448,6 +448,7 @@ def get_class_information(id):
     role = services.get_role(claims.get("role_id"))
     user_ci = int(get_jwt_identity() )   
     result, data = services.get_extended_class_info(id)
+    data=data[0]
     
     match role:
         case 'admin':
@@ -457,6 +458,7 @@ def get_class_information(id):
                 return jsonify({'error': data})
                 
         case 'instructor':
+            print("no es responsable")
             if not services.is_instructor_responsible(id, user_ci):
                 return jsonify({'error': 'Debe ser instructor responsable de la clase para acceder a la información'}), 400   
             
@@ -465,6 +467,7 @@ def get_class_information(id):
                 return jsonify({'error': 'Debe estar inscripto a la clase para poder acceder a la información.'}), 400
         case _:
             return jsonify({'error': 'Rol no identificado'}), 400
+    
             
     if result > 0:
         return jsonify(data), 200
@@ -512,6 +515,10 @@ def roll_call(id):
     data = request.get_json() 
     students_present = data.get('students_present')
     
+    # if not students_present:
+    #     print("este error")
+    #     return jsonify({'error': 'Es necesario ingresar los ids de los estudiantes que fueron parte.'}), 400
+
     result, message = services.roll_call(id, students_present)
     
     if result > 0: 
@@ -854,5 +861,70 @@ def delete_class(id):
         return jsonify({'error': message}), 400 
 
 
+#REPORTES
+
+#actividades con mas estudiantes, snow, ski, etc
+@app.route('/report/most_students', methods=['GET'])
+@jwt_required()
+def report_most_students():
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if(role != "admin"):
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 403 
+    
+    status, results = services.get_activities_with_most_students()
+    if status == 1:
+        return jsonify(results), 200
+    else:
+        return jsonify({"error": results}), 404
+
+
+#Actividades con mas ganancia, contamos el alquiler
+@app.route('/report/income', methods=['GET'])
+@jwt_required()
+def report_income():
+    """
+    Endpoint para obtener las actividades con mayores ingresos generados.
+    Solo accesible para admin
+    """
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    if role != "admin":
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 403  # 403 sin permisos:)
+
+    # Obtener el reporte de services
+    status, results = services.get_top_income_activities()
+    if status == 1:
+        return jsonify(results), 200
+    else:
+        return jsonify({"error": results}), 404
+
+#Mas turnos
+@app.route('/report/most_classes', methods=['GET'])
+@jwt_required()
+def report_most_classes():
+    """
+    Endpoint para obtener los turnos con más clases dictadas.
+    Solo accesible para usuarios con el rol 'admin'.
+    """
+    # Recuperar las claims del JWT
+    claims = get_jwt()
+    role = services.get_role(claims.get("role_id"))
+    
+    # Validar si el rol del usuario es 'admin'
+    if role != "admin":
+        return jsonify({'error': 'Esta acción puede ser realizada únicamente por el administrador.'}), 403  # Forbidden
+
+    # Obtener el reporte
+    status, results = services.get_turns_with_most_classes()
+    if status == 1:
+        return jsonify(results), 200
+    else:
+        return jsonify({"error": results}), 404
+
+
 if __name__ == '__main__':
     app.run(debug=True)
+    

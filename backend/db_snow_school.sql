@@ -530,3 +530,5 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON snowSchool.* TO 'app_user'@'%';
 FLUSH PRIVILEGES;
 
 SHOW GRANTS FOR 'app_user'@'%';
+
+DESCRIBE class_session;
