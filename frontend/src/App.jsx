@@ -8,6 +8,7 @@ import Instructor from "./Pages/Instructor.jsx";
 import Lista from "./Pages/Lista";
 import LogIn from "./Pages/LogIn.jsx";
 import Register from "./Pages/Register.jsx";
+import ClassDetails from "./Pages/ClassDetails.jsx";
 
 const App = () => {
   return (
@@ -20,7 +21,7 @@ const App = () => {
           <Route path="/Alumno" element={<Alumno />} />
           <Route path="/Instructor" element={<Instructor />} />
           <Route path="/Admin" element={<Admin />} />
-          <Route path="/class/:classId" element={<Lista />} />
+          <Route path="/class/:classId" element={<ClassDetails />} />
         </Routes>
       </div>
     </div>
