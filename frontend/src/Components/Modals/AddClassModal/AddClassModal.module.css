@@ -18,6 +18,8 @@
     width: 500px;
     max-width: 90%;
     color: black;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .modalHeader {

@@ -152,7 +152,7 @@ def create_class():
         return jsonify({'error': 'El instructor ya tiene clases en ese horario'}), 400
     
     type = data.get('type')
-    if type != None and type != 'individual':
+    if type != None and type != 'individual' and type != 'grupal':
         return jsonify({'error': 'El tipo de la clase no es adecuado, debe ser individual o por defecto es grupal'}), 400
         
     result, message = services.add_class(instructor_ci, activity, turn, start_date, end_date, days, type)

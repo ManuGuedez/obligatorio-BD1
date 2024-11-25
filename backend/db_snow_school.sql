@@ -532,3 +532,4 @@ FLUSH PRIVILEGES;
 SHOW GRANTS FOR 'app_user'@'%';
 
 DESCRIBE class_session;
+

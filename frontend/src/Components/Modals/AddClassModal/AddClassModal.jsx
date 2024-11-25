@@ -10,6 +10,7 @@ const AddClassModal = ({ onClose }) => {
     activity: "",
     turn: "",
     days: "",
+    type: "grupal",
   });
 
   const [turns, setTurns] = useState([]);
@@ -78,9 +79,9 @@ const AddClassModal = ({ onClose }) => {
         activity: formData.activity,
         turn: parseInt(formData.turn),
         days: selectedDays,
-        type: formData.type || null,
+        type: formData.type,
       };
-      console.log(selectedDays)
+      console.log(selectedDays);
       const response = await ApiService.post(
         "classes/new-class",
         newClass,
@@ -93,7 +94,10 @@ const AddClassModal = ({ onClose }) => {
         alert(response.json().msj);
         window.location.reload();
       } else {
-        alert("Error al crear la clase. Por favor, inténtalo de nuevo.", response.error);
+        alert(
+          "Error al crear la clase. Por favor, inténtalo de nuevo.",
+          response.error
+        );
       }
     } catch (error) {
       console.error(
@@ -177,6 +181,18 @@ const AddClassModal = ({ onClose }) => {
                     >{`${current_turn.start_time} - ${current_turn.end_time}`}</option>
                   );
                 })}
+              </select>
+            </div>
+
+            <div className={classes.formGroup}>
+              <label>Tipo de Clase:</label>
+              <select
+                name="type"
+                value={formData.type}
+                onChange={handleInputChange}
+              >
+                <option value="grupal">Grupal</option>
+                <option value="individual">Individual</option>
               </select>
             </div>
 

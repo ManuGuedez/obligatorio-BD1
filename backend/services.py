@@ -314,7 +314,7 @@ def get_activities():
 def add_class(instructor_ci, activity_id, turn_id, start_date, end_date, days_ids, type):
     
     try:
-        if type:
+        if type == 'individual':
             is_group = False
         else:
             is_group = True
