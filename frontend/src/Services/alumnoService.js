@@ -72,13 +72,32 @@ const alumnoService = {
         `classes/${classId}/equipment-available`,
         token
       );
-      console.log("equipamiento d:", response);
+      console.log("equipamiento:", response);
       return response;
     } catch (err) {
       console.error("Error al obtener el equipamiento disponible:", err);
       throw err;
     }
   },
+  rentEquipment: async (selectedEquipment, classId, token) => {
+    try {
+      console.log("id clase:", classId);
+      const body = {
+        equipment_id: selectedEquipment,
+      };
+      const response = await ApiService.post(
+        `classes/${classId}/rental-equipment`,
+        body,
+        "application/json",
+        token
+      );
+      return response;
+    } catch (err) {
+      console.error("Error al rentar el equipamiento:", err);
+      throw err;
+    }
+  }
 };
+
 
 export default alumnoService;
