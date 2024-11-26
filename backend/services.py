@@ -1,6 +1,6 @@
 import mysql.connector as mysql
 
-cnx = mysql.connect(user='app_user', password='obligatorio_bd1', host='127.0.0.1', database='snowSchool') #host.docker.internal #mysql
+cnx = mysql.connect(user='app_user', password='obligatorio_bd1', host='host.docker.internal', database='snowSchool') #host.docker.internal #mysql
 cursor = cnx.cursor(dictionary=True) # devuelve la info en formato key-value
 from mysql.connector.errors import IntegrityError
 import algoritmo
