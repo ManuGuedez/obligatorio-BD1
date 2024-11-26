@@ -43,7 +43,7 @@ const ModifyStudentModal = ({ onClose }) => {
     try {
       const response = await ApiService.patch(
         `student/${selectedStudent.student_id}/modify-student`,
-        {...formData, name: formData.first_name },
+        { ...formData, name: formData.first_name },
         token
       );
 
@@ -66,55 +66,65 @@ const ModifyStudentModal = ({ onClose }) => {
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <h2>Modificar Student</h2>
-        {loading ? (
-          <p>Cargando...</p>
-        ) : (
-          <>
-            {selectedStudent ? (
-              <div className={styles.editForm}>
-                <label>
-                  Nombre:
-                  <input
-                    type="text"
-                    name="first_name"
-                    value={formData.first_name}
-                    onChange={handleInputChange}
-                  />
-                </label>
-                <label>
-                  Apellido:
-                  <input
-                    type="text"
-                    name="last_name"
-                    value={formData.last_name}
-                    onChange={handleInputChange}
-                  />
-                </label>
-                <div className={styles.buttonGroup}>
-                  <button
-                    onClick={() => setSelectedStudent(null)}
-                    className={styles.cancelButton}
-                  >
-                    Cancelar
-                  </button>
-                  <button onClick={handleSave} className={styles.submitButton}>
-                    Guardar
-                  </button>
+        <div
+          style={{
+            maxHeight: "80vh",
+            overflowY: "auto",
+          }}
+        >
+          {loading ? (
+            <p>Cargando...</p>
+          ) : (
+            <>
+              {selectedStudent ? (
+                <div className={styles.editForm}>
+                  <label>
+                    Nombre:
+                    <input
+                      type="text"
+                      name="first_name"
+                      value={formData.first_name}
+                      onChange={handleInputChange}
+                    />
+                  </label>
+                  <label>
+                    Apellido:
+                    <input
+                      type="text"
+                      name="last_name"
+                      value={formData.last_name}
+                      onChange={handleInputChange}
+                    />
+                  </label>
+                  <div className={styles.buttonGroup}>
+                    <button
+                      onClick={() => setSelectedStudent(null)}
+                      className={styles.cancelButton}
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={handleSave}
+                      className={styles.submitButton}
+                    >
+                      Guardar
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className={styles.studentList}>
-                {student.map((student) => (
-                  <StudentCard
-                    key={student.student_id}
-                    student={student}
-                    handleSelectStudent={handleSelectStudent}
-                  />
-                ))}
-              </div>
-            )}
-          </>
-        )}
+              ) : (
+                <div className={styles.studentList}>
+                  {student.map((student) => (
+                    <StudentCard
+                      key={student.student_id}
+                      student={student}
+                      handleSelectStudent={handleSelectStudent}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
