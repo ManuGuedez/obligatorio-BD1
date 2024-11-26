@@ -1,0 +1,90 @@
+.react-calendar {
+    background-color: #f0f4f8; /* Cambia el fondo */
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: none;
+}
+
+/* Fondo y color de los días */
+.react-calendar__tile {
+    background-color: #ffffff;
+    border-radius: 4px;
+    color: #333;
+    padding: 5px 0;
+    transition: background-color 0.3s ease;
+}
+
+/* Cambiar color de los días al pasar el mouse */
+.react-calendar__tile:hover {
+    background-color: #e0e7ff;
+    color: #333;
+}
+
+/* Fondo y color de los días seleccionados */
+.react-calendar__tile--active {
+    background-color: #4f46e5;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+/* Cambiar el color de los días que no pertenecen al mes actual */
+.react-calendar__month-view__days__day--neighboringMonth {
+    color: #aaa;
+}
+
+/* Encabezado de los días de la semana */
+.react-calendar__month-view__weekdays {
+    text-transform: uppercase;
+    font-weight: bold;
+    color: #4f46e5;
+}
+
+/* Bordes y estilo de las flechas de navegación */
+.react-calendar__navigation button {
+    color: #4f46e5;
+    min-width: 44px;
+    background: none;
+    font-size: 1.2em;
+    margin-top: 4px;
+}
+
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
+    background-color: #e0e7ff;
+    border-radius: 4px;
+}
+
+
+/* Estilo del encabezado de mes y año */
+.react-calendar__navigation__label {
+    font-size: 1.5rem; /* Tamaño de fuente más grande para el mes y año */
+    color: #4f46e5; /* Color azul */
+    font-weight: bold;
+    text-transform: capitalize; /* Para que el mes esté en mayúscula solo la primera letra */
+}
+
+/* Ajustes para centrar y alinear el encabezado */
+.react-calendar__navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Espacio alrededor de las flechas de navegación */
+.react-calendar__navigation button {
+    color: #4f46e5;
+    min-width: 44px;
+    background: none;
+    font-size: 1.2em;
+    margin: 0px; /* Ajuste de espacio para que se vea más alineado */
+    padding: 0;
+    width: 10px;
+}
+
+/* Cambios de color para hover en los botones de navegación */
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
+    background-color: #e0e7ff;
+    border-radius: 4px;
+}

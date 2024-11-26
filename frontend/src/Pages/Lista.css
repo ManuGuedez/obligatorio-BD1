@@ -1,0 +1,98 @@
+.student-list-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(0, 51, 102, 0.8);
+    border-radius: 10px;
+    color: #fff;
+}
+
+h1 {
+    text-align: center;
+    color: #fff;
+}
+
+.error {
+    color: red;
+    text-align: center;
+}
+
+.student-list-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 30px; /* Aumenta el espacio interno */
+    background-color: #1e3a8a;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    max-width: 90%; /* Aumenta el ancho máximo */
+    margin: 30px auto; /* Más espacio alrededor */
+}
+
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px; /* Aumenta la separación */
+    gap: 20px;
+}
+
+.list-header h1 {
+    font-size: 2rem; /* Aumenta el tamaño de la fuente */
+    color: #ffffff;
+    margin: 0;
+}
+
+.save-button {
+    background-color: #4b3fc8;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 12px 24px; /* Aumenta el tamaño del botón */
+    cursor: pointer;
+    font-size: 1.2rem; /* Aumenta el tamaño de la fuente del botón */
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.save-button:hover {
+    background-color: #5a4fd8;
+}
+
+.student-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.student-table th,
+.student-table td {
+    border: 1px solid #ddd;
+    text-align: left;
+    padding: 12px; /* Más espacio interno en las celdas */
+    font-size: 1.1rem; /* Aumenta el tamaño de la fuente */
+    color: white;
+}
+
+.student-table th {
+    background-color: #4b3fc8;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.student-table tbody tr:nth-child(even) {
+    background-color: #2a4b8d;
+}
+
+.student-table tbody tr:hover {
+    background-color: #3a5ea0;
+}
+
+
+.error-message {
+    color: red;
+    font-size: 1em;
+    margin-top: 10px;
+}

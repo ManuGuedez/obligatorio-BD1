@@ -1,0 +1,126 @@
+.register-container {
+  width: 400px;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.register-container h2 {
+  color: white;
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.register-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.form-group label {
+  color: white;
+  font-weight: 500;
+  text-align: right;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.form-group input {
+  color: black;
+}
+
+.form-group select {
+  color: rgb(105, 101, 101); /* Gris cuando ninguna opción está seleccionada */
+}
+
+/* Estilo para cuando se selecciona una opción en el <select> */
+.form-group select:focus,
+.form-group select:not([value=""]) {
+  color: black; /* Negro cuando se selecciona una opción */
+}
+
+/* Estilo para el campo de fecha */
+.form-group input[type="date"] {
+  color: black;
+  background: rgba(255, 255, 255, 0.9);
+  position: relative;
+}
+
+/* Estilo del icono de calendario en negro */
+.form-group input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1); /* Cambia el color del icono de calendario a negro */
+}
+
+/* Efecto de foco para inputs y select */
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  background: white;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+.register-btn-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.register-btn {
+  padding: 0.5rem 2rem;
+  background-color: #1a365d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.register-btn:hover {
+  background-color: #2c5282;
+}
+
+.register-btn:active {
+  transform: scale(0.98);
+}
+
+@media (max-width: 480px) {
+  .register-container {
+      width: 90%;
+      padding: 1.5rem;
+  }
+
+  .form-group {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+  }
+
+  .form-group label {
+      text-align: left;
+  }
+}

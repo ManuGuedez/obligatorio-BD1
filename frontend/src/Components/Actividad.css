@@ -1,0 +1,126 @@
+/* Contenedor de la tarjeta */
+.activity-card {
+    max-width: 320px; /* Aumenta ligeramente el tamaño */
+    flex: 1 1 auto;
+    background-color: #1a365d;
+    border-radius: 8px;
+    padding: 25px; /* Más espacio interno */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    color: #ffffff;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Botones principales */
+.details-btn,
+.enroll-btn {
+    margin-top: 1rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #ffffff;
+    background-color: #668abc;
+}
+
+.enroll-btn.enrolled {
+    background-color: #3a5a7d;
+    cursor: not-allowed;
+}
+
+/* Switch para el equipamiento */
+.equipment-switch {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1rem;
+    color: #e4e6e8;
+}
+
+.equipment-label {
+    font-size: 0.9rem;
+    margin-right: 0.5rem; /* Espacio entre el texto y el switch */
+    color: white;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 4px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #668abc;
+}
+
+input:checked + .slider:before {
+    transform: translateX(18px);
+}
+
+/* Lista de equipamiento */
+.equipment-list ul {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 1rem;
+}
+
+.equipment-item {
+    margin-bottom: 1rem; /* Más espacio entre cada opción */
+    text-align: left; /* Alinea el texto con el checkbox */
+}
+
+.equipment-item label {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #e4e6e8;
+}
+
+.equipment-item input {
+    margin-right: 0.5rem; /* Espacio entre el checkbox y el texto */
+}
+
+
+.error {
+    color: #ff6f61;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    text-align: center;
+}

@@ -1,0 +1,77 @@
+.instructor-dashboard {
+    height: 100%;
+    padding-top: 120px;
+    height: 100vh;
+    width: 100%;
+}
+
+#inspecciona {
+    text-transform: uppercase;
+    /* Convierte el texto a mayúsculas */
+    letter-spacing: 2px;
+    /* Ajusta el espacio entre letras */
+    color: rgb(106, 142, 252);
+
+}
+
+#root{
+    width: 100%;
+}
+
+.app-container{
+    display: flex;
+}
+
+.instructor-dashboard h1 {
+    font-family: 'Montserrat', sans-serif; /* Asegúrate de tener esta fuente, o usa otra similar */
+    font-weight: 600; /* Ajusta el grosor del texto para hacerlo más fino */
+    font-size: 2em; /* Ajusta el tamaño según tu preferencia */
+    line-height: 1.2; /* Espaciado entre líneas */
+    letter-spacing: 0.5px; /* Ajusta el espaciado entre letras */
+    border-bottom: solid 1px;
+    width: 100%;
+    text-align: left;
+}
+
+h2{
+    font-weight: 600; /* Ajusta el grosor del texto para hacerlo más fino */
+    font-size: 1.5em; /* Ajusta el tamaño según tu preferencia */
+}
+
+.instructor-dashboard2 {
+    display: flex;
+    justify-content: space-between;
+    gap: 50px;
+}
+.classes {
+    display: flex;
+    flex-wrap: wrap; /* Permite que las tarjetas pasen a la siguiente fila cuando no hay espacio */
+    
+    width: 100%;
+    
+}
+
+.classes ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap; /* Asegura que las tarjetas se ajusten en varias filas */
+    gap: 20px;
+}
+
+.classes ul li {
+    background-color: #1e3a8a; /* Color de fondo de las tarjetas */
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: calc(33.33% - 20px); /* Tamaño de cada tarjeta para que quepan tres en una fila (ajústalo según sea necesario) */
+    box-sizing: border-box;
+}
+
+.instructor{
+    width: 100%;
+}
+#noClasse{
+
+}
