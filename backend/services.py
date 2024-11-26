@@ -289,7 +289,7 @@ def is_instructor_busy(instructor_id, turn_id, days_ids, start_date, end_date):
     return len(classes) > 0
 
 def get_person_ci_with_id(person_id):
-    query = 'SELECT person.person_ci FROM person WHERE person_id = %s' #AND person.is_deleted = FALSE
+    query = 'SELECT person.person_ci FROM person WHERE person_id = %s AND person.is_deleted = FALSE'
     cursor.execute(query,(person_id,))
     data = cursor.fetchall()
     
@@ -913,14 +913,14 @@ def get_turn_id(start_time, end_time):
     return cursor.fetchall()
         
 def get_all_instructors():
-    query = 'SELECT person_id AS instructor_id, first_name, last_name FROM instructors'
+    query = 'SELECT person_id AS instructor_id, first_name, last_name FROM instructors WHERE is_deleted = FALSE'
     cursor.execute(query)
     instructors = cursor.fetchall()
     
     return instructors
 
 def get_all_students():
-    query = 'SELECT person_id AS student_id, first_name, last_name FROM students'
+    query = 'SELECT person_id AS student_id, first_name, last_name FROM students WHERE is_deleted = FALSE'
     cursor.execute(query)
     students = cursor.fetchall()
     
@@ -1124,6 +1124,22 @@ def delete_instructor(instructor_ci):
     
     return 1, "Instructor eliminado correctamente."
 
+def is_student(person_ci):
+    query = "SELECT student_ci FROM students WHERE student_ci = %s AND is_deleted = FALSE"
+    cursor.execute(query, (person_ci, ))
+    data = cursor.fetchall()
+    
+    return len(data) > 0
+
+
+def is_instructor(person_ci):
+    query = "SELECT instructor_ci FROM instructors WHERE instructor_ci = %s AND is_deleted = FALSE"
+    cursor.execute(query, (person_ci, ))
+    data = cursor.fetchall()
+    
+    return len(data) > 0
+
+
 def delete_person(person_ci):
     update = 'UPDATE person SET is_deleted = TRUE WHERE person_ci = %s'
     cursor.execute(update, (person_ci, ))
@@ -1132,12 +1148,11 @@ def delete_person(person_ci):
     if cursor.rowcount < 0:
         return -1, "Hubo un error al eliminar la persona."
     
-    delete_login(person_ci)
-    rol = get_rol_by_ci(person_ci)
+    #delete_login(person_ci)
+    if is_student(person_ci):
+        return delete_student(person_ci)
+    elif is_instructor(person_ci):
+        return delete_instructor(person_ci)
     
+    return -1, "Persona no esta ingresada en el sistema."
     
-    match rol:
-        case 'instructor':
-            return delete_instructor(person_ci)
-        case 'student':
-           return delete_student(person_ci)

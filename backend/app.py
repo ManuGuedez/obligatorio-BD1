@@ -843,7 +843,9 @@ def delete_person(id):
     if person_ci == int(get_jwt_identity()):  
         return jsonify({'error': 'No es posible borrar el usuario admin.'}), 400
     
-    result, message = services.delete_person(person_ci)
+    result, message= services.delete_person(person_ci)
+    
+
     
     if result:
         return jsonify({'message': 'Person deleted successfully'}), 200

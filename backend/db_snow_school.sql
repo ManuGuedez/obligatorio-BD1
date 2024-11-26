@@ -530,3 +530,23 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON snowSchool.* TO 'app_user'@'%';
 FLUSH PRIVILEGES;
 
 SHOW GRANTS FOR 'app_user'@'%';
+
+
+-- Creación de usuario para realizar unicamente operaciones de CRUD desde la app
+CREATE USER 'app_user'@'%' IDENTIFIED BY 'obligatorio_bd1';
+
+-- Se otorgan permisos de CRUD sobre todas las tablas de la bd del proyecto
+GRANT SELECT, INSERT, UPDATE, DELETE ON snowSchool.* TO 'app_user'@'%';
+FLUSH PRIVILEGES;
+
+SHOW GRANTS FOR 'app_user'@'%';
+
+
+SELECT person.person_ci FROM person WHERE person_id = 7 AND person.is_deleted = FALSE
+
+UPDATE person SET is_deleted = FALSE WHERE person_ci = 56542342
+
+    SELECT r.role_name
+    FROM roles r
+    JOIN login l on r.role_id = l.role_id
+    where l.person_ci = 56542342 -- AND l.is_deleted = FALSE

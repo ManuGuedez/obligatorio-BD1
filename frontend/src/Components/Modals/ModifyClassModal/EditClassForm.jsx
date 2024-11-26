@@ -21,6 +21,7 @@ const EditClassForm = ({ classData, onBack, editType }) => {
                     const turnsResponse = await ApiService.get("turns", token);
                     if (turnsResponse.code === 200) {
                         setTurns(turnsResponse.data);
+                        onSuccess();
                     }
                 }
             } catch (error) {
