@@ -1225,13 +1225,24 @@ def get_turns_with_most_classes():
         return 1, results
     return -1, "No se encontraron datos."
 
+def has_account(person_ci):
+    query = "SELECT * FROM login WHERE person_ci = %s AND is_deleted = FALSE"
+    cursor.execute(query, (person_ci,))
+    data = cursor.fetchall()
+    return len(data) > 0
+
 def modify_instructor_name(instructor_ci, new_name):
     """
     Modifica el nombre de un instructor.
     """
+    update = 'UPDATE person SET name = %s WHERE person_ci = %s'
+    cursor.execute(update, (new_name, instructor_ci))
+    cnx.commit()
+    
     update = 'UPDATE instructors SET first_name = %s WHERE instructor_ci = %s'
     cursor.execute(update, (new_name, instructor_ci))
     cnx.commit()
+    
     if cursor.rowcount < 0:
         return -1, "Hubo un error al modificar el nombre del instructor."
 
@@ -1241,9 +1252,14 @@ def modify_student_name(student_ci, new_name):
     """
     Modifica el nombre de un estudiante.
     """
+    update = 'UPDATE person SET name = %s WHERE person_ci = %s'
+    cursor.execute(update, (new_name, student_ci))
+    cnx.commit()    
+    
     update = 'UPDATE students SET first_name = %s WHERE student_ci = %s'
     cursor.execute(update, (new_name, student_ci))
     cnx.commit()
+    
     if cursor.rowcount < 0:
         return -1, "Hubo un error al modificar el nombre del estudiante."
     return 1, "Nombre del estudiante modificado correctamente."
@@ -1252,9 +1268,14 @@ def modify_instructor_last_name(instructor_ci, new_last_name):
     """
     Modifica el apellido de un instructor.
     """
+    update = 'UPDATE person SET last_name = %s WHERE person_ci = %s'
+    cursor.execute(update, (new_last_name, instructor_ci))
+    cnx.commit()
+    
     update = 'UPDATE instructors SET last_name = %s WHERE instructor_ci = %s'
     cursor.execute(update, (new_last_name, instructor_ci))
     cnx.commit()
+        
     if cursor.rowcount < 0:
         return -1, "Hubo un error al modificar el apellido del instructor."
     return 1, "Apellido del instructor modificado correctamente."
@@ -1263,9 +1284,14 @@ def modify_student_last_name(student_ci, new_last_name):
     """
     Modifica el apellido de un estudiante.
     """
-    update = 'UPDATE students SET last_name = %s WHERE student_ci = %s'
+    update = 'UPDATE person SET last_name = %s WHERE person_ci = %s'
     cursor.execute(update, (new_last_name, student_ci))
     cnx.commit()
+    
+    update = 'UPDATE students SET last_name = %s WHERE student_ci = %s'
+    cursor.execute(update, (new_last_name, student_ci))
+    cnx.commit()        
+    
     if cursor.rowcount < 0:
         return -1, "Hubo un error al modificar el apellido del estudiante."
     return 1, "Apellido del estudiante modificado correctamente."
