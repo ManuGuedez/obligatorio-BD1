@@ -30,12 +30,10 @@ const StudentClassesModal = ({ onClose, studentId }) => {
         ApiService.delete(`classes/${classId}/remove-student`, token, requestBody)
             .then(() => {
                 setClasses(classes.filter(c => c.id !== classId));
-                alert('Clase eliminada con éxito');
                 onClose(); // Cierra el modal después del borrado exitoso
             })
             .catch(error => {
                 console.log('Error deleting class:', error);
-                alert('Error al eliminar la clase');
             });
     };
     

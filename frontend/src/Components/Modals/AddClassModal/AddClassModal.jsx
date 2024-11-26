@@ -10,10 +10,18 @@ const AddClassModal = ({ onClose }) => {
     activity: "",
     turn: "",
     days: "",
+    type: "grupal",
   });
 
   const [turns, setTurns] = useState([]);
   const [ativities, setAtivities] = useState([]);
+  const [weekdays, setWeekdays] = useState([
+    { name: "lunes", selected: false },
+    { name: "martes", selected: false },
+    { name: "miercoles", selected: false },
+    { name: "jueves", selected: false },
+    { name: "viernes", selected: false },
+  ]);
 
   useEffect(() => {
     const getInfo = async () => {
@@ -41,8 +49,27 @@ const AddClassModal = ({ onClose }) => {
     }));
   };
 
+  const handleCheckboxChange = (day) => {
+    setWeekdays((prevDays) =>
+      prevDays.map((weekday) =>
+        weekday.name === day
+          ? { ...weekday, selected: !weekday.selected }
+          : weekday
+      )
+    );
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const selectedDays = weekdays
+      .filter((day) => day.selected)
+      .map((day) => day.name);
+
+    if (selectedDays.length === 0) {
+      alert("Por favor selecciona al menos un día de la semana.");
+      return;
+    }
 
     try {
       const newClass = {
@@ -51,10 +78,10 @@ const AddClassModal = ({ onClose }) => {
         end_date: new Date(formData.end_date).toISOString().split("T")[0],
         activity: formData.activity,
         turn: parseInt(formData.turn),
-        days: formData.days.split(",").map((day) => day.trim().toLowerCase()),
-        type: formData.type || null,
+        days: selectedDays,
+        type: formData.type,
       };
-
+      console.log(selectedDays);
       const response = await ApiService.post(
         "classes/new-class",
         newClass,
@@ -62,9 +89,15 @@ const AddClassModal = ({ onClose }) => {
         localStorage.getItem("token")
       );
 
-      if (response.status === 200) {
+      if (response.code === 200) {
         onClose();
+        alert(response.json().msj);
         window.location.reload();
+      } else {
+        alert(
+          "Error al crear la clase. Por favor, inténtalo de nuevo.",
+          response.error
+        );
       }
     } catch (error) {
       console.error(
@@ -152,6 +185,18 @@ const AddClassModal = ({ onClose }) => {
             </div>
 
             <div className={classes.formGroup}>
+              <label>Tipo de Clase:</label>
+              <select
+                name="type"
+                value={formData.type}
+                onChange={handleInputChange}
+              >
+                <option value="grupal">Grupal</option>
+                <option value="individual">Individual</option>
+              </select>
+            </div>
+
+            {/* <div className={classes.formGroup}>
               <label>Días (separados por coma):</label>
               <input
                 type="text"
@@ -161,6 +206,21 @@ const AddClassModal = ({ onClose }) => {
                 placeholder="lunes,martes,miercoles"
                 required
               />
+            </div> */}
+            <div className={classes.formGroup}>
+              <label>Días de la Semana:</label>
+              <div className={classes.checkboxContainer}>
+                {weekdays.map((day) => (
+                  <label key={day.name} className={classes.checkboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={day.selected}
+                      onChange={() => handleCheckboxChange(day.name)}
+                    />
+                    {day.name}
+                  </label>
+                ))}
+              </div>
             </div>
 
             <div className={classes.modalFooter}>

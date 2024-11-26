@@ -1,7 +1,6 @@
 import React from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import "./App.css";
-import NavBar from "./Components/NavBar.jsx";
 import Admin from "./Pages/Admin.jsx";
 import Alumno from "./Pages/Alumno/Alumno.jsx";
 import Home from "./Pages/Home.jsx";
@@ -9,16 +8,12 @@ import Instructor from "./Pages/Instructor.jsx";
 import Lista from "./Pages/Lista";
 import LogIn from "./Pages/LogIn.jsx";
 import Register from "./Pages/Register.jsx";
+import ClassDetails from "./Pages/ClassDetails.jsx";
 
 const App = () => {
-  const location = useLocation();
-
-  // Define rutas en las que no deseas que aparezca la NavBar
-  const noNavBarRoutes = ["/LogIn", "/Register", "/register", "/login"];
   return (
     <div>
       <div className="app-container">
-        {!noNavBarRoutes.includes(location.pathname) && <NavBar />}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/Register" element={<Register />} />
@@ -26,7 +21,7 @@ const App = () => {
           <Route path="/Alumno" element={<Alumno />} />
           <Route path="/Instructor" element={<Instructor />} />
           <Route path="/Admin" element={<Admin />} />
-          <Route path="/class/:classId" element={<Lista />} />
+          <Route path="/class/:classId" element={<ClassDetails />} />
         </Routes>
       </div>
     </div>
