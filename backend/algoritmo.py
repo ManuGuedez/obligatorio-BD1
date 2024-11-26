@@ -34,9 +34,5 @@ def generar_calendario(start_date, end_date, dias_clase): #start_date, end_date,
         dia_actual += timedelta(days=1)
 
 
-    print("Días en los que se dicta clase en noviembre de 2024:")
-    # for dia in dias_marcados:
-        # print(dia)
-
         
     return dias_marcados

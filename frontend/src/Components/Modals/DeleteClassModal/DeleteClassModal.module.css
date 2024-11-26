@@ -16,6 +16,8 @@
     border-radius: 8px;
     width: 80%;
     max-width: 500px;
+    color: black;
+    height: 90%;
 }
 
 .classItem {
@@ -52,6 +54,8 @@ button:hover {
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
     padding: 20px;
+    max-height: 85%;
+    overflow-y: auto;
 }
 
 .classItem {

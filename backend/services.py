@@ -1,6 +1,6 @@
 import mysql.connector as mysql
 
-cnx = mysql.connect(user='app_user', password='obligatorio_bd1', host='127.0.0.1', database='snowSchool') 
+cnx = mysql.connect(user='app_user', password='obligatorio_bd1', host='127.0.0.1', database='snowSchool') #host.docker.internal #mysql
 cursor = cnx.cursor(dictionary=True) # devuelve la info en formato key-value
 from mysql.connector.errors import IntegrityError
 import algoritmo
@@ -314,7 +314,7 @@ def get_activities():
 def add_class(instructor_ci, activity_id, turn_id, start_date, end_date, days_ids, type):
     
     try:
-        if type:
+        if type == 'individual':
             is_group = False
         else:
             is_group = True
@@ -598,12 +598,13 @@ def remove_student_from_class(class_id, student_ci):
 
 def get_available_classes(student_ci):
     query = """
-        SELECT DISTINCT c.class_id, d.day_name, t.start_time, t.end_time
+        SELECT DISTINCT c.class_id, d.day_name, t.start_time, t.end_time, a.description, a.cost
         FROM classes c
         JOIN class_day cd ON c.class_id = cd.class_id
         JOIN days d ON cd.day_id = d.day_id
         JOIN turns t ON c.turn_id = t.turn_id
         LEFT JOIN student_class sc ON c.class_id = sc.class_id
+        JOIN activities a ON c.activity_id = a.activity_id
         WHERE ((c.is_group = TRUE
             AND (SELECT COUNT(*) FROM student_class WHERE class_id = c.class_id) < 10)
             OR (c.is_group = FALSE 
@@ -642,7 +643,7 @@ def get_available_classes(student_ci):
         if not classes.get(class_id):
             end_time = current_class['end_time']
             start_time = current_class['start_time']
-            classes[class_id] = {'class_id': class_id, 'days': [day_name], 'start_time': start_time, 'end_time': end_time}
+            classes[class_id] = {'class_id': class_id, 'days': [day_name], 'start_time': start_time, 'end_time': end_time, 'description': current_class['description'], 'cost': current_class['cost']}
         else:
             c = classes.get(class_id)
             days = c.get("days")
@@ -711,6 +712,7 @@ def get_extended_class_info(class_id):
         JOIN activities ON (c.activity_id = activities.activity_id)
         JOIN turns ON (c.turn_id = turns.turn_id)
         JOIN instructors i on (c.instructor_ci = i.instructor_ci)
+        JOIN class_day cd ON (c.class_id = cd.class_id)
     WHERE c.class_id = %s AND c.is_deleted = FALSE
     """
     cursor.execute(query, (class_id, ))
@@ -769,7 +771,7 @@ def get_id_class_session(class_id, date):
     return data[0]['id_class_session']
     
 def clase_dictada(id_class_session):
-    update = 'UPDATE class_session SET dictated = %s WHERE id_class_session = %s AND cs.is_deleted = FALSE'
+    update = 'UPDATE class_session SET dictated = %s WHERE id_class_session = %s AND is_deleted = FALSE'
     cursor.execute(update, (True, id_class_session, ))
     cnx.commit() 
     return cursor.rowcount >= 0
@@ -806,6 +808,7 @@ def roll_call(class_id, students_present):
             cnx.commit()  
     
     for student_id in students_present:
+        print("entra al for")
         if not marcar_asistencia(id_class_session, student_id):
             return -1, f"Algo salió mal al marcar la asistencia. {student_id}"
     
@@ -1156,3 +1159,113 @@ def delete_person(person_ci):
     
     return -1, "Persona no esta ingresada en el sistema."
     
+
+#########################################
+#REPORTES#
+
+def get_activities_with_most_students():
+    """
+    Devuelve las actividades con más alumnos inscritos.
+    """
+    query = """
+    SELECT 
+        a.description AS activity,
+        COUNT(sc.student_ci) AS student_count
+    FROM activities a
+    JOIN classes c ON a.activity_id = c.activity_id
+    JOIN student_class sc ON c.class_id = sc.class_id
+    WHERE c.is_deleted = FALSE AND sc.is_deleted = FALSE
+    GROUP BY a.activity_id
+    ORDER BY student_count DESC;
+    """
+    cursor.execute(query)
+    results = cursor.fetchall()
+    return 1, results if results else (-1, "No se encontraron datos.")
+
+def get_top_income_activities():
+    """
+    Devuelve las actividades con mayores ingresos generados.
+    """
+    query = """
+    SELECT
+        a.description AS activity,
+        (a.cost + COALESCE(SUM(e.cost), 0)) AS total_income
+    FROM activities a
+    LEFT JOIN equipment e ON a.activity_id = e.activity_id
+    GROUP BY a.activity_id 
+    ORDER BY total_income DESC;
+    """
+    cursor.execute(query)
+    results = cursor.fetchall()
+    return 1, results if results else (-1, "No se encontraron datos.")
+
+def get_turns_with_most_classes():
+    """
+    Devuelve los turnos con más clases dictadas.
+    """
+    query = """
+    SELECT 
+        t.start_time,
+        t.end_time,
+        COUNT(c.class_id) AS total_classes
+    FROM turns t
+    JOIN classes c ON t.turn_id = c.turn_id
+    WHERE c.is_deleted = FALSE
+    GROUP BY t.turn_id
+    ORDER BY total_classes DESC;
+    """
+    cursor.execute(query)
+    results = cursor.fetchall()
+    if results:
+        for turn in results:
+            #formatea los turnos para que se vean facha, Hora y minutos nomas
+            turn['start_time'] = cast_time(turn['start_time'])
+            turn['end_time'] = cast_time(turn['end_time'])
+        print(results)
+        return 1, results
+    return -1, "No se encontraron datos."
+
+def modify_instructor_name(instructor_ci, new_name):
+    """
+    Modifica el nombre de un instructor.
+    """
+    update = 'UPDATE instructors SET first_name = %s WHERE instructor_ci = %s'
+    cursor.execute(update, (new_name, instructor_ci))
+    cnx.commit()
+    if cursor.rowcount < 0:
+        return -1, "Hubo un error al modificar el nombre del instructor."
+
+    return 1, "Nombre del instructor modificado correctamente."
+
+def modify_student_name(student_ci, new_name):
+    """
+    Modifica el nombre de un estudiante.
+    """
+    update = 'UPDATE students SET first_name = %s WHERE student_ci = %s'
+    cursor.execute(update, (new_name, student_ci))
+    cnx.commit()
+    if cursor.rowcount < 0:
+        return -1, "Hubo un error al modificar el nombre del estudiante."
+    return 1, "Nombre del estudiante modificado correctamente."
+
+def modify_instructor_last_name(instructor_ci, new_last_name):
+    """
+    Modifica el apellido de un instructor.
+    """
+    update = 'UPDATE instructors SET last_name = %s WHERE instructor_ci = %s'
+    cursor.execute(update, (new_last_name, instructor_ci))
+    cnx.commit()
+    if cursor.rowcount < 0:
+        return -1, "Hubo un error al modificar el apellido del instructor."
+    return 1, "Apellido del instructor modificado correctamente."
+
+def modify_student_last_name(student_ci, new_last_name):
+    """
+    Modifica el apellido de un estudiante.
+    """
+    update = 'UPDATE students SET last_name = %s WHERE student_ci = %s'
+    cursor.execute(update, (new_last_name, student_ci))
+    cnx.commit()
+    if cursor.rowcount < 0:
+        return -1, "Hubo un error al modificar el apellido del estudiante."
+    return 1, "Apellido del estudiante modificado correctamente."

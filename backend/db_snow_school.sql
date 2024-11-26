@@ -550,3 +550,6 @@ UPDATE person SET is_deleted = FALSE WHERE person_ci = 56542342
     FROM roles r
     JOIN login l on r.role_id = l.role_id
     where l.person_ci = 56542342 -- AND l.is_deleted = FALSE
+
+
+SELECT person.person_ci FROM person WHERE person_id = 22 AND person.is_deleted = FALSE;

@@ -15,7 +15,8 @@
     background-color: white;
     border-radius: 8px;
     width: 90%;
-    max-width: 500px;
+    max-width: 500px;    
+    color: black;
     padding: 20px;
 }
 

@@ -3,8 +3,8 @@ import { useParams } from "react-router-dom";
 import ServiceInstructor from "../Services/instructorServices";
 import "./Lista.css";
 
-const Lista = () => {
-  const { classId } = useParams(); // Obtener el ID de la clase desde la URL
+const Lista = ( {classId}) => {
+  // const { classId } = useParams(); // Obtener el ID de la clase desde la URL
   const [students, setStudents] = useState([]);
   const token = localStorage.getItem("token"); // Recuperar token del localStorage
   const [error, setError] = useState("");
